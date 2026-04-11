@@ -34,7 +34,7 @@
     --input: 220 15% 90%;
     --ring: 42 80% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --gold: 42 80% 55%;
     --gold-light: 42 70% 75%;
@@ -43,6 +43,9 @@
     --navy-light: 220 30% 35%;
     --navy-dark: 220 45% 12%;
     --cream: 45 40% 96%;
+
+    --glass: 0 0% 100% / 0.6;
+    --glass-border: 0 0% 100% / 0.2;
 
     --sidebar-background: 220 40% 20%;
     --sidebar-foreground: 220 15% 90%;
@@ -74,6 +77,8 @@
     --border: 220 30% 20%;
     --input: 220 30% 20%;
     --ring: 42 80% 55%;
+    --glass: 220 40% 12% / 0.6;
+    --glass-border: 220 30% 30% / 0.3;
     --sidebar-background: 220 45% 8%;
     --sidebar-foreground: 220 15% 90%;
     --sidebar-primary: 42 80% 55%;
@@ -97,6 +102,10 @@
   h1, h2, h3, h4 {
     font-family: 'Playfair Display', serif;
   }
+
+  ::selection {
+    background: hsl(42 80% 55% / 0.3);
+  }
 }
 
 @layer utilities {
@@ -105,6 +114,39 @@
   }
   .font-sans {
     font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Glass utilities */
+@layer components {
+  .glass {
+    @apply backdrop-blur-xl border border-white/[0.15];
+    background: hsla(var(--glass));
+  }
+  .glass-card {
+    @apply backdrop-blur-xl rounded-2xl border border-white/[0.12] shadow-xl;
+    background: hsla(var(--glass));
+  }
+  .glass-nav {
+    @apply backdrop-blur-2xl border-b border-white/[0.08];
+    background: hsla(220 40% 20% / 0.85);
+  }
+  .glass-dark {
+    @apply backdrop-blur-xl rounded-2xl border border-white/[0.08];
+    background: hsla(220 45% 12% / 0.8);
+  }
+  .glass-input {
+    @apply backdrop-blur-sm rounded-xl border border-border/50 bg-background/50;
+  }
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(42 80% 55%), hsl(42 70% 75%), hsl(42 85% 40%));
+  }
+  .glow-gold {
+    box-shadow: 0 0 40px -10px hsl(42 80% 55% / 0.4);
+  }
+  .glow-sm-gold {
+    box-shadow: 0 0 20px -5px hsl(42 80% 55% / 0.3);
   }
 }
 
@@ -172,4 +214,32 @@
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px -5px hsl(42 80% 55% / 0.2); }
+  50% { box-shadow: 0 0 40px -5px hsl(42 80% 55% / 0.5); }
+}
+
+@keyframes blur-in {
+  from {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
 }

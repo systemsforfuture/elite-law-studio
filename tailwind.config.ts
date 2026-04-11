@@ -115,6 +115,10 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        "blur-in": {
+          from: { opacity: "0", filter: "blur(12px)", transform: "translateY(10px)" },
+          to: { opacity: "1", filter: "blur(0)", transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -126,6 +130,7 @@ export default {
         "scale-in": "scale-in 0.5s ease-out forwards",
         shimmer: "shimmer 3s linear infinite",
         float: "float 6s ease-in-out infinite",
+        "blur-in": "blur-in 0.8s ease-out forwards",
       },
     },
   },

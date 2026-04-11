@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Scale, Eye, EyeOff } from "lucide-react";
+import { Scale, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Login = () => {
@@ -14,58 +14,69 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-navy relative overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 opacity-10">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full border border-accent/20"
-              style={{
-                width: `${200 + i * 150}px`,
-                height: `${200 + i * 150}px`,
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-              }}
-            />
-          ))}
+    <div className="min-h-screen flex">
+      {/* Left panel - immersive dark */}
+      <div className="hidden lg:flex lg:w-[45%] bg-navy-dark relative overflow-hidden items-center justify-center">
+        {/* Background effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] bg-accent/[0.06] rounded-full blur-[100px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-[200px] h-[200px] bg-accent/[0.04] rounded-full blur-[80px]" />
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: `linear-gradient(hsl(42 80% 55% / 0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(42 80% 55% / 0.3) 1px, transparent 1px)`,
+            backgroundSize: '50px 50px'
+          }} />
         </div>
-        <div className="relative text-center px-12">
-          <Scale className="h-16 w-16 text-accent mx-auto mb-6" />
-          <h2 className="text-3xl font-serif font-bold text-primary-foreground mb-4">
-            Willkommen im<br />Mandanten-Portal
+
+        <div className="relative text-center px-16 max-w-lg">
+          <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-8 glow-sm-gold">
+            <Scale className="h-10 w-10 text-accent" />
+          </div>
+          <h2 className="text-4xl font-serif font-bold text-primary-foreground mb-5 leading-tight">
+            Willkommen im
+            <br />
+            <span className="text-gradient-gold">Mandanten-Portal</span>
           </h2>
-          <p className="text-primary-foreground/60 max-w-sm mx-auto">
+          <p className="text-primary-foreground/40 font-light leading-relaxed">
             Verfolgen Sie den Status Ihres Falles, kommunizieren Sie sicher mit Ihrem Anwalt 
             und laden Sie Dokumente hoch – alles an einem Ort.
           </p>
+
+          {/* Features list */}
+          <div className="mt-12 space-y-4 text-left">
+            {["Ende-zu-Ende verschlüsselt", "24/7 Fallstatus einsehen", "Sichere Dokumentenübertragung"].map((f) => (
+              <div key={f} className="flex items-center gap-3 text-sm text-primary-foreground/30">
+                <div className="w-1 h-1 rounded-full bg-accent" />
+                {f}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
-          <Link to="/" className="flex items-center gap-3 mb-10 lg:hidden">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-background relative">
+        <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-accent/[0.03] rounded-full blur-[100px]" />
+        
+        <div className="w-full max-w-md relative">
+          <Link to="/" className="flex items-center gap-3 mb-12 lg:hidden">
             <Scale className="h-8 w-8 text-accent" />
             <span className="text-xl font-serif font-bold text-foreground">KANZLEI BERGMANN</span>
           </Link>
 
-          <h1 className="text-2xl font-serif font-bold text-foreground mb-2">Anmelden</h1>
-          <p className="text-sm text-muted-foreground mb-8">
+          <h1 className="text-3xl font-serif font-bold text-foreground mb-2">Anmelden</h1>
+          <p className="text-sm text-muted-foreground mb-10 font-light">
             Melden Sie sich in Ihrem Konto an, um fortzufahren.
           </p>
 
-          {/* Role toggle */}
-          <div className="flex rounded-lg border border-border p-1 mb-8">
+          {/* Role toggle - glassmorphism */}
+          <div className="flex rounded-2xl border border-border/50 bg-muted/30 backdrop-blur-sm p-1 mb-8">
             {(["mandant", "mitarbeiter"] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRole(r)}
-                className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all duration-300 ${
+                className={`flex-1 py-3 text-sm font-medium rounded-xl transition-all duration-500 ${
                   role === r
-                    ? "bg-navy text-primary-foreground shadow-sm"
+                    ? "bg-navy text-primary-foreground shadow-lg shadow-navy/20"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -76,25 +87,25 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">E-Mail</label>
+              <label className="block text-sm font-medium text-foreground mb-2">E-Mail</label>
               <input
                 type="email"
                 placeholder="name@beispiel.de"
-                className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all placeholder:text-muted-foreground/40"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">Passwort</label>
+              <label className="block text-sm font-medium text-foreground mb-2">Passwort</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring pr-10"
+                  className="w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all pr-12 placeholder:text-muted-foreground/40"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -102,23 +113,24 @@ const Login = () => {
             </div>
 
             <div className="flex justify-between items-center text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-input" />
-                <span className="text-muted-foreground">Angemeldet bleiben</span>
+              <label className="flex items-center gap-2.5 cursor-pointer group">
+                <input type="checkbox" className="rounded-md border-border accent-accent" />
+                <span className="text-muted-foreground group-hover:text-foreground transition-colors">Angemeldet bleiben</span>
               </label>
-              <a href="#" className="text-accent hover:underline font-medium">
+              <a href="#" className="text-accent hover:text-gold-dark transition-colors font-medium">
                 Passwort vergessen?
               </a>
             </div>
 
-            <Button variant="gold" className="w-full" size="lg" type="submit">
+            <Button variant="gold" className="w-full rounded-xl glow-sm-gold group" size="lg" type="submit">
               Anmelden
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-8">
+          <p className="text-center text-sm text-muted-foreground mt-10">
             Noch kein Konto?{" "}
-            <a href="#" className="text-accent hover:underline font-medium">
+            <a href="#" className="text-accent hover:text-gold-dark transition-colors font-medium">
               Kontaktieren Sie uns
             </a>
           </p>
