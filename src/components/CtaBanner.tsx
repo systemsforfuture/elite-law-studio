@@ -8,14 +8,14 @@ const CtaBanner = () => {
   return (
     <section className="py-28 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-navy-dark via-navy to-navy-dark" />
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: `linear-gradient(hsl(42 80% 55% / 0.3) 1px, transparent 1px), linear-gradient(90deg, hsl(42 80% 55% / 0.3) 1px, transparent 1px)`,
-        backgroundSize: '40px 40px'
+      <div className="absolute inset-0 opacity-[0.02]" style={{
+        backgroundImage: `radial-gradient(hsl(42 80% 55% / 0.4) 1px, transparent 1px)`,
+        backgroundSize: '32px 32px'
       }} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/[0.06] rounded-full blur-[150px]" />
 
       <div className="container mx-auto px-6 relative" ref={ref}>
-        <div className={`text-center max-w-3xl mx-auto ${isVisible ? "animate-blur-in" : "opacity-0"}`}>
+        <div className={`text-center max-w-3xl mx-auto transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-[0.98]"}`}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400/60" />
@@ -24,7 +24,7 @@ const CtaBanner = () => {
             <span className="text-xs text-accent font-medium">Noch heute einen Termin sichern</span>
           </div>
 
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-primary-foreground mb-6">
+          <h2 className="text-4xl md:text-6xl font-display font-black text-primary-foreground mb-6 tracking-[-0.03em]">
             Lassen Sie uns Ihr <span className="text-gradient-gold">Recht durchsetzen</span>
           </h2>
           <p className="text-lg text-primary-foreground/50 font-light mb-10 max-w-xl mx-auto">
@@ -46,7 +46,6 @@ const CtaBanner = () => {
             </a>
           </div>
 
-          {/* Trust badges */}
           <div className="flex flex-wrap justify-center gap-6 text-primary-foreground/30 text-xs">
             <span className="flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> 100% vertraulich</span>
             <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> Antwort in 2h</span>

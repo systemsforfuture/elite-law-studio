@@ -24,6 +24,10 @@ const faqs = [
     q: "Wie ist die Erfolgsquote Ihrer Kanzlei?",
     a: "Wir erreichen eine Erfolgsquote von 97% – ob durch außergerichtliche Einigungen oder Gerichtsverfahren. Jeder Fall wird individuell mit einer maßgeschneiderten Strategie bearbeitet.",
   },
+  {
+    q: "Wie funktioniert das Mandanten-Portal?",
+    a: "Nach Beauftragung erhalten Sie Zugang zu unserem sicheren Portal. Dort können Sie Dokumente hochladen, Nachrichten an Ihren Anwalt senden, Termine vereinbaren und den Fortschritt Ihres Falls in Echtzeit verfolgen.",
+  },
 ];
 
 const FaqSection = () => {
@@ -36,20 +40,20 @@ const FaqSection = () => {
 
       <div className="container mx-auto px-6" ref={ref}>
         <div className="grid lg:grid-cols-5 gap-16">
-          <div className="lg:col-span-2">
+          <div className={`lg:col-span-2 transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent mb-4">
               <span className="w-8 h-px bg-accent/50" />
               FAQ
             </span>
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mt-3 mb-6">
+            <h2 className="text-4xl md:text-5xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em]">
               Häufig gestellte <span className="text-gradient-gold">Fragen</span>
             </h2>
             <p className="text-muted-foreground text-lg font-light leading-relaxed mb-8">
-              Noch Fragen? Wir helfen Ihnen gerne weiter.
+              Antworten auf die wichtigsten Fragen – transparent und ehrlich.
             </p>
             <a href="#kontakt">
               <Button variant="gold" className="rounded-2xl group">
-                Frage stellen
+                Individuelle Frage stellen
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </a>
@@ -59,16 +63,16 @@ const FaqSection = () => {
             {faqs.map((faq, i) => (
               <div
                 key={i}
-                className={`rounded-2xl border border-border/50 overflow-hidden transition-all duration-500 ${
-                  openIndex === i ? "bg-card shadow-lg shadow-accent/[0.03]" : "bg-transparent hover:bg-card/50"
+                className={`rounded-2xl border border-border/50 overflow-hidden transition-all duration-700 ${
+                  openIndex === i ? "bg-card shadow-lg shadow-accent/[0.03] border-accent/20" : "bg-transparent hover:bg-card/50"
                 } ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-                style={{ transitionDelay: `${i * 80}ms` }}
+                style={{ transitionDelay: `${200 + i * 80}ms` }}
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                  className="w-full flex items-center justify-between p-6 text-left"
+                  className="w-full flex items-center justify-between p-6 text-left group"
                 >
-                  <span className="text-sm font-medium text-foreground pr-4">{faq.q}</span>
+                  <span className={`text-sm font-medium pr-4 transition-colors duration-300 ${openIndex === i ? "text-accent" : "text-foreground group-hover:text-foreground/80"}`}>{faq.q}</span>
                   <ChevronDown
                     className={`h-4 w-4 text-accent shrink-0 transition-transform duration-300 ${
                       openIndex === i ? "rotate-180" : ""
