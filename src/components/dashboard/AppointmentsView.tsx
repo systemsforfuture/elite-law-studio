@@ -92,7 +92,7 @@ const AppointmentsView = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-serif font-bold text-foreground mb-1">Termine</h2>
+          <h2 className="text-lg font-display font-bold text-foreground mb-1">Termine</h2>
           <p className="text-sm text-muted-foreground">Ihre anstehenden Termine und Verhandlungen</p>
         </div>
         <Button variant="navy" size="sm" className="rounded-xl" onClick={() => setShowForm(!showForm)}>

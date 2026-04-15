@@ -50,7 +50,7 @@ const TeamSection = () => {
             Unser Team
             <span className="w-8 h-px bg-accent/50" />
           </span>
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-foreground mt-3 mb-5">
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-foreground mt-3 mb-5">
             Die <span className="text-gradient-gold">Köpfe</span> hinter Ihrem Recht
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light">
@@ -81,11 +81,11 @@ const TeamSection = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-navy-dark via-navy-dark/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
 
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="text-base font-serif font-bold text-primary-foreground mb-1">{member.name}</h3>
+                <h3 className="text-base font-display font-bold text-primary-foreground mb-1">{member.name}</h3>
                 <p className="text-xs text-primary-foreground/50 mb-2 leading-relaxed">{member.role}</p>
 
                 {/* Quote - always visible */}
-                <p className="text-xs text-accent/80 italic mb-3 font-serif">„{member.quote}"</p>
+                <p className="text-xs text-accent/80 italic mb-3 font-display">„{member.quote}"</p>
 
                 {/* Specialties - show on hover */}
                 <div className="flex flex-wrap gap-1.5 mb-4 max-h-0 group-hover:max-h-20 overflow-hidden transition-all duration-500">

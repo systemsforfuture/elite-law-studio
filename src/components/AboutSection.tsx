@@ -15,7 +15,7 @@ const AboutSection = () => {
               <span className="w-8 h-px bg-accent/50" />
               Über uns
             </span>
-            <h2 className="text-4xl md:text-6xl font-serif font-bold text-foreground mt-3 mb-8">
+            <h2 className="text-4xl md:text-6xl font-display font-bold text-foreground mt-3 mb-8">
               Vertrauen durch{" "}
               <span className="text-gradient-gold">Kompetenz</span>
             </h2>
@@ -49,7 +49,7 @@ const AboutSection = () => {
                 <div className="absolute top-0 right-0 w-40 h-40 bg-accent/[0.08] rounded-full blur-[60px]" />
                 
                 <div className="relative">
-                  <div className="text-7xl font-serif font-bold text-gradient-gold mb-2">25+</div>
+                  <div className="text-7xl font-display font-bold text-gradient-gold mb-2">25+</div>
                   <div className="text-sm text-primary-foreground/40 uppercase tracking-[0.2em] mb-10">Jahre Erfahrung</div>
                   
                   <div className="grid grid-cols-2 gap-8">
@@ -60,7 +60,7 @@ const AboutSection = () => {
                       { value: "4.9★", label: "Bewertung" },
                     ].map(({ value, label }) => (
                       <div key={label} className="group">
-                        <div className="text-3xl font-serif font-bold text-primary-foreground group-hover:text-accent transition-colors duration-300">{value}</div>
+                        <div className="text-3xl font-display font-bold text-primary-foreground group-hover:text-accent transition-colors duration-300">{value}</div>
                         <div className="text-xs text-primary-foreground/30 uppercase tracking-wider mt-1">{label}</div>
                       </div>
                     ))}

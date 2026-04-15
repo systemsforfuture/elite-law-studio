@@ -26,7 +26,7 @@ const TrustSection = () => {
               <span className="w-8 h-px bg-accent/50" />
               Warum wir
             </span>
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mt-3 mb-6">
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mt-3 mb-6">
               Ihr Vorteil mit <span className="text-gradient-gold">Kanzlei Bergmann</span>
             </h2>
             <p className="text-muted-foreground text-lg font-light leading-relaxed mb-8">

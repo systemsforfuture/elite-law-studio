@@ -100,7 +100,7 @@ const DocumentsView = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-serif font-bold text-foreground mb-1">Dokumente</h2>
+        <h2 className="text-lg font-display font-bold text-foreground mb-1">Dokumente</h2>
         <p className="text-sm text-muted-foreground">Verwalten und laden Sie Ihre Dokumente hoch</p>
       </div>
 

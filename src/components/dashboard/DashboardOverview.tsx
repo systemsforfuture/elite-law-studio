@@ -36,7 +36,7 @@ const DashboardOverview = ({ onNavigate }: Props) => {
     <div className="space-y-8">
       {/* Case Status Tracker */}
       <div className="glass-card p-8 border-border/50">
-        <h2 className="text-lg font-serif font-bold text-foreground mb-1">Fallstatus-Tracker</h2>
+        <h2 className="text-lg font-display font-bold text-foreground mb-1">Fallstatus-Tracker</h2>
         <p className="text-sm text-muted-foreground mb-8">Ihr aktueller Fallstatus auf einen Blick</p>
         <div className="flex items-center justify-between">
           {steps.map((step, i) => (
@@ -68,7 +68,7 @@ const DashboardOverview = ({ onNavigate }: Props) => {
 
       {/* My Cases */}
       <div>
-        <h2 className="text-lg font-serif font-bold text-foreground mb-1">Meine Fälle</h2>
+        <h2 className="text-lg font-display font-bold text-foreground mb-1">Meine Fälle</h2>
         <p className="text-sm text-muted-foreground mb-4">Ihre aktuellen Fälle auf einen Blick</p>
         <div
           className="glass-card p-6 border-border/50 flex items-center justify-between hover:border-accent/20 transition-all duration-300 cursor-pointer"
@@ -85,7 +85,7 @@ const DashboardOverview = ({ onNavigate }: Props) => {
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Recent Messages */}
         <div>
-          <h2 className="text-lg font-serif font-bold text-foreground mb-4">Letzte Nachrichten</h2>
+          <h2 className="text-lg font-display font-bold text-foreground mb-4">Letzte Nachrichten</h2>
           <div className="space-y-3">
             {messages.map((msg) => (
               <div
@@ -112,7 +112,7 @@ const DashboardOverview = ({ onNavigate }: Props) => {
 
         {/* Document Upload Quick */}
         <div>
-          <h2 className="text-lg font-serif font-bold text-foreground mb-4">Sicherer Dokumenten-Upload</h2>
+          <h2 className="text-lg font-display font-bold text-foreground mb-4">Sicherer Dokumenten-Upload</h2>
           <div
             className="glass-card border-2 border-dashed border-border/50 p-10 text-center hover:border-accent/30 transition-all duration-300 cursor-pointer group"
             onClick={() => onNavigate("Dokumente")}
@@ -129,7 +129,7 @@ const DashboardOverview = ({ onNavigate }: Props) => {
 
       {/* Secure Messages */}
       <div>
-        <h2 className="text-lg font-serif font-bold text-foreground mb-1">Sichere Nachrichten</h2>
+        <h2 className="text-lg font-display font-bold text-foreground mb-1">Sichere Nachrichten</h2>
         <p className="text-sm text-muted-foreground mb-4">Alle Nachrichten zu Ihren Fällen und Dokumenten</p>
         <div className="space-y-2">
           {secureThreads.map((thread) => (

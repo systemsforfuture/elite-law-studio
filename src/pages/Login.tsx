@@ -31,7 +31,7 @@ const Login = () => {
           <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-8 glow-sm-gold">
             <Scale className="h-10 w-10 text-accent" />
           </div>
-          <h2 className="text-4xl font-serif font-bold text-primary-foreground mb-5 leading-tight">
+          <h2 className="text-4xl font-display font-bold text-primary-foreground mb-5 leading-tight">
             Willkommen im
             <br />
             <span className="text-gradient-gold">Mandanten-Portal</span>
@@ -60,10 +60,10 @@ const Login = () => {
         <div className="w-full max-w-md relative">
           <Link to="/" className="flex items-center gap-3 mb-12 lg:hidden">
             <Scale className="h-8 w-8 text-accent" />
-            <span className="text-xl font-serif font-bold text-foreground">KANZLEI BERGMANN</span>
+            <span className="text-xl font-display font-bold text-foreground">KANZLEI BERGMANN</span>
           </Link>
 
-          <h1 className="text-3xl font-serif font-bold text-foreground mb-2">Anmelden</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground mb-2">Anmelden</h1>
           <p className="text-sm text-muted-foreground mb-10 font-light">
             Melden Sie sich in Ihrem Konto an, um fortzufahren.
           </p>

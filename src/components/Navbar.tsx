@@ -28,7 +28,7 @@ const Navbar = () => {
             <div className="absolute inset-0 bg-accent/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </div>
           <div>
-            <span className="text-xl font-serif font-bold text-primary-foreground tracking-wide">
+            <span className="text-xl font-display font-bold text-primary-foreground tracking-wide">
               KANZLEI BERGMANN
             </span>
             <span className="block text-[10px] text-gold-light tracking-[0.3em] uppercase">

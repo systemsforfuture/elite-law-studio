@@ -31,7 +31,7 @@ const ContactSection = () => {
               <span className="w-8 h-px bg-accent/50" />
               Kontakt
             </span>
-            <h2 className="text-4xl md:text-6xl font-serif font-bold text-foreground mt-3 mb-6">
+            <h2 className="text-4xl md:text-6xl font-display font-bold text-foreground mt-3 mb-6">
               Kostenlose{" "}
               <span className="text-gradient-gold">Erstberatung</span>
             </h2>
@@ -73,7 +73,7 @@ const ContactSection = () => {
 
           <div className={`${isVisible ? "animate-slide-in-right" : "opacity-0"}`}>
             <div className="glass-card p-10 shadow-2xl shadow-navy/5">
-              <h3 className="text-2xl font-serif font-semibold text-foreground mb-2">Jetzt Anfrage senden</h3>
+              <h3 className="text-2xl font-display font-semibold text-foreground mb-2">Jetzt Anfrage senden</h3>
               <p className="text-sm text-muted-foreground mb-8">Alle Felder mit * sind Pflichtfelder.</p>
               <form className="space-y-5" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-4">

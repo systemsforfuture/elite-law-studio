@@ -56,7 +56,7 @@ const CaseResultsSection = () => {
             Ergebnisse die sprechen
             <span className="w-8 h-px bg-accent/50" />
           </span>
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-foreground mt-3 mb-5">
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-foreground mt-3 mb-5">
             Echte <span className="text-gradient-gold">Erfolge</span> für echte Menschen
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light">
@@ -83,7 +83,7 @@ const CaseResultsSection = () => {
                 </span>
               </div>
 
-              <h3 className="text-lg font-serif font-bold text-foreground mb-3 group-hover:text-accent transition-colors">{c.title}</h3>
+              <h3 className="text-lg font-display font-bold text-foreground mb-3 group-hover:text-accent transition-colors">{c.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-6">{c.description}</p>
 
               {/* Result highlight */}
@@ -92,7 +92,7 @@ const CaseResultsSection = () => {
                   <TrendingUp className="h-5 w-5 text-accent" />
                 </div>
                 <div>
-                  <div className="text-3xl font-serif font-bold text-gradient-gold">{c.result}</div>
+                  <div className="text-3xl font-display font-bold text-gradient-gold">{c.result}</div>
                   <div className="text-xs text-muted-foreground">{c.resultLabel}</div>
                 </div>
               </div>
