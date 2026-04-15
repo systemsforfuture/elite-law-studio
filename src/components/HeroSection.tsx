@@ -35,7 +35,7 @@ const HeroSection = () => (
 
         {/* Heading */}
         <h1
-          className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-primary-foreground leading-[1.05] mb-8 opacity-0"
+          className="text-5xl md:text-7xl lg:text-8xl font-display font-black text-primary-foreground leading-[1.02] tracking-[-0.04em] mb-8 opacity-0"
           style={{ animation: 'blur-in 1s ease-out 0.4s forwards' }}
         >
           Ihr Recht.{" "}
