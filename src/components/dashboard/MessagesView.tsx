@@ -100,7 +100,7 @@ const MessagesView = () => {
             <ArrowLeft className="h-5 w-5 text-muted-foreground" />
           </button>
           <div>
-            <h2 className="font-serif font-bold text-foreground">{selectedThread.title}</h2>
+            <h2 className="font-display font-bold text-foreground">{selectedThread.title}</h2>
             <p className="text-xs text-muted-foreground">{selectedThread.participant}</p>
           </div>
         </div>
@@ -160,7 +160,7 @@ const MessagesView = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-serif font-bold text-foreground mb-1">Sichere Nachrichten</h2>
+        <h2 className="text-lg font-display font-bold text-foreground mb-1">Sichere Nachrichten</h2>
         <p className="text-sm text-muted-foreground">Kommunizieren Sie sicher mit Ihrem Anwalt</p>
       </div>
 

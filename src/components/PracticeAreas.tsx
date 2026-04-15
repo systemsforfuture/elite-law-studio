@@ -50,7 +50,7 @@ const PracticeAreas = () => {
             Unsere Expertise
             <span className="w-8 h-px bg-accent/50" />
           </span>
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-foreground mt-3 mb-5">Rechtsgebiete</h2>
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-foreground mt-3 mb-5">Rechtsgebiete</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light">
             Wir bieten Ihnen umfassende rechtliche Beratung in allen wichtigen Rechtsgebieten.
           </p>
@@ -71,7 +71,7 @@ const PracticeAreas = () => {
                 </div>
                 <ArrowUpRight className="h-5 w-5 text-muted-foreground/0 group-hover:text-accent transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1" />
               </div>
-              <h3 className="text-xl font-serif font-semibold text-foreground mb-3 group-hover:text-accent transition-colors duration-300">{practice.title}</h3>
+              <h3 className="text-xl font-display font-semibold text-foreground mb-3 group-hover:text-accent transition-colors duration-300">{practice.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{practice.description}</p>
             </div>
           ))}

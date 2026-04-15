@@ -24,7 +24,7 @@ const CtaBanner = () => {
             <span className="text-xs text-accent font-medium">Noch heute einen Termin sichern</span>
           </div>
 
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-primary-foreground mb-6">
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-primary-foreground mb-6">
             Lassen Sie uns Ihr <span className="text-gradient-gold">Recht durchsetzen</span>
           </h2>
           <p className="text-lg text-primary-foreground/50 font-light mb-10 max-w-xl mx-auto">

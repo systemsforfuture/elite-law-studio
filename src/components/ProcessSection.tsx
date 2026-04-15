@@ -43,7 +43,7 @@ const ProcessSection = () => {
             Unser Prozess
             <span className="w-8 h-px bg-accent/50" />
           </span>
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-foreground mt-3 mb-5">
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-foreground mt-3 mb-5">
             In 4 Schritten zum <span className="text-gradient-gold">Erfolg</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light">
@@ -69,7 +69,7 @@ const ProcessSection = () => {
                   {s.step}
                 </span>
               </div>
-              <h3 className="text-lg font-serif font-semibold text-foreground mb-3 group-hover:text-accent transition-colors">{s.title}</h3>
+              <h3 className="text-lg font-display font-semibold text-foreground mb-3 group-hover:text-accent transition-colors">{s.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-[250px] mx-auto">{s.description}</p>
             </div>
           ))}

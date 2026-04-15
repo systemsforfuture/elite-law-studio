@@ -59,7 +59,7 @@ const TestimonialsSection = () => {
             Mandantenstimmen
             <span className="w-8 h-px bg-accent/50" />
           </span>
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-primary-foreground mt-3 mb-5">
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-primary-foreground mt-3 mb-5">
             Was unsere <span className="text-gradient-gold">Mandanten</span> sagen
           </h2>
           <p className="text-primary-foreground/40 max-w-2xl mx-auto text-lg font-light">
@@ -78,7 +78,7 @@ const TestimonialsSection = () => {
             </div>
             <div className="w-px h-8 bg-white/10" />
             <div>
-              <span className="text-2xl font-serif font-bold text-primary-foreground">4.9</span>
+              <span className="text-2xl font-display font-bold text-primary-foreground">4.9</span>
               <span className="text-sm text-primary-foreground/40 ml-1">/ 5.0</span>
             </div>
             <div className="w-px h-8 bg-white/10" />

@@ -51,7 +51,7 @@ const PainPointsSection = () => {
             Handeln Sie jetzt
             <span className="w-8 h-px bg-destructive/40" />
           </span>
-          <h2 className="text-4xl md:text-6xl font-serif font-bold text-primary-foreground mt-3 mb-5">
+          <h2 className="text-4xl md:text-6xl font-display font-bold text-primary-foreground mt-3 mb-5">
             Warten kostet Sie <span className="text-destructive">Geld</span>
           </h2>
           <p className="text-primary-foreground/40 max-w-2xl mx-auto text-lg font-light">
@@ -86,12 +86,12 @@ const PainPointsSection = () => {
                   <p.icon className="h-6 w-6 text-destructive group-hover:text-accent transition-colors duration-500" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-serif font-bold text-primary-foreground mb-2 group-hover:text-accent transition-colors">
+                  <h3 className="text-lg font-display font-bold text-primary-foreground mb-2 group-hover:text-accent transition-colors">
                     {p.problem}
                   </h3>
                   <p className="text-sm text-primary-foreground/50 leading-relaxed mb-4">{p.detail}</p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-serif font-bold text-accent">{p.stat}</span>
+                    <span className="text-2xl font-display font-bold text-accent">{p.stat}</span>
                     <span className="text-xs text-primary-foreground/30">{p.statLabel}</span>
                   </div>
                 </div>

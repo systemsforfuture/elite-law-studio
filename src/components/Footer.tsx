@@ -9,7 +9,7 @@ const Footer = () => (
         <div className="md:col-span-1">
           <div className="flex items-center gap-3 mb-5">
             <Scale className="h-7 w-7 text-accent" />
-            <span className="text-lg font-serif font-bold tracking-wide">KANZLEI BERGMANN</span>
+            <span className="text-lg font-display font-bold tracking-wide">KANZLEI BERGMANN</span>
           </div>
           <p className="text-sm text-primary-foreground/40 leading-relaxed">
             Ihre vertrauenswürdige Kanzlei für Familienrecht, Arbeitsrecht und Vertragsrecht seit 1998.

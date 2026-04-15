@@ -105,7 +105,7 @@ const CasesView = () => {
         <div className="glass-card p-8 border-border/50">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h2 className="text-xl font-serif font-bold text-foreground">{selectedCase.title}</h2>
+              <h2 className="text-xl font-display font-bold text-foreground">{selectedCase.title}</h2>
               <p className="text-sm text-muted-foreground mt-1">Aktenzeichen {selectedCase.aktenzeichen} · {selectedCase.type}</p>
             </div>
             <span className={`px-3 py-1.5 rounded-lg text-xs font-medium ${statusConfig[selectedCase.status].color}`}>
@@ -133,7 +133,7 @@ const CasesView = () => {
 
         {/* Progress */}
         <div className="glass-card p-8 border-border/50">
-          <h3 className="text-lg font-serif font-bold text-foreground mb-6">Fortschritt</h3>
+          <h3 className="text-lg font-display font-bold text-foreground mb-6">Fortschritt</h3>
           <div className="flex items-center justify-between">
             {selectedCase.steps.map((step, i) => (
               <div key={step.label} className="flex items-center flex-1">
@@ -155,7 +155,7 @@ const CasesView = () => {
 
         {/* Documents */}
         <div className="glass-card p-8 border-border/50">
-          <h3 className="text-lg font-serif font-bold text-foreground mb-4">Dokumente</h3>
+          <h3 className="text-lg font-display font-bold text-foreground mb-4">Dokumente</h3>
           <div className="space-y-2">
             {selectedCase.documents.map((doc) => (
               <div key={doc.name} className="flex items-center justify-between p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors">
@@ -175,7 +175,7 @@ const CasesView = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-serif font-bold text-foreground mb-1">Meine Fälle</h2>
+        <h2 className="text-lg font-display font-bold text-foreground mb-1">Meine Fälle</h2>
         <p className="text-sm text-muted-foreground">Alle Ihre Rechtsfälle auf einen Blick</p>
       </div>
 

@@ -53,7 +53,7 @@ const Dashboard = () => {
           <Link to="/" className="flex items-center gap-3">
             <Scale className="h-7 w-7 text-accent" />
             <div>
-              <span className="text-sm font-serif font-bold text-primary-foreground">KANZLEI BERGMANN</span>
+              <span className="text-sm font-display font-bold text-primary-foreground">KANZLEI BERGMANN</span>
               <span className="block text-[10px] text-primary-foreground/30 tracking-[0.2em]">RECHTSANWÄLTE</span>
             </div>
           </Link>
@@ -99,7 +99,7 @@ const Dashboard = () => {
             <button className="lg:hidden text-foreground p-2 rounded-xl hover:bg-muted transition-colors" onClick={() => setSidebarOpen(true)}>
               <Menu className="h-5 w-5" />
             </button>
-            <h1 className="text-xl font-serif font-bold text-foreground">{viewTitles[activeView]}</h1>
+            <h1 className="text-xl font-display font-bold text-foreground">{viewTitles[activeView]}</h1>
           </div>
           <div className="flex items-center gap-3">
             <button className="relative p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
