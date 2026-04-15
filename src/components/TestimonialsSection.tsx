@@ -1,5 +1,5 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
-import { Star, Quote, CheckCircle } from "lucide-react";
+import { Star, Quote, CheckCircle, ShieldCheck } from "lucide-react";
 
 const testimonials = [
   {
@@ -11,6 +11,7 @@ const testimonials = [
     caseType: "Unternehmensrecht",
     verified: true,
     date: "vor 2 Wochen",
+    platform: "Google",
   },
   {
     name: "Sarah Keller",
@@ -21,16 +22,18 @@ const testimonials = [
     caseType: "Arbeitsrecht",
     verified: true,
     date: "vor 1 Monat",
+    platform: "Google",
   },
   {
     name: "Thomas Braun",
     role: "Unternehmer",
-    text: "Die Erbschaftsangelegenheit unserer Familie war komplex und emotional. Frau Dr. Weber hat mit Fingerspitzengefühl eine Lösung gefunden, die alle Seiten zufriedenstellt. Wirklich außergewöhnlich.",
+    text: "Die Erbschaftsangelegenheit unserer Familie war komplex und emotional. Frau Dr. Weber hat mit Fingerspitzengefühl eine Lösung gefunden, die alle Seiten zufriedenstellt.",
     rating: 5,
     image: "https://randomuser.me/api/portraits/men/55.jpg",
     caseType: "Erbrecht",
     verified: true,
     date: "vor 3 Wochen",
+    platform: "Google",
   },
   {
     name: "Anna-Lena Fischer",
@@ -41,6 +44,7 @@ const testimonials = [
     caseType: "Immobilienrecht",
     verified: true,
     date: "vor 5 Tagen",
+    platform: "Google",
   },
 ];
 
@@ -53,13 +57,13 @@ const TestimonialsSection = () => {
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent/[0.03] rounded-full blur-[120px]" />
 
       <div className="container mx-auto px-6" ref={ref}>
-        <div className="text-center mb-20">
+        <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent mb-4">
             <span className="w-8 h-px bg-accent/50" />
             Mandantenstimmen
             <span className="w-8 h-px bg-accent/50" />
           </span>
-          <h2 className="text-4xl md:text-6xl font-display font-bold text-primary-foreground mt-3 mb-5">
+          <h2 className="text-4xl md:text-6xl font-display font-black text-primary-foreground mt-3 mb-5 tracking-[-0.03em]">
             Was unsere <span className="text-gradient-gold">Mandanten</span> sagen
           </h2>
           <p className="text-primary-foreground/40 max-w-2xl mx-auto text-lg font-light">
@@ -68,15 +72,18 @@ const TestimonialsSection = () => {
         </div>
 
         {/* Google rating badge */}
-        <div className={`flex justify-center mb-16 ${isVisible ? "animate-blur-in" : "opacity-0"}`}>
+        <div className={`flex justify-center mb-16 transition-all duration-700 delay-200 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
           <div className="glass-dark px-8 py-4 flex items-center gap-5">
-            <img src="https://www.google.com/favicon.ico" alt="Google" className="h-5 w-5" />
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-5 w-5 fill-accent text-accent" />
-              ))}
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-green-400" />
+              <span className="text-xs font-medium text-primary-foreground/60">Verifiziert</span>
             </div>
             <div className="w-px h-8 bg-white/10" />
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-accent text-accent" />
+              ))}
+            </div>
             <div>
               <span className="text-2xl font-display font-bold text-primary-foreground">4.9</span>
               <span className="text-sm text-primary-foreground/40 ml-1">/ 5.0</span>
@@ -86,21 +93,21 @@ const TestimonialsSection = () => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-5">
           {testimonials.map((t, i) => (
             <div
               key={t.name}
-              className={`group glass-dark p-8 hover:border-accent/20 transition-all duration-500 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              className={`group glass-dark p-8 hover:border-accent/20 transition-all duration-700 ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               }`}
-              style={{ transitionDelay: `${i * 150}ms`, transitionDuration: "800ms" }}
+              style={{ transitionDelay: `${400 + i * 150}ms` }}
             >
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <img
                     src={t.image}
                     alt={t.name}
-                    className="w-14 h-14 rounded-2xl object-cover ring-2 ring-accent/10"
+                    className="w-14 h-14 rounded-2xl object-cover ring-2 ring-accent/10 group-hover:ring-accent/30 transition-all duration-300"
                     loading="lazy"
                   />
                   <div>
@@ -111,21 +118,21 @@ const TestimonialsSection = () => {
                       )}
                     </div>
                     <p className="text-xs text-primary-foreground/40">{t.role}</p>
-                    <p className="text-[10px] text-primary-foreground/25 mt-0.5">{t.date}</p>
+                    <p className="text-[10px] text-primary-foreground/25 mt-0.5">{t.platform} · {t.date}</p>
                   </div>
                 </div>
-                <Quote className="h-8 w-8 text-accent/20 group-hover:text-accent/40 transition-colors" />
+                <Quote className="h-8 w-8 text-accent/15 group-hover:text-accent/30 transition-colors duration-500" />
               </div>
 
               <p className="text-sm text-primary-foreground/60 leading-relaxed mb-6">„{t.text}"</p>
 
               <div className="flex items-center justify-between">
-                <div className="flex gap-1">
+                <div className="flex gap-0.5">
                   {[...Array(t.rating)].map((_, j) => (
                     <Star key={j} className="h-3.5 w-3.5 fill-accent text-accent" />
                   ))}
                 </div>
-                <span className="text-[11px] uppercase tracking-wider text-accent/60 font-medium">{t.caseType}</span>
+                <span className="text-[11px] uppercase tracking-wider text-accent/50 font-medium">{t.caseType}</span>
               </div>
             </div>
           ))}
