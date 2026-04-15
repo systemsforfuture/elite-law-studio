@@ -1,30 +1,38 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Linkedin, Mail } from "lucide-react";
+import teamBergmann from "@/assets/team-bergmann.jpg";
+import teamWeber from "@/assets/team-weber.jpg";
+import teamRichter from "@/assets/team-richter.jpg";
+import teamMueller from "@/assets/team-mueller.jpg";
 
 const team = [
   {
     name: "Dr. Alexander Bergmann",
     role: "Gründungspartner · Fachanwalt für Handelsrecht",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=500&fit=crop&crop=face",
+    image: teamBergmann,
     specialties: ["Unternehmensrecht", "M&A", "Gesellschaftsrecht"],
+    quote: "Ihr Recht ist keine Verhandlungssache.",
   },
   {
     name: "Dr. Katharina Weber",
     role: "Partnerin · Fachanwältin für Familienrecht",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=face",
+    image: teamWeber,
     specialties: ["Familienrecht", "Erbrecht", "Mediation"],
+    quote: "Familien verdienen Lösungen, keine Schlachtfelder.",
   },
   {
     name: "Maximilian Richter",
     role: "Senior Associate · Fachanwalt für Arbeitsrecht",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop&crop=face",
+    image: teamRichter,
     specialties: ["Arbeitsrecht", "Kündigungsschutz", "Abfindungen"],
+    quote: "Kein Arbeitnehmer sollte Unrecht hinnehmen.",
   },
   {
     name: "Dr. Sophie Müller",
     role: "Partnerin · Fachanwältin für Strafrecht",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop&crop=face",
+    image: teamMueller,
     specialties: ["Strafrecht", "Wirtschaftsstrafrecht", "Compliance"],
+    quote: "Jeder verdient eine Verteidigung auf Augenhöhe.",
   },
 ];
 
@@ -46,7 +54,7 @@ const TeamSection = () => {
             Die <span className="text-gradient-gold">Köpfe</span> hinter Ihrem Recht
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light">
-            Erfahrene Fachanwälte mit Leidenschaft für Gerechtigkeit.
+            Erfahrene Fachanwälte mit Leidenschaft für Gerechtigkeit – und einer gemeinsamen Mission: Ihr Recht durchzusetzen.
           </p>
         </div>
 
@@ -59,23 +67,25 @@ const TeamSection = () => {
               }`}
               style={{ transitionDelay: `${i * 150}ms`, transitionDuration: "800ms", transitionProperty: "all" }}
             >
-              {/* Image */}
               <div className="aspect-[3/4] overflow-hidden">
                 <img
                   src={member.image}
                   alt={member.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   loading="lazy"
+                  width={512}
+                  height={640}
                 />
               </div>
 
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-dark via-navy-dark/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-dark via-navy-dark/40 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-500" />
 
-              {/* Content at bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-6">
                 <h3 className="text-base font-serif font-bold text-primary-foreground mb-1">{member.name}</h3>
-                <p className="text-xs text-primary-foreground/50 mb-3 leading-relaxed">{member.role}</p>
+                <p className="text-xs text-primary-foreground/50 mb-2 leading-relaxed">{member.role}</p>
+
+                {/* Quote - always visible */}
+                <p className="text-xs text-accent/80 italic mb-3 font-serif">„{member.quote}"</p>
 
                 {/* Specialties - show on hover */}
                 <div className="flex flex-wrap gap-1.5 mb-4 max-h-0 group-hover:max-h-20 overflow-hidden transition-all duration-500">
@@ -86,7 +96,6 @@ const TeamSection = () => {
                   ))}
                 </div>
 
-                {/* Social icons */}
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center hover:bg-accent/20 transition-colors">
                     <Linkedin className="h-3.5 w-3.5 text-primary-foreground/70" />

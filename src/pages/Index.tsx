@@ -1,6 +1,8 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import PainPointsSection from "@/components/PainPointsSection";
 import PracticeAreas from "@/components/PracticeAreas";
+import CaseResultsSection from "@/components/CaseResultsSection";
 import ProcessSection from "@/components/ProcessSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import AboutSection from "@/components/AboutSection";
@@ -10,12 +12,15 @@ import CtaBanner from "@/components/CtaBanner";
 import FaqSection from "@/components/FaqSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import StickyCta from "@/components/StickyCta";
 
 const Index = () => (
   <div className="min-h-screen">
     <Navbar />
     <HeroSection />
+    <PainPointsSection />
     <PracticeAreas />
+    <CaseResultsSection />
     <ProcessSection />
     <TestimonialsSection />
     <AboutSection />
@@ -25,6 +30,7 @@ const Index = () => (
     <FaqSection />
     <ContactSection />
     <Footer />
+    <StickyCta />
   </div>
 );
 
