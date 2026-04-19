@@ -38,10 +38,15 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-1">
-          {["Rechtsgebiete", "Über uns", "Mandanten", "Kontakt"].map((item) => (
+          {[
+            { label: "Rechtsgebiete", href: "#rechtsgebiete" },
+            { label: "Über uns", href: "#ueber-uns" },
+            { label: "Portal", href: "#mandanten" },
+            { label: "Kontakt", href: "#kontakt" },
+          ].map(({ label: item, href }) => (
             <a
               key={item}
-              href={`#${item.toLowerCase().replace(/\s/g, "-").replace("ü", "ue")}`}
+              href={href}
               className="relative px-4 py-2 text-sm font-medium text-primary-foreground/70 hover:text-primary-foreground transition-colors duration-300 tracking-wide uppercase group"
             >
               {item}
@@ -66,10 +71,15 @@ const Navbar = () => {
       {mobileOpen && (
         <div className="md:hidden glass-nav border-t border-white/[0.08]">
           <div className="container mx-auto px-6 py-6 flex flex-col gap-2">
-            {["Rechtsgebiete", "Über uns", "Mandanten", "Kontakt"].map((item) => (
+            {[
+              { label: "Rechtsgebiete", href: "#rechtsgebiete" },
+              { label: "Über uns", href: "#ueber-uns" },
+              { label: "Portal", href: "#mandanten" },
+              { label: "Kontakt", href: "#kontakt" },
+            ].map(({ label: item, href }) => (
               <a
                 key={item}
-                href={`#${item.toLowerCase().replace(/\s/g, "-").replace("ü", "ue")}`}
+                href={href}
                 className="text-sm font-medium text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/5 transition-all py-3 px-4 rounded-xl"
                 onClick={() => setMobileOpen(false)}
               >
