@@ -80,11 +80,11 @@ const FaqSection = () => {
                   />
                 </button>
                 <div
-                  className={`overflow-hidden transition-all duration-500 ${
-                    openIndex === i ? "max-h-40 pb-6" : "max-h-0"
+                  className={`grid transition-all duration-500 ${
+                    openIndex === i ? "grid-rows-[1fr] opacity-100 pb-6" : "grid-rows-[0fr] opacity-0"
                   }`}
                 >
-                  <p className="px-6 text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+                  <p className="px-6 text-sm text-muted-foreground leading-relaxed overflow-hidden">{faq.a}</p>
                 </div>
               </div>
             ))}
