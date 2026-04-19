@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Scale, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Scale, Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Login = () => {
@@ -126,6 +126,28 @@ const Login = () => {
               Anmelden
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
+
+            <div className="relative my-2">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/50" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-3 text-muted-foreground/60 tracking-widest">oder</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/dashboard")}
+              className="w-full rounded-xl border border-accent/30 bg-accent/5 hover:bg-accent/10 hover:border-accent/50 px-4 py-3.5 text-sm font-medium text-foreground transition-all duration-300 flex items-center justify-center gap-2 group"
+            >
+              <Sparkles className="h-4 w-4 text-accent group-hover:rotate-12 transition-transform" />
+              Demo-Zugang ansehen
+              <span className="text-xs text-muted-foreground font-light">(ohne Anmeldung)</span>
+            </button>
+            <p className="text-center text-xs text-muted-foreground/60 -mt-2">
+              Erkunden Sie das Mandanten-Portal in 30 Sekunden
+            </p>
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-10">
