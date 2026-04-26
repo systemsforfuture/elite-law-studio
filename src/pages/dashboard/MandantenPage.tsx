@@ -23,6 +23,10 @@ import type { Mandant, MandantStatus } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
 import { useMandantenQuery } from "@/lib/queries/use-mandanten";
+import NewMandantDialog from "@/components/dashboard/NewMandantDialog";
+import EmptyState from "@/components/dashboard/EmptyState";
+import { Link } from "react-router-dom";
+import { Loader2, UserPlus } from "lucide-react";
 import { useAktenQuery } from "@/lib/queries/use-akten";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
@@ -295,6 +299,7 @@ const MandantenPage = () => {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<MandantStatus | "all">("all");
   const [selected, setSelected] = useState<Mandant | null>(null);
+  const [newDialog, setNewDialog] = useState(false);
   const { data: mandanten = [], isLoading } = useMandantenQuery();
 
   const filtered = useMemo(() => {
@@ -344,11 +349,45 @@ const MandantenPage = () => {
             ),
           )}
         </div>
-        <Button variant="gold" size="sm" className="rounded-xl">
+        <Button
+          variant="gold"
+          size="sm"
+          className="rounded-xl"
+          onClick={() => setNewDialog(true)}
+        >
           <Plus className="mr-2 h-3.5 w-3.5" />
           Neuer Mandant
         </Button>
       </div>
+
+      <NewMandantDialog open={newDialog} onOpenChange={setNewDialog} />
+
+      {!isLoading && mandanten.length === 0 ? (
+        <EmptyState
+          icon={UserPlus}
+          title="Noch keine Mandanten"
+          description="Sobald die Voice-KI Anrufe annimmt oder Sie über das Funnel-Formular Leads bekommen, erscheinen Mandanten hier automatisch. Sie können auch manuell anlegen oder per Excel importieren."
+          action={
+            <div className="flex gap-2">
+              <Button variant="gold" onClick={() => setNewDialog(true)} className="rounded-xl">
+                <Plus className="mr-2 h-4 w-4" />
+                Manuell anlegen
+              </Button>
+              <Link to="/dashboard/import">
+                <Button variant="outline" className="rounded-xl">
+                  Excel/DATEV importieren
+                </Button>
+              </Link>
+            </div>
+          }
+          hint="KI-Anrufe + Funnel-Leads landen automatisch als 'Interessent'"
+        />
+      ) : isLoading ? (
+        <div className="glass-card p-12 border-border/50 flex items-center justify-center text-muted-foreground">
+          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+          Lade Mandanten…
+        </div>
+      ) : (
 
       <div className="glass-card border-border/50 overflow-hidden">
         <div className="overflow-x-auto">
@@ -424,6 +463,7 @@ const MandantenPage = () => {
           </span>
         </div>
       </div>
+      )}
     </div>
   );
 };

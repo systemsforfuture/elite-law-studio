@@ -23,6 +23,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
+import { useRealtimeSubscriptions } from "@/lib/queries/use-realtime";
 
 interface NavGroup {
   label: string;
@@ -86,6 +87,7 @@ const DashboardLayout = () => {
   const location = useLocation();
   const { tenant } = useTenant();
   const title = titleByPath[location.pathname] ?? "Dashboard";
+  useRealtimeSubscriptions();
 
   return (
     <div className="min-h-screen bg-background flex">

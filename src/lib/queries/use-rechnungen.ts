@@ -23,30 +23,37 @@ export const useRechnungenQuery = () =>
     staleTime: 30_000,
   });
 
-export const useEskalateRechnung = () => {
+export interface MahnungResult {
+  rechnung: Rechnung;
+  mahn_text: string;
+  stufe: 1 | 2 | 3 | 4;
+}
+
+export const useGenerateMahnung = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string): Promise<Rechnung | null> => {
+    mutationFn: async (id: string): Promise<MahnungResult | null> => {
       if (useMockFallback()) {
         const r = mockRechnungen.find((x) => x.id === id);
-        return r ? { ...r, mahnstufe: ((r.mahnstufe + 1) as Rechnung["mahnstufe"]) } : null;
+        if (!r) return null;
+        const stufe = Math.min(r.mahnstufe + 1, 4) as 1 | 2 | 3 | 4;
+        return {
+          rechnung: { ...r, mahnstufe: stufe } as Rechnung,
+          stufe,
+          mahn_text:
+            "[Mock] Sehr geehrter Mandant,\n\nleider haben wir Ihre Zahlung der Rechnung " +
+            r.rechnungsnummer +
+            " in Höhe von " +
+            r.betrag_brutto +
+            "€ noch nicht erhalten. Bitte überweisen Sie den Betrag bis zum nächsten Werktag.\n\nMit freundlichen Grüßen,\nIhre Kanzlei",
+        };
       }
-      // Server-side: eine RPC würde hier den nächsten Stufen-Übergang machen
-      // Vorerst: Inkrement im Frontend
-      const { data: cur } = await supabase!
-        .from("rechnungen")
-        .select("mahnstufe")
-        .eq("id", id)
-        .single();
-      const next = Math.min(((cur?.mahnstufe ?? 0) + 1) as number, 4);
-      const { data, error } = await supabase!
-        .from("rechnungen")
-        .update({ mahnstufe: next, naechste_aktion_am: new Date().toISOString().slice(0, 10) })
-        .eq("id", id)
-        .select()
-        .single();
+      const { data, error } = await supabase!.functions.invoke(
+        "generate-mahnung",
+        { body: { rechnung_id: id } },
+      );
       if (error) throw error;
-      return data as unknown as Rechnung;
+      return data as MahnungResult;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["rechnungen"] }),
   });

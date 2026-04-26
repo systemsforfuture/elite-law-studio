@@ -17,6 +17,7 @@ import type { User as UserType } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useTeamQuery, useTeamStats } from "@/lib/queries/use-team";
 import { useAktenQuery } from "@/lib/queries/use-akten";
+import InviteUserDialog from "@/components/dashboard/InviteUserDialog";
 
 const roleLabel = {
   owner: { label: "Owner", cls: "bg-accent/15 text-accent" },
@@ -226,6 +227,7 @@ const TeamDetail = ({
 
 const TeamPage = () => {
   const [selected, setSelected] = useState<UserType | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const { data: users = [] } = useTeamQuery();
 
   if (selected) {
@@ -243,11 +245,18 @@ const TeamPage = () => {
             {users.length} Mitglieder · Magic-Link-Einladungen per E-Mail
           </p>
         </div>
-        <Button variant="gold" size="sm" className="rounded-xl">
+        <Button
+          variant="gold"
+          size="sm"
+          className="rounded-xl"
+          onClick={() => setInviteOpen(true)}
+        >
           <Plus className="mr-2 h-3.5 w-3.5" />
           Mitglied einladen
         </Button>
       </div>
+
+      <InviteUserDialog open={inviteOpen} onOpenChange={setInviteOpen} />
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {users.map((u) => {
