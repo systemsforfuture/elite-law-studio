@@ -30,6 +30,9 @@ import {
 } from "@/data/mockData";
 import { useTenant } from "@/contexts/TenantContext";
 import type { AktenStufe } from "@/data/types";
+import { useStripeCheckout } from "@/lib/queries/use-stripe";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const stufenSeq: AktenStufe[] = [
   "fallaufnahme",
@@ -46,8 +49,31 @@ const stufeLabel: Record<AktenStufe, string> = {
 
 const PortalDashboard = () => {
   const { tenant } = useTenant();
+  const checkout = useStripeCheckout();
   // Demo: Mandant Müller
   const mandant = mandanten.find((m) => m.id === "md_1")!;
+
+  const handlePay = async (rechnung_id: string) => {
+    const t = toast.loading("Stripe-Checkout wird erstellt…");
+    try {
+      const result = await checkout.mutateAsync(rechnung_id);
+      if (result.mock_mode) {
+        toast.success("Demo-Mode", {
+          id: t,
+          description:
+            "STRIPE_SECRET_KEY nicht gesetzt. In Production öffnet sich Stripe-Checkout.",
+        });
+      } else {
+        toast.success("Weiterleitung zu Stripe…", { id: t });
+        window.location.href = result.url;
+      }
+    } catch (e) {
+      toast.error("Checkout fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  };
   const meineAkten = akten.filter((a) => a.mandant_id === mandant.id);
   const aktiveAkte = meineAkten[0];
   const meineKonv = konversationen.filter((k) => k.mandant_id === mandant.id);
@@ -529,8 +555,18 @@ const PortalDashboard = () => {
                         Bezahlt
                       </span>
                     ) : (
-                      <Button variant="gold" size="sm" className="rounded-lg mt-1">
-                        Online zahlen
+                      <Button
+                        variant="gold"
+                        size="sm"
+                        className="rounded-lg mt-1"
+                        disabled={checkout.isPending}
+                        onClick={() => handlePay(r.id)}
+                      >
+                        {checkout.isPending ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          "Online zahlen"
+                        )}
                       </Button>
                     )}
                   </div>
