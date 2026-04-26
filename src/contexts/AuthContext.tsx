@@ -81,6 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id]);
 
   const value = useMemo<AuthContextValue>(
