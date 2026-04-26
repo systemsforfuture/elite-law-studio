@@ -37,6 +37,7 @@ export default defineConfig(({ mode }) => ({
           "form-vendor": ["react-hook-form", "@hookform/resolvers", "zod"],
           "chart-vendor": ["recharts"],
           "query-vendor": ["@tanstack/react-query"],
+          "supabase-vendor": ["@supabase/supabase-js"],
         },
       },
     },

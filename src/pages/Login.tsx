@@ -1,16 +1,42 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Cpu, Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react";
+import { Cpu, ArrowRight, Sparkles, CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [role, setRole] = useState<"kanzlei" | "admin">("kanzlei");
-  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { isConfigured, signInWithMagicLink } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/dashboard");
+    setError(null);
+    if (!isConfigured) {
+      // Demo-Mode: kein Supabase konfiguriert → direkt ins Dashboard
+      navigate("/dashboard");
+      return;
+    }
+    if (!email.trim()) {
+      setError("Bitte E-Mail-Adresse eingeben.");
+      return;
+    }
+    setSending(true);
+    const { error: e2 } = await signInWithMagicLink(email.trim());
+    setSending(false);
+    if (e2) {
+      setError(
+        e2.message.includes("not allowed")
+          ? "Diese E-Mail ist nicht für die Plattform freigeschaltet. Wenden Sie sich an Ihren Kanzlei-Owner."
+          : e2.message,
+      );
+    } else {
+      setSent(true);
+    }
   };
 
   return (
@@ -76,9 +102,19 @@ const Login = () => {
           <h1 className="text-3xl font-display font-bold text-foreground mb-2">
             Anmelden
           </h1>
-          <p className="text-sm text-muted-foreground mb-10 font-light">
-            Magic-Link an Ihre Kanzlei-E-Mail.
+          <p className="text-sm text-muted-foreground mb-6 font-light">
+            Magic-Link an Ihre Kanzlei-E-Mail. Kein Passwort nötig.
           </p>
+
+          {!isConfigured && (
+            <div className="mb-6 p-3 rounded-xl border border-amber-500/30 bg-amber-500/[0.04] text-xs text-amber-700 flex items-start gap-2">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+              <span>
+                Demo-Modus: Backend ist nicht konfiguriert. Login führt direkt
+                ins Dashboard mit Mock-Daten.
+              </span>
+            </div>
+          )}
 
           <div className="flex rounded-2xl border border-border/50 bg-muted/30 backdrop-blur-sm p-1 mb-8">
             {(["kanzlei", "admin"] as const).map((r) => (
@@ -96,95 +132,99 @@ const Login = () => {
             ))}
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                E-Mail
-              </label>
-              <input
-                type="email"
-                placeholder="max@kanzlei-bergmann.de"
-                className="w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all placeholder:text-muted-foreground/40"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Passwort
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all pr-12 placeholder:text-muted-foreground/40"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center text-sm">
-              <label className="flex items-center gap-2.5 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  className="rounded-md border-border accent-accent"
-                />
-                <span className="text-muted-foreground group-hover:text-foreground transition-colors">
-                  Angemeldet bleiben
-                </span>
-              </label>
-              <a
-                href="#"
-                className="text-accent hover:text-gold-dark transition-colors font-medium"
+          {sent ? (
+            <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.04] mb-6">
+              <CheckCircle2 className="h-8 w-8 text-emerald-600 mb-3" />
+              <h3 className="text-base font-semibold text-foreground mb-1">
+                Magic-Link unterwegs
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Wir haben Ihnen einen Login-Link an{" "}
+                <strong className="text-foreground">{email}</strong> gesendet.
+                Öffnen Sie den Link auf demselben Gerät.
+              </p>
+              <button
+                onClick={() => {
+                  setSent(false);
+                  setEmail("");
+                }}
+                className="text-xs text-accent font-medium hover:text-gold-dark mt-4"
               >
-                Magic-Link senden
-              </a>
+                Andere E-Mail versuchen
+              </button>
             </div>
-
-            <Button
-              variant="gold"
-              className="w-full rounded-xl glow-sm-gold group"
-              size="lg"
-              type="submit"
-            >
-              Anmelden
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-
-            <div className="relative my-2">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border/50" />
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  E-Mail
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="max@kanzlei-bergmann.de"
+                  className="w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all placeholder:text-muted-foreground/40"
+                  disabled={sending}
+                  autoComplete="email"
+                  autoFocus
+                />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-3 text-muted-foreground/60 tracking-widest">
-                  oder
+
+              {error && (
+                <div className="p-3 rounded-xl border border-rose-500/30 bg-rose-500/[0.04] text-xs text-rose-700 flex items-start gap-2">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <Button
+                variant="gold"
+                className="w-full rounded-xl glow-sm-gold group"
+                size="lg"
+                type="submit"
+                disabled={sending}
+              >
+                {sending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Magic-Link wird gesendet…
+                  </>
+                ) : (
+                  <>
+                    {isConfigured ? "Magic-Link senden" : "Demo-Login"}
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </Button>
+
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border/50" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-3 text-muted-foreground/60 tracking-widest">
+                    oder
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => navigate("/dashboard")}
+                className="w-full rounded-xl border border-accent/30 bg-accent/5 hover:bg-accent/10 hover:border-accent/50 px-4 py-3.5 text-sm font-medium text-foreground transition-all duration-300 flex items-center justify-center gap-2 group"
+              >
+                <Sparkles className="h-4 w-4 text-accent group-hover:rotate-12 transition-transform" />
+                Demo-Tenant ansehen
+                <span className="text-xs text-muted-foreground font-light">
+                  (ohne Login)
                 </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => navigate("/dashboard")}
-              className="w-full rounded-xl border border-accent/30 bg-accent/5 hover:bg-accent/10 hover:border-accent/50 px-4 py-3.5 text-sm font-medium text-foreground transition-all duration-300 flex items-center justify-center gap-2 group"
-            >
-              <Sparkles className="h-4 w-4 text-accent group-hover:rotate-12 transition-transform" />
-              Demo-Tenant ansehen
-              <span className="text-xs text-muted-foreground font-light">
-                (ohne Login)
-              </span>
-            </button>
-            <p className="text-center text-xs text-muted-foreground/60 -mt-2">
-              Komplette Plattform mit Beispieldaten Kanzlei Bergmann
-            </p>
-          </form>
+              </button>
+              <p className="text-center text-xs text-muted-foreground/60 -mt-2">
+                Komplette Plattform mit Beispieldaten Kanzlei Bergmann
+              </p>
+            </form>
+          )}
 
           <p className="text-center text-sm text-muted-foreground mt-10">
             Noch keine Kanzlei-Lizenz?{" "}
