@@ -63,7 +63,7 @@ const AboutSection = () => {
                       { value: "12", label: "Anwälte" },
                       { value: `${mandates.toLocaleString("de-DE")}+`, label: "Mandate" },
                       { value: `${successRate}%`, label: "Erfolgsquote" },
-                      { value: "4.9★", label: "Bewertung" },
+                      { value: "4,9 / 5", label: "Bewertung" },
                     ].map(({ value, label }) => (
                       <div key={label} className="group">
                         <div className="text-3xl font-display font-bold text-primary-foreground group-hover:text-accent transition-colors duration-300 tabular-nums">{value}</div>

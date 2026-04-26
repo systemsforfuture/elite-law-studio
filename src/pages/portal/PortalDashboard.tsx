@@ -107,13 +107,13 @@ const PortalDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top-Bar */}
-      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-2xl border-b border-border/50 h-16 flex items-center px-6 justify-between">
-        <Link to="/portal" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
+      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-2xl border-b border-border/50 h-16 flex items-center px-3 sm:px-6 justify-between gap-2">
+        <Link to="/portal" className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
             <Cpu className="h-4 w-4 text-accent" />
           </div>
-          <div>
-            <span className="text-sm font-display font-bold text-foreground">
+          <div className="min-w-0">
+            <span className="text-sm font-display font-bold text-foreground truncate block">
               {tenant.kanzlei_name}
             </span>
             <span className="block text-[10px] text-muted-foreground/60 tracking-wider">
@@ -122,7 +122,7 @@ const PortalDashboard = () => {
           </div>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/30 border border-border/50">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-foreground">
@@ -130,14 +130,14 @@ const PortalDashboard = () => {
             </span>
           </div>
           <Link to="/portal">
-            <button className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+            <button className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors" aria-label="Abmelden">
               <LogOut className="h-4 w-4" />
             </button>
           </Link>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8 max-w-5xl">
+      <main className="container mx-auto px-3 sm:px-6 py-6 sm:py-8 max-w-5xl">
         {/* Begrüßung */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
@@ -189,22 +189,22 @@ const PortalDashboard = () => {
         {tab === "ueberblick" && aktiveAkte && (
           <div className="space-y-6">
             {/* Status-Tracker */}
-            <section className="glass-card p-8 border-border/50">
+            <section className="glass-card p-5 sm:p-8 border-border/50">
               <h2 className="text-lg font-display font-bold text-foreground mb-1">
                 Fallstatus-Tracker
               </h2>
-              <p className="text-sm text-muted-foreground mb-8">
+              <p className="text-sm text-muted-foreground mb-6 sm:mb-8">
                 Wo stehen wir gerade in Ihrem Verfahren?
               </p>
-              <div className="flex items-center justify-between">
+              <div className="flex items-start sm:items-center justify-between gap-1">
                 {stufenSeq.map((st, i) => {
                   const done = i < stufeIdx;
                   const current = i === stufeIdx;
                   return (
-                    <div key={st} className="flex items-center flex-1">
-                      <div className="flex flex-col items-center text-center flex-1">
+                    <div key={st} className="flex items-start sm:items-center flex-1 min-w-0">
+                      <div className="flex flex-col items-center text-center flex-1 min-w-0">
                         <div
-                          className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-3 transition-all ${
+                          className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center mb-2 sm:mb-3 transition-all shrink-0 ${
                             done
                               ? "bg-navy text-primary-foreground shadow-md shadow-navy/20"
                               : current
@@ -213,18 +213,18 @@ const PortalDashboard = () => {
                           }`}
                         >
                           {done ? (
-                            <CheckCircle2 className="h-5 w-5" />
+                            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                           ) : current ? (
-                            <Clock className="h-5 w-5" />
+                            <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
                           ) : (
-                            <Circle className="h-5 w-5" />
+                            <Circle className="h-4 w-4 sm:h-5 sm:w-5" />
                           )}
                         </div>
-                        <span className="text-xs font-medium text-foreground">
+                        <span className="text-[10px] sm:text-xs font-medium text-foreground leading-tight">
                           {i + 1}. {stufeLabel[st]}
                         </span>
                         <span
-                          className={`text-[10px] mt-1 font-medium ${
+                          className={`text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 font-medium leading-tight ${
                             done
                               ? "text-navy"
                               : current
@@ -233,15 +233,15 @@ const PortalDashboard = () => {
                           }`}
                         >
                           {done
-                            ? "(Abgeschlossen)"
+                            ? "Erledigt"
                             : current
-                              ? "(In Bearbeitung)"
-                              : "(Ausstehend)"}
+                              ? "Aktiv"
+                              : "Offen"}
                         </span>
                       </div>
                       {i < stufenSeq.length - 1 && (
                         <div
-                          className={`h-px flex-1 mx-3 -mt-6 ${
+                          className={`h-px flex-1 mx-1 sm:mx-3 mt-4 sm:mt-0 sm:-mt-6 min-w-[8px] ${
                             done ? "bg-navy" : "bg-border"
                           }`}
                         />
@@ -252,7 +252,7 @@ const PortalDashboard = () => {
               </div>
 
               {aktiveAkte.next_step && (
-                <div className="mt-8 p-4 rounded-xl bg-accent/[0.04] border border-accent/15">
+                <div className="mt-6 sm:mt-8 p-4 rounded-xl bg-accent/[0.04] border border-accent/15">
                   <div className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1">
                     Nächster Schritt
                   </div>
@@ -263,20 +263,20 @@ const PortalDashboard = () => {
               )}
             </section>
 
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Anwalt-Card */}
               {anwalt && (
-                <section className="glass-card p-6 border-border/50">
+                <section className="glass-card p-5 sm:p-6 border-border/50">
                   <h3 className="text-sm font-display font-bold text-foreground mb-4">
                     Ihr Anwalt
                   </h3>
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-navy text-primary-foreground flex items-center justify-center font-bold text-lg">
+                    <div className="w-14 h-14 rounded-2xl bg-navy text-primary-foreground flex items-center justify-center font-bold text-lg shrink-0">
                       {anwalt.avatar_initials}
                     </div>
-                    <div>
-                      <div className="font-semibold text-foreground">{anwalt.name}</div>
-                      <div className="text-xs text-muted-foreground">
+                    <div className="min-w-0">
+                      <div className="font-semibold text-foreground truncate">{anwalt.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
                         {anwalt.rechtsgebiete?.join(" · ")}
                       </div>
                     </div>
@@ -300,12 +300,12 @@ const PortalDashboard = () => {
               )}
 
               {/* Quick-Upload */}
-              <section className="glass-card p-6 border-border/50">
+              <section className="glass-card p-5 sm:p-6 border-border/50">
                 <h3 className="text-sm font-display font-bold text-foreground mb-4">
                   Dokument einreichen
                 </h3>
                 <div
-                  className="border-2 border-dashed border-accent/20 rounded-xl p-6 text-center cursor-pointer hover:bg-accent/5 transition-colors"
+                  className="border-2 border-dashed border-accent/20 rounded-xl p-5 sm:p-6 text-center cursor-pointer hover:bg-accent/5 transition-colors"
                   onClick={() => setTab("dokumente")}
                 >
                   <Upload className="h-7 w-7 text-accent mx-auto mb-2" />
@@ -455,32 +455,34 @@ const PortalDashboard = () => {
                 return (
                   <div
                     key={t.id}
-                    className="glass-card p-5 border-border/50 flex items-center gap-4"
+                    className="glass-card p-4 sm:p-5 border-border/50 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-accent/10 flex flex-col items-center justify-center shrink-0">
-                      <span className="text-[10px] uppercase font-semibold text-accent">
-                        {d.toLocaleDateString("de-DE", { month: "short" })}
-                      </span>
-                      <span className="text-lg font-display font-bold text-foreground tabular-nums">
-                        {d.getDate()}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-foreground">
-                        {t.titel}
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-accent/10 flex flex-col items-center justify-center shrink-0">
+                        <span className="text-[10px] uppercase font-semibold text-accent">
+                          {d.toLocaleDateString("de-DE", { month: "short" })}
+                        </span>
+                        <span className="text-base sm:text-lg font-display font-bold text-foreground tabular-nums">
+                          {d.getDate()}
+                        </span>
                       </div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        {d.toLocaleString("de-DE")}
-                        {u && ` · mit ${u.name}`}
-                        {t.ort && ` · ${t.ort}`}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-foreground truncate">
+                          {t.titel}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                          {d.toLocaleString("de-DE")}
+                          {u && ` · mit ${u.name}`}
+                          {t.ort && ` · ${t.ort}`}
+                        </div>
                       </div>
                     </div>
                     {t.bestaetigt ? (
-                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded">
+                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded shrink-0 self-start sm:self-auto">
                         Bestätigt
                       </span>
                     ) : (
-                      <Button variant="outline" size="sm" className="rounded-xl">
+                      <Button variant="outline" size="sm" className="rounded-xl shrink-0 self-start sm:self-auto">
                         Bestätigen
                       </Button>
                     )}
@@ -548,10 +550,10 @@ const PortalDashboard = () => {
               meineRechnungen.map((r) => (
                 <div
                   key={r.id}
-                  className="glass-card p-5 border-border/50 flex items-center justify-between"
+                  className="glass-card p-4 sm:p-5 border-border/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                 >
-                  <div>
-                    <div className="text-sm font-semibold text-foreground font-mono">
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-foreground font-mono truncate">
                       {r.rechnungsnummer}
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5">
@@ -559,19 +561,19 @@ const PortalDashboard = () => {
                       {new Date(r.faelligkeit).toLocaleDateString("de-DE")}
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:text-right">
                     <div className="text-lg font-display font-bold text-foreground tabular-nums">
                       {r.betrag_brutto.toLocaleString("de-DE")}€
                     </div>
                     {r.status === "bezahlt" ? (
-                      <span className="text-[10px] uppercase font-bold text-emerald-700">
+                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded">
                         Bezahlt
                       </span>
                     ) : (
                       <Button
                         variant="gold"
                         size="sm"
-                        className="rounded-lg mt-1"
+                        className="rounded-lg"
                         disabled={checkout.isPending}
                         onClick={() => handlePay(r.id)}
                       >
@@ -590,8 +592,8 @@ const PortalDashboard = () => {
         )}
       </main>
 
-      <footer className="border-t border-border/50 px-6 py-6 mt-12">
-        <div className="container mx-auto max-w-5xl flex justify-between items-center text-xs text-muted-foreground/60">
+      <footer className="border-t border-border/50 px-3 sm:px-6 py-6 mt-12">
+        <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center text-xs text-muted-foreground/60">
           <span>
             Mandanten-Portal · powered by SYSTEMS™
           </span>
