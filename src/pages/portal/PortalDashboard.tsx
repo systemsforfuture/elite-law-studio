@@ -53,6 +53,9 @@ const PortalDashboard = () => {
   const { tenant } = useTenant();
   const checkout = useStripeCheckout();
   const mandantAuth = useMandantAuth();
+  const [tab, setTab] = useState<
+    "ueberblick" | "nachrichten" | "termine" | "dokumente" | "rechnungen"
+  >("ueberblick");
 
   // Real mandant aus Auth, oder Demo-Mandant Müller als Fallback
   const mandant =
@@ -98,8 +101,6 @@ const PortalDashboard = () => {
   const stufeIdx = aktiveAkte
     ? stufenSeq.indexOf(aktiveAkte.stufe)
     : -1;
-
-  const [tab, setTab] = useState<"ueberblick" | "nachrichten" | "termine" | "dokumente" | "rechnungen">("ueberblick");
 
   return (
     <div className="min-h-screen bg-background">

@@ -3,13 +3,13 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { konversationen as mockKonversationen } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 export const useKonversationenQuery = () =>
   useQuery({
     queryKey: ["konversationen"],
     queryFn: async (): Promise<Konversation[]> => {
-      if (useMockFallback()) return mockKonversationen;
+      if (shouldMock()) return mockKonversationen;
       const { data, error } = await supabase!
         .from("konversationen")
         .select("*")

@@ -3,13 +3,13 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { rechnungen as mockRechnungen } from "@/data/mockData";
 import type { Rechnung } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 export const useRechnungenQuery = () =>
   useQuery({
     queryKey: ["rechnungen"],
     queryFn: async (): Promise<Rechnung[]> => {
-      if (useMockFallback()) return mockRechnungen;
+      if (shouldMock()) return mockRechnungen;
       const { data, error } = await supabase!
         .from("rechnungen")
         .select("*")
@@ -33,7 +33,7 @@ export const useGenerateMahnung = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string): Promise<MahnungResult | null> => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         const r = mockRechnungen.find((x) => x.id === id);
         if (!r) return null;
         const stufe = Math.min(r.mahnstufe + 1, 4) as 1 | 2 | 3 | 4;

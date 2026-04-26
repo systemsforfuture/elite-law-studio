@@ -5,7 +5,7 @@ import type { Mandant } from "@/data/types";
 
 const QK = ["mandanten"] as const;
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 /**
  * Mandanten-Liste. Greift auf Supabase zu wenn konfiguriert, sonst Mock.
@@ -14,7 +14,7 @@ export const useMandantenQuery = () =>
   useQuery({
     queryKey: QK,
     queryFn: async (): Promise<Mandant[]> => {
-      if (useMockFallback()) return mockMandanten;
+      if (shouldMock()) return mockMandanten;
       const { data, error } = await supabase!
         .from("mandanten")
         .select("*")
@@ -34,7 +34,7 @@ export const useMandantQuery = (id: string | undefined | null) =>
     enabled: Boolean(id),
     queryFn: async (): Promise<Mandant | null> => {
       if (!id) return null;
-      if (useMockFallback()) {
+      if (shouldMock()) {
         return mockMandanten.find((m) => m.id === id) ?? null;
       }
       const { data, error } = await supabase!
@@ -57,7 +57,7 @@ export const useCreateMandant = () => {
     mutationFn: async (
       input: Omit<Mandant, "id" | "created_at" | "tenant_id"> & { tenant_id?: string },
     ): Promise<Mandant> => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         // No-op in mock mode
         const fake: Mandant = {
           ...input,
@@ -91,7 +91,7 @@ export const useUpdateMandant = () => {
       id: string;
       patch: Partial<Mandant>;
     }): Promise<Mandant> => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         const m = mockMandanten.find((x) => x.id === id);
         if (!m) throw new Error("Nicht gefunden");
         return { ...m, ...patch };
@@ -116,7 +116,7 @@ export const useDeleteMandant = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      if (useMockFallback()) return;
+      if (shouldMock()) return;
       const { error } = await supabase!.from("mandanten").delete().eq("id", id);
       if (error) throw error;
     },

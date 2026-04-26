@@ -3,13 +3,13 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { akten as mockAkten, strategien as mockStrategien } from "@/data/mockData";
 import type { Akte, AnwaltsStrategie } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 export const useAktenQuery = () =>
   useQuery({
     queryKey: ["akten"],
     queryFn: async (): Promise<Akte[]> => {
-      if (useMockFallback()) return mockAkten;
+      if (shouldMock()) return mockAkten;
       const { data, error } = await supabase!
         .from("akten")
         .select("*")
@@ -29,7 +29,7 @@ export const useAkteQuery = (id: string | undefined | null) =>
     enabled: Boolean(id),
     queryFn: async (): Promise<Akte | null> => {
       if (!id) return null;
-      if (useMockFallback()) return mockAkten.find((a) => a.id === id) ?? null;
+      if (shouldMock()) return mockAkten.find((a) => a.id === id) ?? null;
       const { data, error } = await supabase!
         .from("akten")
         .select("*")
@@ -44,7 +44,7 @@ export const useStrategienQuery = () =>
   useQuery({
     queryKey: ["strategien"],
     queryFn: async (): Promise<AnwaltsStrategie[]> => {
-      if (useMockFallback()) return mockStrategien;
+      if (shouldMock()) return mockStrategien;
       const { data, error } = await supabase!
         .from("anwalts_strategien")
         .select("*")
@@ -60,7 +60,7 @@ export const useStrategieQuery = (akte_id: string | undefined | null) =>
     enabled: Boolean(akte_id),
     queryFn: async (): Promise<AnwaltsStrategie | null> => {
       if (!akte_id) return null;
-      if (useMockFallback())
+      if (shouldMock())
         return mockStrategien.find((s) => s.akte_id === akte_id) ?? null;
       const { data, error } = await supabase!
         .from("anwalts_strategien")
@@ -87,7 +87,7 @@ export const useGenerateStrategie = () => {
       akte_id,
       iteration_prompt,
     }: GenerateStrategieInput): Promise<AnwaltsStrategie | null> => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         console.info("[strategie] Mock-Generation für", akte_id);
         await new Promise((r) => setTimeout(r, 1500));
         return mockStrategien.find((s) => s.akte_id === akte_id) ?? null;
