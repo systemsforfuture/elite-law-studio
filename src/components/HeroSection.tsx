@@ -31,7 +31,7 @@ const HeroSection = () => {
         />
       </div>
 
-      <div className="relative container mx-auto px-6 pt-28 pb-20">
+      <div className="relative container mx-auto px-4 sm:px-6 pt-28 pb-20 overflow-hidden">
         <div className="max-w-4xl">
           <div
             className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-accent/20 bg-accent/[0.08] backdrop-blur-sm mb-10 opacity-0"
@@ -52,7 +52,7 @@ const HeroSection = () => {
           </div>
 
           <h1
-            className="text-5xl md:text-7xl lg:text-[5.5rem] font-display font-black text-primary-foreground leading-[1.02] tracking-[-0.04em] mb-8 opacity-0"
+            className="text-[2.5rem] sm:text-5xl md:text-7xl lg:text-[5.5rem] font-display font-black text-primary-foreground leading-[1.05] tracking-[-0.04em] mb-8 opacity-0 break-words hyphens-auto"
             style={{ animation: "blur-in 1s ease-out 0.4s forwards" }}
           >
             Ihre Kanzlei,
@@ -112,30 +112,30 @@ const HeroSection = () => {
           </Link>
 
           <div
-            className="flex flex-wrap gap-4 opacity-0"
+            className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-4 opacity-0"
             style={{ animation: "blur-in 0.8s ease-out 1s forwards" }}
           >
             {[
               { icon: ShieldCheck, label: "Setup", value: `${setupHours}h` },
-              { icon: Sparkles, label: "Eingespart/Woche", value: `${stunden}h` },
+              { icon: Sparkles, label: "Pro Woche", value: `${stunden}h` },
               {
                 icon: Star,
-                label: "Aktive Kanzleien",
+                label: "Kanzleien",
                 value: `${kanzleien.toLocaleString("de-DE")}+`,
               },
             ].map(({ icon: Icon, label, value }) => (
               <div
                 key={label}
-                className="glass-dark px-8 py-5 flex items-center gap-4 group hover:border-accent/20 transition-all duration-500 cursor-default"
+                className="glass-dark px-3 py-3 sm:px-8 sm:py-5 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4 group hover:border-accent/20 transition-all duration-500 cursor-default text-center sm:text-left"
               >
-                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
-                  <Icon className="h-5 w-5 text-accent" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300 shrink-0">
+                  <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
                 </div>
                 <div>
-                  <div className="text-2xl font-display font-bold text-primary-foreground tabular-nums">
+                  <div className="text-base sm:text-2xl font-display font-bold text-primary-foreground tabular-nums leading-tight">
                     {value}
                   </div>
-                  <div className="text-[11px] text-primary-foreground/40 uppercase tracking-wider">
+                  <div className="text-[9px] sm:text-[11px] text-primary-foreground/40 uppercase tracking-wider">
                     {label}
                   </div>
                 </div>

@@ -141,6 +141,7 @@ export interface Dokument {
   status: DokumentStatus;
   uploaded_by: "mandant" | "anwalt" | "ai_import";
   uploaded_at: string;
+  storage_path?: string;
   ai_extracted?: {
     dokument_typ: string;
     parteien?: string[];
