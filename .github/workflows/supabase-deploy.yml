@@ -85,6 +85,7 @@ jobs:
           supabase functions deploy generate-mahnung
           supabase functions deploy import-data
           supabase functions deploy send-message
+          supabase functions deploy stripe-checkout
           # öffentlich (Marketing-Forms / Onboarding ohne Login)
           supabase functions deploy capture-lead --no-verify-jwt
           supabase functions deploy create-tenant --no-verify-jwt
@@ -92,6 +93,7 @@ jobs:
           supabase functions deploy webhook-vapi --no-verify-jwt
           supabase functions deploy webhook-whatsapp --no-verify-jwt
           supabase functions deploy webhook-email --no-verify-jwt
+          supabase functions deploy webhook-stripe --no-verify-jwt
 
       - name: Summary
         if: steps.secrets.outputs.skip != 'true'
