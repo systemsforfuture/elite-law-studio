@@ -84,6 +84,7 @@ jobs:
           supabase functions deploy analyze-document
           supabase functions deploy generate-mahnung
           supabase functions deploy import-data
+          supabase functions deploy send-message
           # öffentlich (Marketing-Forms / Onboarding ohne Login)
           supabase functions deploy capture-lead --no-verify-jwt
           supabase functions deploy create-tenant --no-verify-jwt
