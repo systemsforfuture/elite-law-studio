@@ -12,6 +12,7 @@ import {
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
 import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "sonner";
 import { Loader2, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,7 @@ const eskalationsStufen = [
 const MahnwesenPage = () => {
   const [selected, setSelected] = useState<Rechnung | null>(null);
   const { data: rechnungen = [], isLoading } = useRechnungenQuery();
+  const { tenant } = useTenant();
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
   const generateMahnung = useGenerateMahnung();
   const [generatedText, setGeneratedText] = useState<string | null>(null);
@@ -227,17 +229,39 @@ const MahnwesenPage = () => {
                               )}
                             </Button>
                             {generatedText && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="rounded-lg"
-                                onClick={() => {
-                                  navigator.clipboard.writeText(generatedText);
-                                  toast.success("In Zwischenablage kopiert");
-                                }}
-                              >
-                                Text kopieren
-                              </Button>
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="rounded-lg"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(generatedText);
+                                    toast.success("In Zwischenablage kopiert");
+                                  }}
+                                >
+                                  Text kopieren
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="rounded-lg"
+                                  onClick={async () => {
+                                    const { generateMahnPdf } = await import(
+                                      "@/lib/generate-mahn-pdf"
+                                    );
+                                    generateMahnPdf({
+                                      tenant,
+                                      mandant: findMandant(selected.mandant_id) ?? null,
+                                      rechnung: selected,
+                                      mahn_text: generatedText,
+                                      stufe: aktStufe + 1,
+                                    });
+                                    toast.success("PDF heruntergeladen");
+                                  }}
+                                >
+                                  PDF Download
+                                </Button>
+                              </>
                             )}
                           </div>
                         </>

@@ -38,6 +38,7 @@ export default defineConfig(({ mode }) => ({
           "chart-vendor": ["recharts"],
           "query-vendor": ["@tanstack/react-query"],
           "supabase-vendor": ["@supabase/supabase-js"],
+          "sentry-vendor": ["@sentry/react"],
         },
       },
     },
