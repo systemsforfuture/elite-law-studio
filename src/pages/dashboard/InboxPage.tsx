@@ -16,6 +16,7 @@ import { findMandant, mandantName } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useTriageInbox, type TriageResult } from "@/lib/queries/use-triage";
+import { useSendMessage } from "@/lib/queries/use-send-message";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
@@ -29,6 +30,54 @@ const InboxPage = () => {
   const [triage, setTriage] = useState<TriageResult | null>(null);
   const { data: konversationen = [], isLoading } = useKonversationenQuery();
   const triageInbox = useTriageInbox();
+  const sendMessage = useSendMessage();
+
+  const handleSend = async (k: Konversation) => {
+    if (!reply.trim()) {
+      toast.error("Bitte einen Antworttext eingeben");
+      return;
+    }
+    const md = findMandant(k.mandant_id);
+    const to =
+      k.kanal === "whatsapp"
+        ? md?.whatsapp ?? md?.telefon ?? ""
+        : md?.email ?? "";
+    if (!to) {
+      toast.error("Kein Empfänger-Kontakt verknüpft");
+      return;
+    }
+    const t = toast.loading("Antwort wird gesendet…");
+    try {
+      const result = await sendMessage.mutateAsync({
+        channel: k.kanal === "whatsapp" ? "whatsapp" : "email",
+        to,
+        subject: k.betreff ? `Re: ${k.betreff}` : "Antwort von Ihrer Kanzlei",
+        text: reply,
+        mandant_id: k.mandant_id ?? undefined,
+        in_reply_to: k.id,
+      });
+      if (result.mock_mode) {
+        toast.success("Antwort als gesendet markiert (Provider-Demo-Modus)", {
+          id: t,
+          description:
+            "Echtes Versenden braucht RESEND_API_KEY oder WhatsApp-Token.",
+        });
+      } else if (result.ok) {
+        toast.success(`Antwort gesendet (${k.kanal})`, { id: t });
+      } else {
+        toast.error("Provider-Fehler", {
+          id: t,
+          description: result.provider_error ?? "Unbekannt",
+        });
+      }
+      setReply("");
+    } catch (e) {
+      toast.error("Senden fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  };
 
   useEffect(() => {
     if (!selected) {
@@ -218,9 +267,24 @@ const InboxPage = () => {
                 <span className="text-xs text-muted-foreground">
                   Wird über SYSTEMS Mail-Engine zugestellt
                 </span>
-                <Button variant="gold" size="sm" className="rounded-xl">
-                  <Send className="mr-2 h-3.5 w-3.5" />
-                  Senden
+                <Button
+                  variant="gold"
+                  size="sm"
+                  className="rounded-xl"
+                  disabled={sendMessage.isPending || !reply.trim()}
+                  onClick={() => selected && handleSend(selected)}
+                >
+                  {sendMessage.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                      Sende…
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-3.5 w-3.5" />
+                      Senden
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
