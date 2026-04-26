@@ -308,7 +308,7 @@ const OverviewPage = () => {
           <section className="glass-card p-6 border-border/50">
             <h3 className="text-sm font-display font-bold text-foreground mb-4 flex items-center gap-2">
               <Clock className="h-4 w-4 text-accent" />
-              Vapi-Telefon-Guthaben
+              Telefon-Guthaben
             </h3>
             <div className="text-3xl font-display font-black text-foreground tabular-nums mb-1">
               184<span className="text-lg text-muted-foreground">€</span>

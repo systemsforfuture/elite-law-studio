@@ -5,28 +5,28 @@ import { Button } from "@/components/ui/button";
 
 const faqs = [
   {
-    q: "Ist das mit dem anwaltlichen Berufsgeheimnis vereinbar?",
-    a: "Ja. §43e BRAO erlaubt Cloud-Nutzung explizit, wenn Verschlüsselung und Vertraulichkeit gewährleistet sind. Wir hosten ausschließlich in Deutschland (Frankfurt), verschlüsseln Ihre Daten mit einem eigenen Schlüssel pro Kanzlei, schließen den Auftragsverarbeitungs-Vertrag mit Ihnen ab und legen die Daten so ab, dass keine Behörde direkten Zugriff bekommt (Beschlagnahmefreiheit).",
+    q: "Was kostet eine Erstberatung?",
+    a: "Die Erstberatung bei uns ist kostenlos und unverbindlich. Wir analysieren Ihren Fall und geben Ihnen eine ehrliche Einschätzung – ohne versteckte Kosten.",
   },
   {
-    q: "Wie schnell sind wir live?",
-    a: "24 Stunden ab Vertragsabschluss bis zum ersten echten Anruf. Persönliche Begleitung durch unser Customer-Success-Team. Datenmigration aus RA-MICRO, DATEV, Advoware oder Excel ist im Setup enthalten.",
+    q: "Wie schnell bekomme ich einen Termin?",
+    a: "In dringenden Fällen können wir oft noch am selben Tag einen Termin anbieten. Reguläre Erstberatungen sind innerhalb von 48 Stunden möglich.",
   },
   {
-    q: "Was passiert bei juristischen Fragen — entscheidet die KI selbständig?",
-    a: "Niemals. Die KI ist auf Empfangs- und Verwaltungs-Aufgaben begrenzt. Bei juristischen Fragen, Notfällen oder unsicheren Situationen eskaliert sie automatisch an den zuständigen Anwalt — per Push, SMS oder Anruf. Sie entscheiden, was eskaliert wird.",
+    q: "Übernimmt meine Rechtsschutzversicherung die Kosten?",
+    a: "In den meisten Fällen ja. Wir prüfen vorab kostenlos, ob Ihre Versicherung die Kosten übernimmt und kümmern uns um die Deckungszusage.",
   },
   {
-    q: "Bleiben unsere Telefonnummer und unser Branding erhalten?",
-    a: "Komplett. Sie behalten Ihre Telefonnummer, Ihre Domain, Ihr Logo, Ihre Farben. Premium-Tarif: Klonen Ihrer eigenen Stimme — Mandanten hören Sie selbst antworten, auch wenn die KI im Hintergrund läuft.",
+    q: "Kann ich auch Online-Beratung nutzen?",
+    a: "Selbstverständlich. Über unser digitales Mandanten-Portal können Sie Termine per Video wahrnehmen, Dokumente austauschen und den Status Ihres Falls jederzeit einsehen.",
   },
   {
-    q: "Was kostet die Telefonie zusätzlich?",
-    a: "Im Tarif-Preis sind Telefon-Minuten inkludiert (Foundation 200, Growth 500, Premium 1.500). Darüber hinaus Pre-Paid-Aufladung. Volle Transparenz im Dashboard — Sie laden Guthaben einmalig auf, der Rest läuft automatisch.",
+    q: "Wie ist die Erfolgsquote Ihrer Kanzlei?",
+    a: "Wir erreichen eine Erfolgsquote von 97% – ob durch außergerichtliche Einigungen oder Gerichtsverfahren. Jeder Fall wird individuell mit einer maßgeschneiderten Strategie bearbeitet.",
   },
   {
-    q: "Was, wenn wir nach 14 Tagen merken, dass es nichts ist?",
-    a: "Dann zahlen Sie nichts. Setup-Fee wird erst bei Live-Schaltung fällig. Kommen wir nicht ans Ziel — kein Cent. Die ersten 14 Tage volle Plattform inklusive. Faire Sache.",
+    q: "Wie funktioniert das Mandanten-Portal?",
+    a: "Nach Beauftragung erhalten Sie Zugang zu unserem sicheren Portal. Dort können Sie Dokumente hochladen, Nachrichten an Ihren Anwalt senden, Termine vereinbaren und den Fortschritt Ihres Falls in Echtzeit verfolgen.",
   },
 ];
 
@@ -49,11 +49,11 @@ const FaqSection = () => {
               Häufig gestellte <span className="text-gradient-gold">Fragen</span>
             </h2>
             <p className="text-muted-foreground text-lg font-light leading-relaxed mb-8">
-              Antworten auf die wichtigsten Fragen — transparent, ehrlich, ohne Marketing-Sprech.
+              Antworten auf die wichtigsten Fragen – transparent und ehrlich.
             </p>
-            <a href="#contact">
+            <a href="#kontakt">
               <Button variant="gold" className="rounded-2xl group">
-                Andere Frage? Sprechen Sie mit uns
+                Individuelle Frage stellen
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </a>

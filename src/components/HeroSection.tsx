@@ -89,12 +89,27 @@ const HeroSection = () => {
           </div>
 
           <p
-            className="text-xs text-primary-foreground/30 mb-16 opacity-0"
+            className="text-xs text-primary-foreground/30 mb-8 opacity-0"
             style={{ animation: "blur-in 0.8s ease-out 0.9s forwards" }}
           >
             ✓ 14 Tage kostenlos testen · ✓ Keine Kreditkarte · ✓ Setup
             inklusive
           </p>
+
+          <Link
+            to="/template/kanzlei"
+            className="group inline-flex items-center gap-3 px-5 py-3 rounded-2xl border border-accent/20 bg-accent/[0.04] hover:border-accent/40 hover:bg-accent/[0.08] transition-all backdrop-blur-sm mb-16 opacity-0"
+            style={{ animation: "blur-in 0.8s ease-out 1s forwards" }}
+          >
+            <span className="text-[10px] uppercase tracking-[0.2em] text-accent font-bold">
+              Live-Vorschau
+            </span>
+            <span className="w-px h-4 bg-accent/30" />
+            <span className="text-sm text-primary-foreground/80">
+              So sieht <strong className="text-primary-foreground">Ihre White-Label-Funnel-Seite</strong> aus
+            </span>
+            <ArrowRight className="h-3.5 w-3.5 text-accent transition-transform group-hover:translate-x-1" />
+          </Link>
 
           <div
             className="flex flex-wrap gap-4 opacity-0"

@@ -112,8 +112,8 @@ const AgentsSection = () => {
           </h2>
           <p className="text-primary-foreground/40 max-w-2xl mx-auto text-lg font-light">
             Jeder Agent ist Spezialist. Ein Master-Orchestrator entscheidet, wer
-            wann übernimmt — und wann eskaliert wird. Built on Claude Sonnet
-            4.7.
+            wann übernimmt — und wann eskaliert wird. Eigene SYSTEMS-Sprach-KI,
+            speziell für deutsches Recht trainiert.
           </p>
         </div>
 
@@ -178,18 +178,18 @@ const AgentsSection = () => {
                   <div className="grid sm:grid-cols-2 gap-3 mb-6">
                     <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                       <div className="text-[10px] uppercase tracking-wider text-primary-foreground/40 mb-1">
-                        Modell
+                        Spezialisiert auf
                       </div>
-                      <div className="font-mono text-sm text-primary-foreground/90">
-                        claude-sonnet-4-7
+                      <div className="text-sm text-primary-foreground/90">
+                        Deutsches Recht
                       </div>
                     </div>
                     <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                       <div className="text-[10px] uppercase tracking-wider text-primary-foreground/40 mb-1">
-                        Confidence-Threshold
+                        Sicherheits-Schwelle
                       </div>
-                      <div className="font-mono text-sm text-primary-foreground/90">
-                        {(a.confidence * 100).toFixed(0)}% · Auto-Eskalation darunter
+                      <div className="text-sm text-primary-foreground/90">
+                        {(a.confidence * 100).toFixed(0)}% · darunter Eskalation an Anwalt
                       </div>
                     </div>
                   </div>

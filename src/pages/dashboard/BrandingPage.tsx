@@ -127,7 +127,7 @@ const BrandingPage = () => {
                   {tenant.branding_config.voice_id}
                 </div>
                 <div className="text-[10px] text-muted-foreground mt-1">
-                  ElevenLabs Voice-Cloning
+                  SYSTEMS Voice-Cloning · 99% Naturklang
                 </div>
               </div>
             </div>

@@ -3,12 +3,12 @@ import { Shield, Clock, Award, TrendingUp, Lock, HeartHandshake, ArrowRight } fr
 import { Button } from "@/components/ui/button";
 
 const trustPoints = [
-  { icon: Shield, title: "Berufsgeheimnis-konform", desc: "§43e BRAO erlaubt Cloud-Nutzung explizit" },
-  { icon: Lock, title: "Verschlüsselung pro Tenant", desc: "AES-256 at-Rest, eigener KMS-Schlüssel" },
-  { icon: Award, title: "Multi-Tenant Postgres RLS", desc: "Drei unabhängige Isolations-Layer" },
-  { icon: TrendingUp, title: "Permanent-Assisted-Onboarding", desc: "Customer-Success-Lead von Tag 1" },
-  { icon: Clock, title: "Hosting in Deutschland", desc: "Frankfurt am Main · keine US-Server" },
-  { icon: HeartHandshake, title: "Beschlagnahmefreiheit", desc: "Keine Behörde bekommt direkten Zugriff" },
+  { icon: Shield, title: "Anwaltsgeheimnis", desc: "Absolute Vertraulichkeit in jedem Fall" },
+  { icon: Clock, title: "24h Erreichbarkeit", desc: "Notfall-Hotline für dringende Fälle" },
+  { icon: Award, title: "Fachanwälte", desc: "Zertifizierte Spezialisten pro Rechtsgebiet" },
+  { icon: TrendingUp, title: "97% Erfolgsquote", desc: "Nachweislich überdurchschnittliche Ergebnisse" },
+  { icon: Lock, title: "DSGVO-konform", desc: "Höchste Datenschutzstandards" },
+  { icon: HeartHandshake, title: "Persönlich", desc: "Fester Ansprechpartner ab Tag eins" },
 ];
 
 const TrustSection = () => {
@@ -23,19 +23,17 @@ const TrustSection = () => {
           <div className={`lg:col-span-2 transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent mb-4">
               <span className="w-8 h-px bg-accent/50" />
-              Sicherheit & Compliance
+              Warum wir
             </span>
             <h2 className="text-4xl md:text-5xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em]">
-              Anwalts-tauglich. <span className="text-gradient-gold">Vom ersten Tag an.</span>
+              Ihr Vorteil mit <span className="text-gradient-gold">Kanzlei Bergmann</span>
             </h2>
             <p className="text-muted-foreground text-lg font-light leading-relaxed mb-8">
-              Berufsgeheimnis ist nicht verhandelbar. Deshalb haben wir die
-              Plattform von Anfang an mit drei unabhängigen Sicherheitslayern
-              gebaut. Audit-Log, Verschlüsselung pro Tenant, EU-Hosting.
+              Wir kombinieren juristische Exzellenz mit modernem Service – damit Sie sich auf das Wesentliche konzentrieren können.
             </p>
-            <a href="#contact">
+            <a href="#kontakt">
               <Button variant="gold" className="rounded-2xl group" size="lg">
-                Auftragsverarbeitungs-Vertrag ansehen
+                Jetzt beraten lassen
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </a>

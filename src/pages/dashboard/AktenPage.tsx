@@ -197,7 +197,7 @@ const AktenPage = () => {
                   Noch keine Strategie generiert
                 </h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
-                  Claude analysiert Akte, Dokumente und Mandanten-Historie und
+                  Die SYSTEMS-KI analysiert Akte, Dokumente und Mandanten-Historie und
                   schlägt eine vollständige Anwalts-Strategie vor — mit
                   Risiko-Bewertung, Handlungsoptionen und Schriftsatz-Skizze.
                 </p>
@@ -206,7 +206,7 @@ const AktenPage = () => {
                   Strategie jetzt generieren
                 </Button>
                 <div className="text-[11px] text-muted-foreground/60 mt-3">
-                  ~12 Sek · Sonnet 4.7 · Kosten ~0,18€
+                  ~12 Sek · SYSTEMS Strategie-KI · im Tarif inklusive
                 </div>
               </div>
             ) : (
