@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Phone, X } from "lucide-react";
 
@@ -29,7 +30,7 @@ const StickyCta = () => {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
             </span>
             <span className="text-sm text-primary-foreground/60">
-              <strong className="text-primary-foreground">Jetzt verfügbar</strong> – Kostenlose Erstberatung
+              <strong className="text-primary-foreground">14 Tage kostenlos</strong> testen — keine Kreditkarte
             </span>
           </div>
 
@@ -37,15 +38,15 @@ const StickyCta = () => {
             <a href="tel:+493012345678" className="hidden md:block">
               <Button variant="hero-outline" size="sm" className="rounded-xl text-xs">
                 <Phone className="mr-1.5 h-3 w-3" />
-                Sofort anrufen
+                Sales anrufen
               </Button>
             </a>
-            <a href="#kontakt">
+            <Link to="/onboarding">
               <Button variant="hero" size="sm" className="rounded-xl text-xs glow-gold group">
-                Erstberatung sichern
+                Live-Demo starten
                 <ArrowRight className="ml-1.5 h-3 w-3 transition-transform group-hover:translate-x-0.5" />
               </Button>
-            </a>
+            </Link>
             <button
               onClick={() => setDismissed(true)}
               className="w-7 h-7 rounded-lg flex items-center justify-center text-primary-foreground/30 hover:text-primary-foreground/60 hover:bg-white/5 transition-colors"

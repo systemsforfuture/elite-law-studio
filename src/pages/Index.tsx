@@ -1,18 +1,19 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import PainPointsSection from "@/components/PainPointsSection";
-import PracticeAreas from "@/components/PracticeAreas";
-import CaseResultsSection from "@/components/CaseResultsSection";
-import ProcessSection from "@/components/ProcessSection";
+import ModulesSection from "@/components/sections/ModulesSection";
+import AgentsSection from "@/components/sections/AgentsSection";
+import AutomationSection from "@/components/AutomationSection";
+import ROICalculator from "@/components/sections/ROICalculator";
+import PricingSection from "@/components/sections/PricingSection";
 import ComparisonSection from "@/components/ComparisonSection";
+import IntegrationsSection from "@/components/sections/IntegrationsSection";
+import OnboardingTeaser from "@/components/sections/OnboardingTeaser";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import AboutSection from "@/components/AboutSection";
-import TeamSection from "@/components/TeamSection";
-import AutomationSection from "@/components/AutomationSection";
 import TrustSection from "@/components/TrustSection";
-import CtaBanner from "@/components/CtaBanner";
 import FaqSection from "@/components/FaqSection";
-import ContactSection from "@/components/ContactSection";
+import SalesCTASection from "@/components/sections/SalesCTASection";
 import Footer from "@/components/Footer";
 import StickyCta from "@/components/StickyCta";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
@@ -22,18 +23,19 @@ const Index = () => (
     <Navbar />
     <HeroSection />
     <PainPointsSection />
-    <PracticeAreas />
-    <CaseResultsSection />
-    <ProcessSection />
+    <ModulesSection />
+    <AgentsSection />
+    <AutomationSection />
+    <ROICalculator />
+    <PricingSection />
     <ComparisonSection />
+    <IntegrationsSection />
+    <OnboardingTeaser />
     <TestimonialsSection />
     <AboutSection />
-    <TeamSection />
-    <AutomationSection />
     <TrustSection />
-    <CtaBanner />
     <FaqSection />
-    <ContactSection />
+    <SalesCTASection />
     <Footer />
     <StickyCta />
     <ExitIntentPopup />

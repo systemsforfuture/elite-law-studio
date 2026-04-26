@@ -5,28 +5,28 @@ import { Button } from "@/components/ui/button";
 
 const faqs = [
   {
-    q: "Was kostet eine Erstberatung?",
-    a: "Die Erstberatung bei uns ist kostenlos und unverbindlich. Wir analysieren Ihren Fall und geben Ihnen eine ehrliche Einschätzung – ohne versteckte Kosten.",
+    q: "Ist das mit dem anwaltlichen Berufsgeheimnis vereinbar?",
+    a: "Ja. §43e BRAO erlaubt Cloud-Nutzung explizit, wenn Verschlüsselung und Vertraulichkeit gewährleistet sind. Wir hosten ausschließlich in Frankfurt (Supabase EU + Vercel EU), verschlüsseln at-Rest pro-Tenant, schließen den Auftragsverarbeitungs-Vertrag mit Ihnen ab und legen die Daten so ab, dass keine Behörde direkten Zugriff bekommt (Beschlagnahmefreiheit).",
   },
   {
-    q: "Wie schnell bekomme ich einen Termin?",
-    a: "In dringenden Fällen können wir oft noch am selben Tag einen Termin anbieten. Reguläre Erstberatungen sind innerhalb von 48 Stunden möglich.",
+    q: "Wie schnell sind wir live?",
+    a: "24 Stunden ab Vertragsabschluss bis zum ersten echten Anruf. Permanent-Assisted-Onboarding mit unserem Customer-Success-Lead. Datenmigration aus RA-MICRO, DATEV, Advoware oder Excel ist im Setup enthalten.",
   },
   {
-    q: "Übernimmt meine Rechtsschutzversicherung die Kosten?",
-    a: "In den meisten Fällen ja. Wir prüfen vorab kostenlos, ob Ihre Versicherung die Kosten übernimmt und kümmern uns um die Deckungszusage.",
+    q: "Was passiert bei juristischen Fragen — entscheidet die KI selbständig?",
+    a: "Niemals. Die KI ist auf Empfangs- und Verwaltungs-Aufgaben begrenzt. Bei juristischen Fragen, Notfällen oder unsicheren Konfidenz-Werten eskaliert sie automatisch an den zuständigen Anwalt — per Push, SMS oder Anruf. Sie entscheiden, was eskaliert wird.",
   },
   {
-    q: "Kann ich auch Online-Beratung nutzen?",
-    a: "Selbstverständlich. Über unser digitales Mandanten-Portal können Sie Termine per Video wahrnehmen, Dokumente austauschen und den Status Ihres Falls jederzeit einsehen.",
+    q: "Bleiben unsere Telefonnummer und unser Branding erhalten?",
+    a: "Komplett. Sie behalten Ihre Telefonnummer (Port zu Vapi), Ihre Domain, Ihr Logo, Ihre Farben. Premium-Tarif: Voice-Cloning Ihrer eigenen Stimme. Mandanten merken nicht, dass eine KI antwortet — sie hören Ihre Stimme oder eine professionelle Empfangsstimme im Branding der Kanzlei.",
   },
   {
-    q: "Wie ist die Erfolgsquote Ihrer Kanzlei?",
-    a: "Wir erreichen eine Erfolgsquote von 97% – ob durch außergerichtliche Einigungen oder Gerichtsverfahren. Jeder Fall wird individuell mit einer maßgeschneiderten Strategie bearbeitet.",
+    q: "Was kostet die Vapi-Telefonie zusätzlich?",
+    a: "Vapi-Minuten werden nach Verbrauch abgerechnet (~0.30€/Min). Für eine Kanzlei mit 200 Anruf-Minuten/Monat sind das ~60€. Premium-Kanzleien mit 800 Min ~240€. Diese Kosten sind transparent im Dashboard sichtbar — Sie laden Guthaben einmalig auf, der Rest läuft automatisch.",
   },
   {
-    q: "Wie funktioniert das Mandanten-Portal?",
-    a: "Nach Beauftragung erhalten Sie Zugang zu unserem sicheren Portal. Dort können Sie Dokumente hochladen, Nachrichten an Ihren Anwalt senden, Termine vereinbaren und den Fortschritt Ihres Falls in Echtzeit verfolgen.",
+    q: "Was, wenn wir nach 14 Tagen merken, dass es nichts ist?",
+    a: "Dann zahlen Sie nichts. Setup-Fee wird erst bei Live-Schaltung fällig. Kommen wir nicht ans Ziel — kein Cent. Die ersten 14 Tage volle Plattform inklusive. Faire Sache.",
   },
 ];
 
@@ -49,11 +49,11 @@ const FaqSection = () => {
               Häufig gestellte <span className="text-gradient-gold">Fragen</span>
             </h2>
             <p className="text-muted-foreground text-lg font-light leading-relaxed mb-8">
-              Antworten auf die wichtigsten Fragen – transparent und ehrlich.
+              Antworten auf die wichtigsten Fragen — transparent, ehrlich, ohne Marketing-Sprech.
             </p>
-            <a href="#kontakt">
+            <a href="#contact">
               <Button variant="gold" className="rounded-2xl group">
-                Individuelle Frage stellen
+                Andere Frage? Sprechen Sie mit uns
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </a>

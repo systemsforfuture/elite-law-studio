@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { X, Gift, ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -77,22 +78,22 @@ const ExitIntentPopup = () => {
           </span>
 
           <h3 className="text-2xl font-display font-black text-foreground mb-3 tracking-[-0.02em]">
-            Bevor Sie gehen –
+            Bevor Sie gehen —
             <br />
-            <span className="text-gradient-gold">sichern Sie sich Ihre kostenlose Erstberatung</span>
+            <span className="text-gradient-gold">sehen Sie SYSTEMS in 30 Sekunden live</span>
           </h3>
 
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Eine 30-minütige Ersteinschätzung Ihres Falls – komplett kostenlos und unverbindlich.
-            Antwort innerhalb von 2 Stunden.
+            Klickbare Plattform-Demo, ohne Anmeldung. Voice-Agent live testen,
+            Mandanten-Inbox sehen, Mahnwesen-Workflow durchspielen.
           </p>
 
-          <a href="#kontakt" onClick={() => setOpen(false)}>
+          <Link to="/onboarding" onClick={() => setOpen(false)}>
             <Button variant="gold" className="w-full rounded-xl group glow-gold" size="lg">
-              Jetzt kostenlos sichern
+              Live-Demo starten
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
-          </a>
+          </Link>
 
           <button
             onClick={() => setOpen(false)}
