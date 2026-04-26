@@ -16,9 +16,11 @@ import Footer from "@/components/kanzlei-template/Footer";
 import StickyCta from "@/components/kanzlei-template/StickyCta";
 import ExitIntent from "@/components/kanzlei-template/ExitIntent";
 import SystemsBadge from "@/components/kanzlei-template/SystemsBadge";
+import DemoBanner from "@/components/kanzlei-template/DemoBanner";
 
 const KanzleiTemplate = () => (
   <div className="min-h-screen">
+    <DemoBanner />
     <Navbar />
     <Hero />
     <PainPoints />
