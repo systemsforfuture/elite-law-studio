@@ -16,17 +16,17 @@ import {
   Receipt as ReceiptIcon,
 } from "lucide-react";
 import {
-  mandanten,
-  akten,
-  konversationen,
-  rechnungen,
   findUser,
   mandantName,
-  activitiesForMandant,
 } from "@/data/mockData";
 import type { Mandant, MandantStatus } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
+import { useMandantenQuery } from "@/lib/queries/use-mandanten";
+import { useAktenQuery } from "@/lib/queries/use-akten";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useActivitiesForMandant } from "@/lib/queries/use-activities";
 
 const statusBadge: Record<MandantStatus, { label: string; cls: string }> = {
   aktiv: { label: "Aktiv", cls: "bg-emerald-500/15 text-emerald-700" },
@@ -54,12 +54,15 @@ const MandantDetail = ({
   onBack: () => void;
 }) => {
   const [tab, setTab] = useState<DetailTab>("ueberblick");
+  const { data: akten = [] } = useAktenQuery();
+  const { data: konversationen = [] } = useKonversationenQuery();
+  const { data: rechnungen = [] } = useRechnungenQuery();
+  const { data: acts = [] } = useActivitiesForMandant(mandant.id);
   const aktenForMandant = akten.filter((a) => a.mandant_id === mandant.id);
   const konvForMandant = konversationen.filter(
     (k) => k.mandant_id === mandant.id,
   );
   const rechForMandant = rechnungen.filter((r) => r.mandant_id === mandant.id);
-  const acts = activitiesForMandant(mandant.id);
   const anwalt = findUser(mandant.zugewiesener_anwalt_id);
 
   return (
@@ -292,6 +295,7 @@ const MandantenPage = () => {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<MandantStatus | "all">("all");
   const [selected, setSelected] = useState<Mandant | null>(null);
+  const { data: mandanten = [], isLoading } = useMandantenQuery();
 
   const filtered = useMemo(() => {
     return mandanten.filter((m) => {
@@ -299,12 +303,12 @@ const MandantenPage = () => {
       const hit =
         !q ||
         mandantName(m).toLowerCase().includes(q) ||
-        m.email.toLowerCase().includes(q) ||
+        (m.email ?? "").toLowerCase().includes(q) ||
         (m.telefon ?? "").toLowerCase().includes(q);
       const matchStatus = statusFilter === "all" || m.status === statusFilter;
       return hit && matchStatus;
     });
-  }, [query, statusFilter]);
+  }, [mandanten, query, statusFilter]);
 
   if (selected) {
     return <MandantDetail mandant={selected} onBack={() => setSelected(null)} />;

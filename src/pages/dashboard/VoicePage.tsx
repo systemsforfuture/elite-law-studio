@@ -15,12 +15,11 @@ import {
   Sparkles,
   Activity,
 } from "lucide-react";
-import { konversationen, findMandant, mandantName, kiAgents } from "@/data/mockData";
+import { findMandant, mandantName, kiAgents } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
-
-const voiceCalls = konversationen.filter((k) => k.kanal === "voice");
 
 const VoicePage = () => {
   const { tenant } = useTenant();
@@ -28,6 +27,8 @@ const VoicePage = () => {
   const [selected, setSelected] = useState<Konversation | null>(null);
   const [playing, setPlaying] = useState(false);
   const voiceAgent = kiAgents.find((a) => a.slug === "voice_receptionist")!;
+  const { data: konversationen = [] } = useKonversationenQuery();
+  const voiceCalls = konversationen.filter((k) => k.kanal === "voice");
 
   if (selected) {
     return (

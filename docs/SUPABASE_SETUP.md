@@ -48,9 +48,7 @@ Settings → Database → Database password (Reset wenn vergessen).
 
 > ⚠️ Das DB-Passwort gehört nur lokal in `.env.local` als `SUPABASE_DB_URL` oder in den GitHub-Actions-Secrets — niemals in den Chat oder ins Repo.
 
-## 3. Demo-Tenant + Owner-User anlegen
-
-### 3a — Tenant per Seed
+## 3. Demo-Tenant per Seed anlegen
 
 Im SQL Editor:
 
@@ -58,35 +56,12 @@ Im SQL Editor:
 -- supabase/seed.sql Inhalt einfügen und Run
 ```
 
-Oder per CLI:
-
-```bash
-psql "$SUPABASE_DB_URL" -f supabase/seed.sql
-```
-
 Ergebnis: Ein Demo-Tenant „Kanzlei Bergmann" mit ID `11111111-1111-1111-1111-111111111111`.
 
-### 3b — Ersten Auth-User erstellen + zum Tenant verknüpfen
-
-Ohne Auth-User kommst du nicht ins Dashboard (RLS verlangt `auth.uid()`).
-
-**Im Supabase-Dashboard:**
-
-1. Authentication → Users → **Add user** → **Create new user**
-2. Email: deine echte E-Mail · Password: irgendwas (du benutzt eh Magic Link) · **Auto confirm email** anhaken
-3. Danach im SQL Editor — die UUID des Users aus Authentication-Tab kopieren:
-
-```sql
-insert into public.users (id, tenant_id, email, name, role, avatar_initials)
-values (
-  'AUTH-USER-UUID-HIER',                               -- aus auth.users kopieren
-  '11111111-1111-1111-1111-111111111111',              -- Bergmann-Tenant
-  'deine@mail.de',
-  'Dein Name',
-  'owner',
-  'DN'
-);
-```
+> **Auto-Bootstrap aktiv:** Du musst dich **nicht** mehr manuell zur public.users-Tabelle hinzufügen. Sobald du dich per Magic Link einloggst, ruft die App `bootstrap_user_self()` auf:
+> - **Erste Person** im System → wird automatisch Bergmann-Owner
+> - **Eingeladene Personen** → werden automatisch dem einladenden Tenant zugeordnet (über `invite_user`-RPC)
+> - **Andere** → bekommen Fehlermeldung „Keine offene Einladung"
 
 ## 4. Email-Templates für Magic Link anpassen (optional)
 
@@ -113,16 +88,39 @@ Authentication → URL Configuration → **Site URL**: `http://127.0.0.1:5173` (
 
 Wenn das klappt: **Schema, RLS, Auth funktionieren.** Backend-Foundation steht.
 
-## 6. Was als nächstes ansteht (Sprint 2.1+)
+## 6. Auto-Deploy aktivieren (optional, einmalige 2-Min-Aktion)
 
-1. **Auto-Bootstrap der `public.users`-Zeile** beim ersten Login (RPC `bootstrap_user`)
-2. **Module-für-Modul-Migration** der Mock-Daten:
-   - Mandanten → Supabase Queries
-   - Akten → Supabase Queries
-   - Konversationen, Termine, Dokumente, Rechnungen, Aktivitäten, Strategien
-3. **Storage-Upload** für Dokumente in Bucket `tenant-files`
-4. **Audit-Log-Trigger** auf jeder Tabelle (write-only via Postgres-Trigger)
-5. **GitHub Action** für automatisches `supabase db push` bei main-Push (mit GitHub-Secret)
+Damit zukünftige Migrations automatisch deployen wenn du auf `main` pushst — **nie wieder manuell SQL Editor öffnen.**
+
+GitHub Repo → **Settings → Secrets and variables → Actions → New repository secret**:
+
+| Secret-Name | Wert | Wo finden |
+|---|---|---|
+| `SUPABASE_ACCESS_TOKEN` | Personal Access Token | https://supabase.com/dashboard/account/tokens → **Generate new token** |
+| `SUPABASE_DB_PASSWORD` | DB-Passwort des Projekts | Supabase Dashboard → Project Settings → Database → **Database password** (Reset wenn vergessen) |
+
+Workflow-Datei: `.github/workflows/supabase-deploy.yml` — triggert bei jedem Push auf `main` mit Änderungen in `supabase/migrations/`.
+
+> Der Personal Access Token gibt **account-weite** Rechte. Der ist NUR im GitHub-Secret — nirgendwo sonst. Bei Verdacht: in Supabase widerrufen.
+
+## 7. Was als nächstes ansteht
+
+Migrations-Backlog (alle bereits in dieser Codebase geplant):
+
+- **Sprint 2.1** ✅ Auto-Bootstrap Bootstrap (`bootstrap_user_self`) + Audit-Trigger
+- **Sprint 2.2 – 2.4** ✅ Alle Module nutzen jetzt `react-query` Hooks mit graceful fallback
+  - Mandanten, Akten, Strategien, Termine, Dokumente, Rechnungen, Konversationen, Activities, Team
+- **Sprint 2.5** ✅ Storage-Upload-Hook (`useUploadDokument`) bereit
+- **Sprint 2.6** ✅ Audit-Triggers Postgres-side
+- **Sprint 2.7** ✅ GitHub Action für `supabase db push` bei main-Push
+
+Noch offen (Sprint 3+):
+
+1. KI-Edge-Functions: Strategie-Generierung, Inbox-Triage, Voice-Webhook
+2. Tatsächliche Daten-Migration aus RA-MICRO/DATEV (Importer-Backend)
+3. Type-Generierung: `supabase gen types typescript --project-id dsgenkjlkdzkoplnxebg > src/lib/database.types.ts`
+4. Email-Templates: Magic-Link, Einladung, Mahnung-Templates polieren
+5. Beobachtbarkeit: Sentry / Logflare / pg_stat_statements
 
 ## Troubleshooting
 

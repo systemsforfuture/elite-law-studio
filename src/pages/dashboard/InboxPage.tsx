@@ -10,8 +10,9 @@ import {
   Sparkles,
   Phone,
 } from "lucide-react";
-import { konversationen, findMandant, mandantName } from "@/data/mockData";
+import { findMandant, mandantName } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { Button } from "@/components/ui/button";
 
 type Filter = "all" | "email" | "whatsapp" | "escalated" | "ai";
@@ -20,6 +21,7 @@ const InboxPage = () => {
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<Konversation | null>(null);
   const [reply, setReply] = useState("");
+  const { data: konversationen = [] } = useKonversationenQuery();
 
   const items = useMemo(() => {
     return konversationen
@@ -32,7 +34,7 @@ const InboxPage = () => {
         return true;
       })
       .sort((a, b) => b.zeitpunkt.localeCompare(a.zeitpunkt));
-  }, [filter]);
+  }, [filter, konversationen]);
 
   if (selected) {
     const md = findMandant(selected.mandant_id);

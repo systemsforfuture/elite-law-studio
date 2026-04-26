@@ -1,0 +1,59 @@
+name: Supabase Deploy
+
+# Pusht neue Migrationen automatisch in das verlinkte Supabase-Projekt
+# bei jedem Push auf main, der supabase/-Dateien geändert hat.
+#
+# Voraussetzungen (einmaliges Setup):
+#   1. Repo Settings → Secrets and variables → Actions → New repository secret
+#      - SUPABASE_ACCESS_TOKEN — Personal Access Token aus
+#        https://supabase.com/dashboard/account/tokens
+#      - SUPABASE_DB_PASSWORD — DB-Passwort aus
+#        Project Settings → Database → Database password
+#   2. Anschließend triggert jeder Push auf main mit Schema-Änderungen
+#      automatisch ein db push. Siehe docs/SUPABASE_SETUP.md.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "supabase/config.toml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: supabase-deploy
+  cancel-in-progress: false
+
+env:
+  SUPABASE_PROJECT_REF: dsgenkjlkdzkoplnxebg
+
+jobs:
+  deploy:
+    name: db push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF" \
+            --password "${{ secrets.SUPABASE_DB_PASSWORD }}"
+
+      - name: Deploy Migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase db push --password "${{ secrets.SUPABASE_DB_PASSWORD }}" --include-all
+
+      - name: Summary
+        run: |
+          echo "::notice title=Supabase deployed::Migrations applied to ${SUPABASE_PROJECT_REF}"

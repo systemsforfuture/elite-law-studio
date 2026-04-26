@@ -12,9 +12,11 @@ import {
   Sparkles,
   Activity as ActivityIcon,
 } from "lucide-react";
-import { users, akten, findTeamStats, mandantName, findMandant } from "@/data/mockData";
+import { mandantName, findMandant, findTeamStats } from "@/data/mockData";
 import type { User as UserType } from "@/data/types";
 import { Button } from "@/components/ui/button";
+import { useTeamQuery, useTeamStats } from "@/lib/queries/use-team";
+import { useAktenQuery } from "@/lib/queries/use-akten";
 
 const roleLabel = {
   owner: { label: "Owner", cls: "bg-accent/15 text-accent" },
@@ -30,7 +32,8 @@ const TeamDetail = ({
   user: UserType;
   onBack: () => void;
 }) => {
-  const stats = findTeamStats(user.id);
+  const { data: stats } = useTeamStats(user.id);
+  const { data: akten = [] } = useAktenQuery();
   const userAkten = akten.filter((a) => a.zugewiesener_anwalt_id === user.id);
 
   return (
@@ -223,6 +226,7 @@ const TeamDetail = ({
 
 const TeamPage = () => {
   const [selected, setSelected] = useState<UserType | null>(null);
+  const { data: users = [] } = useTeamQuery();
 
   if (selected) {
     return <TeamDetail user={selected} onBack={() => setSelected(null)} />;
