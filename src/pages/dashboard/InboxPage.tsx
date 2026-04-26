@@ -18,6 +18,7 @@ import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useTriageInbox, type TriageResult } from "@/lib/queries/use-triage";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
 
 type Filter = "all" | "email" | "whatsapp" | "escalated" | "ai";
 
@@ -26,7 +27,7 @@ const InboxPage = () => {
   const [selected, setSelected] = useState<Konversation | null>(null);
   const [reply, setReply] = useState("");
   const [triage, setTriage] = useState<TriageResult | null>(null);
-  const { data: konversationen = [] } = useKonversationenQuery();
+  const { data: konversationen = [], isLoading } = useKonversationenQuery();
   const triageInbox = useTriageInbox();
 
   useEffect(() => {
@@ -331,9 +332,24 @@ const InboxPage = () => {
           </div>
         </div>
         <div className="divide-y divide-border/40">
-          {items.length === 0 && (
-            <div className="p-12 text-center text-sm text-muted-foreground">
-              Keine Nachrichten gefunden.
+          {isLoading && konversationen.length === 0 && (
+            <>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonRow key={i} />
+              ))}
+            </>
+          )}
+          {!isLoading && items.length === 0 && (
+            <div className="p-12 text-center">
+              <Mail className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+              <p className="text-sm text-foreground font-medium">
+                Keine Nachrichten
+              </p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                Sobald Mandanten per Email oder WhatsApp schreiben, erscheinen
+                ihre Nachrichten hier — die KI hat schon eine Antwort
+                vorbereitet.
+              </p>
             </div>
           )}
           {items.map((k) => {
