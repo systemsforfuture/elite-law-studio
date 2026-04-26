@@ -41,17 +41,17 @@ const ContactSection = () => {
   const inputClass = "w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all duration-300 placeholder:text-muted-foreground/50 hover:border-border";
 
   return (
-    <section id="kontakt" className="py-32 bg-card relative overflow-hidden">
+    <section id="kontakt" className="py-20 sm:py-32 bg-card relative overflow-hidden">
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent/[0.03] rounded-full blur-[100px]" />
 
-      <div className="container mx-auto px-6" ref={ref}>
-        <div className="grid lg:grid-cols-2 gap-16">
+      <div className="container mx-auto px-4 sm:px-6" ref={ref}>
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
           <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent mb-4">
               <span className="w-8 h-px bg-accent/50" />
               Kontakt
             </span>
-            <h2 className="text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em]">
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em] leading-[1.05]">
               Kostenlose{" "}
               <span className="text-gradient-gold">Erstberatung</span>
             </h2>
@@ -91,20 +91,20 @@ const ContactSection = () => {
                   className={`flex items-center gap-4 group transition-all duration-500 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-6"}`}
                   style={{ transitionDelay: `${800 + i * 80}ms` }}
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-accent/[0.08] flex items-center justify-center group-hover:bg-accent/15 group-hover:scale-110 transition-all duration-300">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-accent/[0.08] flex items-center justify-center group-hover:bg-accent/15 group-hover:scale-110 transition-all duration-300 shrink-0">
                     <Icon className="h-5 w-5 text-accent" />
                   </div>
-                  <span className="text-sm text-foreground group-hover:text-accent transition-colors duration-300">{label}</span>
+                  <span className="text-sm text-foreground group-hover:text-accent transition-colors duration-300 break-all">{label}</span>
                 </a>
               ))}
             </div>
           </div>
 
           <div className={`transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}>
-            <div className="glass-card p-10 shadow-2xl shadow-navy/5 relative">
+            <div className="glass-card p-5 sm:p-8 lg:p-10 shadow-2xl shadow-navy/5 relative">
               {/* Urgency badge on form */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-accent text-accent-foreground text-xs font-semibold shadow-lg shadow-accent/30">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 max-w-[calc(100%-1rem)]">
+                <div className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-accent text-accent-foreground text-[10px] sm:text-xs font-semibold shadow-lg shadow-accent/30 whitespace-nowrap">
                   <span className="relative flex h-1.5 w-1.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-foreground/60" />
                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-foreground" />
@@ -113,11 +113,11 @@ const ContactSection = () => {
                 </div>
               </div>
 
-              <h3 className="text-2xl font-display font-bold text-foreground mb-2 mt-2">Jetzt Anfrage senden</h3>
-              <p className="text-sm text-muted-foreground mb-8">Alle Felder mit * sind Pflichtfelder.</p>
-              
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="grid grid-cols-2 gap-4">
+              <h3 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-2 mt-2">Jetzt Anfrage senden</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-6 sm:mb-8">Alle Felder mit * sind Pflichtfelder.</p>
+
+              <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <input type="text" required placeholder="Vorname *" value={formData.firstName} onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} className={inputClass} />
                   <input type="text" required placeholder="Nachname *" value={formData.lastName} onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} className={inputClass} />
                 </div>
