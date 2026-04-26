@@ -29,6 +29,7 @@ import { CommandPalette, useCommandPalette } from "@/components/dashboard/Comman
 import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import WelcomeTour from "@/components/dashboard/WelcomeTour";
+import ProfileMenu from "@/components/dashboard/ProfileMenu";
 
 interface NavGroup {
   label: string;
@@ -228,9 +229,7 @@ const DashboardLayout = () => {
             </button>
             <ThemeToggle />
             <NotificationsDropdown />
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-navy to-navy-light flex items-center justify-center shadow-sm">
-              <User className="h-4 w-4 text-primary-foreground" />
-            </div>
+            <ProfileMenu />
           </div>
         </header>
 
