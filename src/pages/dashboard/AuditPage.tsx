@@ -12,9 +12,9 @@ import {
   Plus,
   ArrowDownToLine,
 } from "lucide-react";
-import { auditLog } from "@/data/mockData";
 import type { AuditEvent } from "@/data/types";
 import { Button } from "@/components/ui/button";
+import { useAuditLog } from "@/lib/queries/use-audit";
 
 const actionMeta: Record<
   AuditEvent["action"],
@@ -38,6 +38,7 @@ const actionMeta: Record<
 };
 
 const AuditPage = () => {
+  const { data: auditLog = [] } = useAuditLog();
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-3 gap-4">
