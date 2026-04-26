@@ -12,23 +12,35 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
+import { useMandantAuth } from "@/contexts/MandantAuthContext";
+import { toast } from "sonner";
 
 const PortalLogin = () => {
   const { tenant } = useTenant();
+  const mandantAuth = useMandantAuth();
   const [email, setEmail] = useState("");
   const [aktenzeichen, setAktenzeichen] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
+
+    if (mandantAuth.isDemoMode) {
+      navigate("/portal/dashboard");
+      return;
+    }
+
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    const { error: e2 } = await mandantAuth.signInWithMagicLink(email.trim());
+    setSending(false);
+    if (e2) {
+      toast.error("Login fehlgeschlagen", { description: e2.message });
+    } else {
       setSent(true);
-    }, 900);
+    }
   };
 
   return (
