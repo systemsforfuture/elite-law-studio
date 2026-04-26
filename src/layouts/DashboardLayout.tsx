@@ -203,20 +203,20 @@ const DashboardLayout = () => {
       )}
 
       <div className="flex-1 lg:ml-72 min-w-0">
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-2xl border-b border-border/50 h-16 flex items-center px-6 justify-between">
-          <div className="flex items-center gap-4 min-w-0">
+        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-2xl border-b border-border/50 h-16 flex items-center px-3 sm:px-6 justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             <button
-              className="lg:hidden text-foreground p-2 rounded-xl hover:bg-muted transition-colors"
+              className="lg:hidden text-foreground p-2 rounded-xl hover:bg-muted transition-colors shrink-0"
               onClick={() => setSidebarOpen(true)}
               aria-label="Menü"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <h1 className="text-xl font-display font-bold text-foreground truncate">
+            <h1 className="text-base sm:text-xl font-display font-bold text-foreground truncate">
               {title}
             </h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={() => cmdk.setOpen(true)}
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60 transition-all border border-border/50"
@@ -227,8 +227,15 @@ const DashboardLayout = () => {
                 ⌘K
               </kbd>
             </button>
+            <button
+              onClick={() => cmdk.setOpen(true)}
+              className="sm:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              aria-label="Suchen"
+            >
+              <Search className="h-4 w-4" />
+            </button>
             <div
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground bg-muted/30 border border-border/50"
+              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground bg-muted/30 border border-border/50"
               role="status"
               aria-label="KI-Agenten Status"
             >
@@ -244,13 +251,13 @@ const DashboardLayout = () => {
         <CommandPalette open={cmdk.open} onOpenChange={cmdk.setOpen} />
         <WelcomeTour />
 
-        <main id="main-content" className="p-6 lg:p-8 max-w-7xl">
+        <main id="main-content" className="p-3 sm:p-6 lg:p-8 max-w-7xl">
           <Outlet />
         </main>
 
-        <footer className="border-t border-border/50 px-6 py-4 mt-8">
-          <div className="flex justify-between items-center text-xs text-muted-foreground/60">
-            <div className="flex gap-6">
+        <footer className="border-t border-border/50 px-3 sm:px-6 py-4 mt-8">
+          <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center text-xs text-muted-foreground/60">
+            <div className="flex flex-wrap gap-4 sm:gap-6">
               <a href="#" className="hover:text-foreground transition-colors">
                 Datenschutz
               </a>
