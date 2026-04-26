@@ -263,20 +263,20 @@ const PortalDashboard = () => {
               )}
             </section>
 
-            <div className="grid lg:grid-cols-2 gap-6">
+            <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Anwalt-Card */}
               {anwalt && (
-                <section className="glass-card p-6 border-border/50">
+                <section className="glass-card p-5 sm:p-6 border-border/50">
                   <h3 className="text-sm font-display font-bold text-foreground mb-4">
                     Ihr Anwalt
                   </h3>
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-navy text-primary-foreground flex items-center justify-center font-bold text-lg">
+                    <div className="w-14 h-14 rounded-2xl bg-navy text-primary-foreground flex items-center justify-center font-bold text-lg shrink-0">
                       {anwalt.avatar_initials}
                     </div>
-                    <div>
-                      <div className="font-semibold text-foreground">{anwalt.name}</div>
-                      <div className="text-xs text-muted-foreground">
+                    <div className="min-w-0">
+                      <div className="font-semibold text-foreground truncate">{anwalt.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
                         {anwalt.rechtsgebiete?.join(" · ")}
                       </div>
                     </div>
@@ -300,12 +300,12 @@ const PortalDashboard = () => {
               )}
 
               {/* Quick-Upload */}
-              <section className="glass-card p-6 border-border/50">
+              <section className="glass-card p-5 sm:p-6 border-border/50">
                 <h3 className="text-sm font-display font-bold text-foreground mb-4">
                   Dokument einreichen
                 </h3>
                 <div
-                  className="border-2 border-dashed border-accent/20 rounded-xl p-6 text-center cursor-pointer hover:bg-accent/5 transition-colors"
+                  className="border-2 border-dashed border-accent/20 rounded-xl p-5 sm:p-6 text-center cursor-pointer hover:bg-accent/5 transition-colors"
                   onClick={() => setTab("dokumente")}
                 >
                   <Upload className="h-7 w-7 text-accent mx-auto mb-2" />
@@ -455,32 +455,34 @@ const PortalDashboard = () => {
                 return (
                   <div
                     key={t.id}
-                    className="glass-card p-5 border-border/50 flex items-center gap-4"
+                    className="glass-card p-4 sm:p-5 border-border/50 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-accent/10 flex flex-col items-center justify-center shrink-0">
-                      <span className="text-[10px] uppercase font-semibold text-accent">
-                        {d.toLocaleDateString("de-DE", { month: "short" })}
-                      </span>
-                      <span className="text-lg font-display font-bold text-foreground tabular-nums">
-                        {d.getDate()}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-foreground">
-                        {t.titel}
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-accent/10 flex flex-col items-center justify-center shrink-0">
+                        <span className="text-[10px] uppercase font-semibold text-accent">
+                          {d.toLocaleDateString("de-DE", { month: "short" })}
+                        </span>
+                        <span className="text-base sm:text-lg font-display font-bold text-foreground tabular-nums">
+                          {d.getDate()}
+                        </span>
                       </div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        {d.toLocaleString("de-DE")}
-                        {u && ` · mit ${u.name}`}
-                        {t.ort && ` · ${t.ort}`}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-foreground truncate">
+                          {t.titel}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                          {d.toLocaleString("de-DE")}
+                          {u && ` · mit ${u.name}`}
+                          {t.ort && ` · ${t.ort}`}
+                        </div>
                       </div>
                     </div>
                     {t.bestaetigt ? (
-                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded">
+                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded shrink-0 self-start sm:self-auto">
                         Bestätigt
                       </span>
                     ) : (
-                      <Button variant="outline" size="sm" className="rounded-xl">
+                      <Button variant="outline" size="sm" className="rounded-xl shrink-0 self-start sm:self-auto">
                         Bestätigen
                       </Button>
                     )}
