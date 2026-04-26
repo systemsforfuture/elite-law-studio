@@ -88,6 +88,45 @@ Authentication → URL Configuration → **Site URL**: `http://127.0.0.1:5173` (
 
 Wenn das klappt: **Schema, RLS, Auth funktionieren.** Backend-Foundation steht.
 
+## 5b. KI-Edge-Functions konfigurieren (für echte KI-Antworten)
+
+Drei Edge Functions sind im Repo (`supabase/functions/`):
+
+| Function | Zweck | Auth |
+|---|---|---|
+| `generate-strategie` | Anwalts-Strategie aus Akte generieren | User-JWT |
+| `triage-inbox` | Email/WhatsApp kategorisieren + Antwort vorschlagen | User-JWT |
+| `capture-lead` | Lead aus Kontakt-Formular speichern | öffentlich |
+
+### Deployment
+
+Per CLI:
+```bash
+supabase functions deploy generate-strategie
+supabase functions deploy triage-inbox
+supabase functions deploy capture-lead --no-verify-jwt
+```
+
+`capture-lead` braucht `--no-verify-jwt` weil das Formular auf der White-Label-Seite ohne Login aufgerufen wird.
+
+### Anthropic-API-Key setzen
+
+Damit die KI tatsächlich antwortet (statt Mock-Strings):
+
+Option A — Dashboard:
+- https://supabase.com/dashboard/project/dsgenkjlkdzkoplnxebg/settings/functions
+- Section **Edge Function Secrets** → **Add new secret**
+- Name: `ANTHROPIC_API_KEY` · Value: `sk-ant-api03-…` (aus https://console.anthropic.com/settings/keys)
+
+Option B — CLI:
+```bash
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-api03-...
+```
+
+> Ohne Key liefern die Functions Mock-Antworten zurück. Die UI funktioniert trotzdem — du siehst gut formatierte Beispiel-Outputs.
+
+> **Sicherheit:** Der Anthropic-Key ist NUR Server-side (Edge Function Secret). Niemals im Frontend, niemals im Repo. Bei Leak: in Anthropic Console rotieren.
+
 ## 6. Auto-Deploy aktivieren (optional, einmalige 2-Min-Aktion)
 
 Damit zukünftige Migrations automatisch deployen wenn du auf `main` pushst — **nie wieder manuell SQL Editor öffnen.**

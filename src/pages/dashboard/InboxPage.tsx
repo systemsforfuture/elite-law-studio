@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Mail,
   MessageCircle,
@@ -9,10 +9,14 @@ import {
   Send,
   Sparkles,
   Phone,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useTriageInbox, type TriageResult } from "@/lib/queries/use-triage";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 type Filter = "all" | "email" | "whatsapp" | "escalated" | "ai";
@@ -21,7 +25,30 @@ const InboxPage = () => {
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<Konversation | null>(null);
   const [reply, setReply] = useState("");
+  const [triage, setTriage] = useState<TriageResult | null>(null);
   const { data: konversationen = [] } = useKonversationenQuery();
+  const triageInbox = useTriageInbox();
+
+  useEffect(() => {
+    if (!selected) {
+      setTriage(null);
+      return;
+    }
+    let cancelled = false;
+    triageInbox
+      .mutateAsync(selected.id)
+      .then((r) => !cancelled && setTriage(r))
+      .catch((e) => {
+        if (!cancelled) {
+          console.warn("Triage failed:", e);
+          setTriage(null);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected?.id]);
 
   const items = useMemo(() => {
     return konversationen
@@ -38,10 +65,13 @@ const InboxPage = () => {
 
   if (selected) {
     const md = findMandant(selected.mandant_id);
-    const aiSuggestion =
+    const fallbackSuggestion =
       selected.kanal === "whatsapp"
         ? "Vielen Dank für Ihre Nachricht. Die Klageerwiderung ist beim Gericht eingereicht. Antwort der Gegenseite läuft, wir informieren Sie sofort. Bei akuten Fragen erreichen Sie mich unter +49 30 …"
         : "Sehr geehrter Herr/Frau …, vielen Dank für Ihre Anfrage. Gerne können wir einen Termin vereinbaren. Hier ist mein Kalender: <Link>. Mit freundlichen Grüßen — Ihre Kanzlei.";
+    const aiSuggestion = triage?.antwort_vorschlag ?? fallbackSuggestion;
+    const triageLoading = triageInbox.isPending;
+    const triageEskaliert = triage?.eskalation_noetig === true;
 
     return (
       <div className="space-y-6">
@@ -97,18 +127,35 @@ const InboxPage = () => {
               </div>
             </div>
 
-            <div className="glass-card p-6 border-accent/30 bg-accent/[0.04]">
+            <div
+              className={`glass-card p-6 ${
+                triageEskaliert
+                  ? "border-amber-500/30 bg-amber-500/[0.04]"
+                  : "border-accent/30 bg-accent/[0.04]"
+              }`}
+            >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Bot className="h-4 w-4 text-accent" />
+                  {triageLoading ? (
+                    <Loader2 className="h-4 w-4 text-accent animate-spin" />
+                  ) : (
+                    <Bot className="h-4 w-4 text-accent" />
+                  )}
                   <h3 className="text-sm font-display font-bold text-foreground">
-                    KI-Vorschlag
+                    {triageLoading ? "KI analysiert…" : "KI-Vorschlag"}
                   </h3>
                 </div>
-                <span className="text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/15 px-2 py-0.5 rounded">
-                  Konfidenz 0.91
-                </span>
+                {triage && (
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/15 px-2 py-0.5 rounded">
+                    Konfidenz {triage.konfidenz.toFixed(2)}
+                  </span>
+                )}
               </div>
+              {triageEskaliert && triage?.eskalation_grund && (
+                <div className="text-xs text-amber-700 font-medium mb-2">
+                  Empfehlung: An Anwalt eskalieren — {triage.eskalation_grund}
+                </div>
+              )}
               <p className="text-sm text-foreground/80 italic mb-4">
                 „{aiSuggestion}"
               </p>
@@ -117,13 +164,40 @@ const InboxPage = () => {
                   variant="gold"
                   size="sm"
                   className="rounded-xl"
-                  onClick={() => setReply(aiSuggestion)}
+                  disabled={triageLoading}
+                  onClick={() => {
+                    setReply(aiSuggestion);
+                    toast.success("KI-Vorschlag übernommen");
+                  }}
                 >
                   <Sparkles className="mr-2 h-3.5 w-3.5" />
-                  Übernehmen & senden
+                  Übernehmen
                 </Button>
-                <Button variant="outline" size="sm" className="rounded-xl">
-                  Anpassen
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl"
+                  disabled={triageLoading}
+                  onClick={() => {
+                    if (selected) {
+                      const t = toast.loading("Neuer KI-Vorschlag…");
+                      triageInbox
+                        .mutateAsync(selected.id)
+                        .then((r) => {
+                          setTriage(r);
+                          toast.success("KI hat überlegt", { id: t });
+                        })
+                        .catch((e) =>
+                          toast.error("Fehlgeschlagen", {
+                            id: t,
+                            description: String(e),
+                          }),
+                        );
+                    }
+                  }}
+                >
+                  <RefreshCw className="mr-2 h-3.5 w-3.5" />
+                  Neu generieren
                 </Button>
               </div>
             </div>

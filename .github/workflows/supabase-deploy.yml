@@ -17,6 +17,7 @@ on:
     branches: [main]
     paths:
       - "supabase/migrations/**"
+      - "supabase/functions/**"
       - "supabase/config.toml"
   workflow_dispatch: {}
 
@@ -54,6 +55,16 @@ jobs:
         run: |
           supabase db push --password "${{ secrets.SUPABASE_DB_PASSWORD }}" --include-all
 
+      - name: Deploy Edge Functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          # generate-strategie + triage-inbox: User-JWT erforderlich
+          supabase functions deploy generate-strategie
+          supabase functions deploy triage-inbox
+          # capture-lead: öffentlich (Marketing-Forms ohne Login)
+          supabase functions deploy capture-lead --no-verify-jwt
+
       - name: Summary
         run: |
-          echo "::notice title=Supabase deployed::Migrations applied to ${SUPABASE_PROJECT_REF}"
+          echo "::notice title=Supabase deployed::Migrations + Edge Functions applied to ${SUPABASE_PROJECT_REF}"

@@ -2,22 +2,40 @@ import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, MapPin, Clock, ArrowRight, CheckCircle, Shield, Star } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useCaptureLead } from "@/lib/queries/use-capture-lead";
 
 const ContactSection = () => {
   const { ref, isVisible } = useScrollAnimation();
-  const { toast } = useToast();
+  const captureLead = useCaptureLead();
   const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", phone: "", message: "", rechtsgebiet: "" });
-  const [sending, setSending] = useState(false);
+  const sending = captureLead.isPending;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      toast({ title: "Anfrage gesendet ✓", description: "Wir melden uns innerhalb von 2 Stunden bei Ihnen." });
+    if (!formData.email.trim()) {
+      toast.error("Bitte E-Mail-Adresse angeben");
+      return;
+    }
+    const t = toast.loading("Anfrage wird gesendet…");
+    try {
+      const result = await captureLead.mutateAsync({
+        vorname: formData.firstName || undefined,
+        nachname: formData.lastName || undefined,
+        email: formData.email.trim(),
+        telefon: formData.phone || undefined,
+        rechtsgebiet: formData.rechtsgebiet || undefined,
+        beschreibung: formData.message || undefined,
+        herkunft: "web",
+      });
+      toast.success("Anfrage angekommen ✓", { id: t, description: result.message });
       setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", rechtsgebiet: "" });
-    }, 1500);
+    } catch (err) {
+      toast.error("Senden fehlgeschlagen", {
+        id: t,
+        description: err instanceof Error ? err.message : "Bitte versuchen Sie es erneut.",
+      });
+    }
   };
 
   const inputClass = "w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all duration-300 placeholder:text-muted-foreground/50 hover:border-border";
