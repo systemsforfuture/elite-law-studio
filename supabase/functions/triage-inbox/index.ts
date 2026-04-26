@@ -81,17 +81,39 @@ Deno.serve(async (req: Request) => {
 
     const { data: tenant } = await admin
       .from("tenants")
-      .select("kanzlei_name, branding_config, rechtsgebiete")
+      .select("kanzlei_name, branding_config, rechtsgebiete, agent_config")
       .eq("id", ctx.tenant_id)
       .single();
 
-    const tonalitaet = (tenant?.branding_config as { tonalitaet?: string })
-      ?.tonalitaet ?? "freundlich";
+    const branding = (tenant?.branding_config ?? {}) as { tonalitaet?: string };
+    const agentCfg = ((tenant?.agent_config ?? {}) as Record<string, {
+      status?: string;
+      konfidenz_threshold?: number;
+      tonalitaet?: string;
+      custom_prompt_addition?: string | null;
+    }>)[konv.kanal === "whatsapp" ? "whatsapp_conversationalist" : "email_triagist"];
+
+    // Wenn Agent pausiert → kein Vorschlag
+    if (agentCfg?.status === "pausiert") {
+      return new Response(
+        JSON.stringify({
+          error: "Agent pausiert für diesen Kanal",
+        }),
+        {
+          status: 423,
+          headers: { ...corsHeaders, "content-type": "application/json" },
+        },
+      );
+    }
+
+    const tonalitaet =
+      agentCfg?.tonalitaet ?? branding.tonalitaet ?? "freundlich";
 
     const userPrompt = `
 KANZLEI: ${tenant?.kanzlei_name ?? "—"}
 TONALITÄT: ${tonalitaet}
 RECHTSGEBIETE: ${(tenant?.rechtsgebiete ?? []).join(", ")}
+${agentCfg?.custom_prompt_addition ? `\nKANZLEI-SPEZIFISCHE ANWEISUNGEN:\n${agentCfg.custom_prompt_addition}\n` : ""}
 
 MANDANT: ${
       konv.mandant

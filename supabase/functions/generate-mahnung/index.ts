@@ -71,9 +71,23 @@ Deno.serve(async (req: Request) => {
 
     const { data: tenant } = await admin
       .from("tenants")
-      .select("kanzlei_name")
+      .select("kanzlei_name, agent_config")
       .eq("id", ctx.tenant_id)
       .single();
+
+    const mahnCfg = ((tenant?.agent_config ?? {}) as Record<string, {
+      status?: string;
+      custom_prompt_addition?: string | null;
+    }>)["mahnungs_eskalator"];
+    if (mahnCfg?.status === "pausiert") {
+      return new Response(
+        JSON.stringify({ error: "Mahnungs-KI pausiert. Aktivieren unter /dashboard/agenten" }),
+        {
+          status: 423,
+          headers: { ...corsHeaders, "content-type": "application/json" },
+        },
+      );
+    }
 
     const md = rechnung.mandant;
     const empfaenger = md
@@ -93,6 +107,7 @@ RECHNUNG:
 - Datum: ${rechnung.rechnungsdatum}
 - Fällig: ${rechnung.faelligkeit}
 - Bruttobetrag: ${rechnung.betrag_brutto}€
+${mahnCfg?.custom_prompt_addition ? `\nKANZLEI-SPEZIFISCHE ANWEISUNGEN:\n${mahnCfg.custom_prompt_addition}\n` : ""}
 
 Erstelle den Brieftext.`.trim();
 
