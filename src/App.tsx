@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TenantProvider } from "@/contexts/TenantContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { MandantAuthProvider } from "@/contexts/MandantAuthContext";
 
 // Eager: critical landing routes (first paint matters)
 import Index from "./pages/Index.tsx";
@@ -54,8 +55,9 @@ const App = () => (
       disableTransitionOnChange
     >
       <AuthProvider>
-        <TenantProvider>
-          <TooltipProvider>
+        <MandantAuthProvider>
+          <TenantProvider>
+            <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -88,8 +90,9 @@ const App = () => (
               </Routes>
             </Suspense>
           </BrowserRouter>
-          </TooltipProvider>
-        </TenantProvider>
+            </TooltipProvider>
+          </TenantProvider>
+        </MandantAuthProvider>
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>

@@ -29,10 +29,12 @@ import {
   mandanten,
 } from "@/data/mockData";
 import { useTenant } from "@/contexts/TenantContext";
+import { useMandantAuth } from "@/contexts/MandantAuthContext";
 import type { AktenStufe } from "@/data/types";
 import { useStripeCheckout } from "@/lib/queries/use-stripe";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { Navigate } from "react-router-dom";
 
 const stufenSeq: AktenStufe[] = [
   "fallaufnahme",
@@ -50,8 +52,16 @@ const stufeLabel: Record<AktenStufe, string> = {
 const PortalDashboard = () => {
   const { tenant } = useTenant();
   const checkout = useStripeCheckout();
-  // Demo: Mandant Müller
-  const mandant = mandanten.find((m) => m.id === "md_1")!;
+  const mandantAuth = useMandantAuth();
+
+  // Real mandant aus Auth, oder Demo-Mandant Müller als Fallback
+  const mandant =
+    mandantAuth.mandant ?? mandanten.find((m) => m.id === "md_1")!;
+
+  // Wenn Supabase konfiguriert + nicht eingeloggt + kein Demo → zurück zum Login
+  if (!mandantAuth.isDemoMode && !mandantAuth.mandant && !mandantAuth.loading) {
+    return <Navigate to="/portal" replace />;
+  }
 
   const handlePay = async (rechnung_id: string) => {
     const t = toast.loading("Stripe-Checkout wird erstellt…");
