@@ -107,13 +107,13 @@ const PortalDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top-Bar */}
-      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-2xl border-b border-border/50 h-16 flex items-center px-6 justify-between">
-        <Link to="/portal" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
+      <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-2xl border-b border-border/50 h-16 flex items-center px-3 sm:px-6 justify-between gap-2">
+        <Link to="/portal" className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
             <Cpu className="h-4 w-4 text-accent" />
           </div>
-          <div>
-            <span className="text-sm font-display font-bold text-foreground">
+          <div className="min-w-0">
+            <span className="text-sm font-display font-bold text-foreground truncate block">
               {tenant.kanzlei_name}
             </span>
             <span className="block text-[10px] text-muted-foreground/60 tracking-wider">
@@ -122,7 +122,7 @@ const PortalDashboard = () => {
           </div>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/30 border border-border/50">
             <User className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-foreground">
@@ -130,14 +130,14 @@ const PortalDashboard = () => {
             </span>
           </div>
           <Link to="/portal">
-            <button className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
+            <button className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors" aria-label="Abmelden">
               <LogOut className="h-4 w-4" />
             </button>
           </Link>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8 max-w-5xl">
+      <main className="container mx-auto px-3 sm:px-6 py-6 sm:py-8 max-w-5xl">
         {/* Begrüßung */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
