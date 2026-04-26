@@ -32,6 +32,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useMandantAuth } from "@/contexts/MandantAuthContext";
 import type { AktenStufe } from "@/data/types";
 import { useStripeCheckout } from "@/lib/queries/use-stripe";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
@@ -53,6 +54,7 @@ const PortalDashboard = () => {
   const { tenant } = useTenant();
   const checkout = useStripeCheckout();
   const mandantAuth = useMandantAuth();
+  useDocumentTitle(`Portal · ${tenant.kanzlei_name}`);
   const [tab, setTab] = useState<
     "ueberblick" | "nachrichten" | "termine" | "dokumente" | "rechnungen"
   >("ueberblick");

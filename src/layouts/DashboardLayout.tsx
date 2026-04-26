@@ -30,6 +30,7 @@ import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import WelcomeTour from "@/components/dashboard/WelcomeTour";
 import ProfileMenu from "@/components/dashboard/ProfileMenu";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 interface NavGroup {
   label: string;
@@ -93,6 +94,7 @@ const DashboardLayout = () => {
   const location = useLocation();
   const { tenant } = useTenant();
   const title = titleByPath[location.pathname] ?? "Dashboard";
+  useDocumentTitle(`${title} · ${tenant.kanzlei_name}`);
   useRealtimeSubscriptions();
   const cmdk = useCommandPalette();
 
