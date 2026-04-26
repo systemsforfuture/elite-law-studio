@@ -16,13 +16,12 @@ import {
   Activity as ActivityIcon,
 } from "lucide-react";
 import {
-  akten,
   findMandant,
   findUser,
   mandantName,
-  findStrategie,
-  activitiesForAkte,
 } from "@/data/mockData";
+import { useAktenQuery, useStrategieQuery, useStrategienQuery } from "@/lib/queries/use-akten";
+import { useActivitiesForAkte } from "@/lib/queries/use-activities";
 import type { Akte, AktenStufe } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
@@ -47,13 +46,15 @@ const AktenPage = () => {
   const [tab, setTab] = useState<DetailTab>("ueberblick");
   const [iterationPrompt, setIterationPrompt] = useState("");
   const [iterating, setIterating] = useState(false);
+  const { data: akten = [] } = useAktenQuery();
+  const { data: strategie } = useStrategieQuery(selected?.id);
+  const { data: allStrategien = [] } = useStrategienQuery();
+  const { data: acts = [] } = useActivitiesForAkte(selected?.id);
 
   if (selected) {
     const md = findMandant(selected.mandant_id);
     const anwalt = findUser(selected.zugewiesener_anwalt_id);
     const stufeIdx = stufenSeq.indexOf(selected.stufe);
-    const strategie = findStrategie(selected.id);
-    const acts = activitiesForAkte(selected.id);
 
     return (
       <div className="space-y-6">
@@ -514,7 +515,7 @@ const AktenPage = () => {
           const md = findMandant(a.mandant_id);
           const anwalt = findUser(a.zugewiesener_anwalt_id);
           const kritisch = a.fristen.some((f) => f.kritisch);
-          const hasStrategy = !!findStrategie(a.id);
+          const hasStrategy = allStrategien.some((s) => s.akte_id === a.id);
           return (
             <div
               key={a.id}

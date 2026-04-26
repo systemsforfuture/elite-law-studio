@@ -14,19 +14,23 @@ import {
   CalendarClock,
 } from "lucide-react";
 import {
-  konversationen,
-  rechnungen,
-  termine,
   kiAgents,
-  akten,
   findMandant,
   findUser,
   mandantName,
 } from "@/data/mockData";
 import { useTenant } from "@/contexts/TenantContext";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useTermineQuery } from "@/lib/queries/use-termine";
+import { useAktenQuery } from "@/lib/queries/use-akten";
 
 const OverviewPage = () => {
   const { tenant } = useTenant();
+  const { data: konversationen = [] } = useKonversationenQuery();
+  const { data: rechnungen = [] } = useRechnungenQuery();
+  const { data: termine = [] } = useTermineQuery();
+  const { data: akten = [] } = useAktenQuery();
 
   const aiHandled24h = kiAgents.reduce(
     (sum, a) => sum + a.letzte_24h.resolved,

@@ -10,8 +10,10 @@ import {
   Sparkles,
   Bell,
 } from "lucide-react";
-import { termine, akten, findMandant, findUser, mandantName } from "@/data/mockData";
+import { findMandant, findUser, mandantName } from "@/data/mockData";
 import type { TerminTyp } from "@/data/types";
+import { useTermineQuery } from "@/lib/queries/use-termine";
+import { useAktenQuery } from "@/lib/queries/use-akten";
 import { Button } from "@/components/ui/button";
 
 const typLabel: Record<TerminTyp, string> = {
@@ -31,6 +33,8 @@ const typColor: Record<TerminTyp, string> = {
 
 const TerminePage = () => {
   const [refMonth, setRefMonth] = useState(new Date(2026, 4, 1));
+  const { data: termine = [] } = useTermineQuery();
+  const { data: akten = [] } = useAktenQuery();
 
   const monthStart = new Date(refMonth.getFullYear(), refMonth.getMonth(), 1);
   const monthEnd = new Date(refMonth.getFullYear(), refMonth.getMonth() + 1, 0);

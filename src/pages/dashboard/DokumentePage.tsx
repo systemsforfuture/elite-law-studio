@@ -10,8 +10,9 @@ import {
   Sparkles,
   Search,
 } from "lucide-react";
-import { dokumente, findMandant, mandantName } from "@/data/mockData";
+import { findMandant, mandantName } from "@/data/mockData";
 import type { Dokument, DokumentStatus } from "@/data/types";
+import { useDokumenteQuery } from "@/lib/queries/use-dokumente";
 import { Button } from "@/components/ui/button";
 
 const statusBadge: Record<DokumentStatus, { label: string; cls: string }> = {
@@ -37,6 +38,7 @@ const formatBytes = (b: number) => {
 const DokumentePage = () => {
   const [selected, setSelected] = useState<Dokument | null>(null);
   const [query, setQuery] = useState("");
+  const { data: dokumente = [] } = useDokumenteQuery();
 
   if (selected) {
     const md = findMandant(selected.mandant_id);

@@ -9,8 +9,9 @@ import {
   ArrowLeft,
   TrendingUp,
 } from "lucide-react";
-import { rechnungen, findMandant, mandantName } from "@/data/mockData";
+import { findMandant, mandantName } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
+import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { Button } from "@/components/ui/button";
 
 const statusLabel: Record<RechnungStatus, string> = {
@@ -68,6 +69,7 @@ const eskalationsStufen = [
 
 const MahnwesenPage = () => {
   const [selected, setSelected] = useState<Rechnung | null>(null);
+  const { data: rechnungen = [] } = useRechnungenQuery();
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
   const summeOffen = offen.reduce((s, r) => s + r.betrag_brutto, 0);
   const zurueckGeholt = 18420;
