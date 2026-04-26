@@ -26,6 +26,7 @@ import {
 import { useTenant } from "@/contexts/TenantContext";
 import { useRealtimeSubscriptions } from "@/lib/queries/use-realtime";
 import { CommandPalette, useCommandPalette } from "@/components/dashboard/CommandPalette";
+import ThemeToggle from "@/components/dashboard/ThemeToggle";
 
 interface NavGroup {
   label: string;
@@ -223,6 +224,7 @@ const DashboardLayout = () => {
               Alle KI-Agenten aktiv
               <ChevronDown className="h-3 w-3" />
             </button>
+            <ThemeToggle />
             <button className="relative p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
               <Bell className="h-5 w-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full ring-2 ring-background" />
