@@ -1,11 +1,14 @@
 import type {
+  Activity,
   Akte,
+  AnwaltsStrategie,
   AuditEvent,
   Dokument,
   KIAgent,
   Konversation,
   Mandant,
   Rechnung,
+  TeamMemberStats,
   Tenant,
   Termin,
   User,
@@ -716,6 +719,255 @@ export const auditLog: AuditEvent[] = [
     details: "Standard-Antwort gesendet, Termin-Link inkludiert",
   },
 ];
+
+export const activities: Activity[] = [
+  {
+    id: "act_1",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_2",
+    akte_id: "akte_2",
+    ts: "2026-04-26T09:15:00Z",
+    type: "whatsapp",
+    actor: "mandant",
+    actor_name: "Anna Weber",
+    title: "WhatsApp eingegangen",
+    detail: "Mandantin fragt nach Stand der Klageerwiderung — KI hat eskaliert (juristische Frage).",
+    link_to: { module: "inbox", id: "konv_3" },
+  },
+  {
+    id: "act_2",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_4",
+    ts: "2026-04-26T08:14:00Z",
+    type: "voice_call",
+    actor: "ai",
+    actor_name: "Voice-Receptionist",
+    title: "KI-Anruf qualifiziert",
+    detail: "Petra Klein, Erbstreit, Erstgespräch gebucht für 03.05. 14:00 mit Dr. Bergmann.",
+    link_to: { module: "voice", id: "konv_1" },
+  },
+  {
+    id: "act_3",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_1",
+    akte_id: "akte_1",
+    ts: "2026-04-25T14:30:00Z",
+    type: "email_out",
+    actor: "anwalt",
+    actor_name: "Dr. Maximilian Bergmann",
+    title: "E-Mail an Mandant gesendet",
+    detail: "Termin-Vorbereitung 28.05. — bitte Unterlagen mitbringen.",
+  },
+  {
+    id: "act_4",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_2",
+    akte_id: "akte_2",
+    ts: "2026-04-25T10:42:00Z",
+    type: "ai_strategy_generated",
+    actor: "ai",
+    actor_name: "Claude Sonnet 4.7",
+    title: "Anwalts-Strategie v2 generiert",
+    detail: "Aktualisierte Strategie für Klageerwiderung Weber, 92% Konfidenz.",
+    link_to: { module: "akten", id: "akte_2" },
+  },
+  {
+    id: "act_5",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_5",
+    ts: "2026-04-25T19:42:00Z",
+    type: "email_in",
+    actor: "mandant",
+    actor_name: "Stefan Hoffmann",
+    title: "E-Mail eingegangen",
+    detail: "Aufhebungsvertrag — bitte um Rückmeldung. KI hat Standardantwort gesendet.",
+  },
+  {
+    id: "act_6",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_2",
+    akte_id: "akte_2",
+    ts: "2026-02-01T11:42:00Z",
+    type: "document_upload",
+    actor: "mandant",
+    actor_name: "Anna Weber",
+    title: "Kündigungsschreiben hochgeladen",
+    detail: "Kuendigungsschreiben_Weber.pdf — 184.5 KB",
+  },
+  {
+    id: "act_7",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_2",
+    akte_id: "akte_2",
+    ts: "2026-02-01T11:43:00Z",
+    type: "document_analyzed",
+    actor: "ai",
+    actor_name: "Dokumenten-Analyst",
+    title: "KI-Analyse abgeschlossen",
+    detail: "Fristlose Kündigung erkannt. Erfolgsaussichten Klage hoch (94% Konfidenz).",
+  },
+  {
+    id: "act_8",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_1",
+    ts: "2026-03-30T12:00:00Z",
+    type: "rechnung_sent",
+    actor: "system",
+    actor_name: "System",
+    title: "Rechnung 2026-0142 versendet",
+    detail: "2.400,00€ brutto · fällig 13.04.",
+  },
+  {
+    id: "act_9",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_1",
+    ts: "2026-04-14T07:55:00Z",
+    type: "mahnung_sent",
+    actor: "ai",
+    actor_name: "Mahnungs-Eskalator",
+    title: "Mahnung Stufe 1 generiert",
+    detail: "Freundliche Zahlungserinnerung versendet. Frist: 30.04.2026.",
+  },
+  {
+    id: "act_10",
+    tenant_id: "tnt_bergmann",
+    mandant_id: "md_2",
+    akte_id: "akte_2",
+    ts: "2026-04-26T09:18:00Z",
+    type: "anwalt_note",
+    actor: "anwalt",
+    actor_name: "Sarah Fischer",
+    title: "Notiz hinzugefügt",
+    detail: "Klageerwiderung-Entwurf liegt im Postfach. Heute Nachmittag final reviewen.",
+  },
+];
+
+export const strategien: AnwaltsStrategie[] = [
+  {
+    id: "strat_1",
+    tenant_id: "tnt_bergmann",
+    akte_id: "akte_2",
+    version: 2,
+    status: "review",
+    generated_by: "ai",
+    generated_at: "2026-04-25T10:42:00Z",
+    modell: "claude-sonnet-4-7",
+    konfidenz: 0.92,
+    sections: {
+      sachverhalt:
+        "Mandantin Anna Weber wurde am 28.01.2026 fristlos gekündigt. Begründung des Arbeitgebers (TechCorp GmbH): angebliche Pflichtverletzung durch unentschuldigtes Fernbleiben. Mandantin bestreitet die Vorwürfe und legte ärztliches Attest für den fraglichen Zeitraum vor.",
+      rechtliche_einordnung:
+        "Die Kündigung wurde auf §626 BGB gestützt, ohne konkrete Tatsachendarstellung. Nach BAG-Rechtsprechung (zuletzt BAG 24.5.2018 — 2 AZR 73/18) muss der Arbeitgeber bei fristloser Kündigung den wichtigen Grund konkret darlegen und beweisen. Die pauschale Berufung auf 'Pflichtverletzung' genügt diesem Maßstab nicht. Die 2-Wochen-Frist nach §626 II BGB ist für den Arbeitgeber zudem schwer einzuhalten, da der Vorfall bereits Anfang Januar lag.",
+      risiken: [
+        {
+          titel: "Beweislastverteilung Arbeitgeber",
+          risiko: "low",
+          detail: "Arbeitgeber kann Pflichtverletzung nicht konkret nachweisen. Risiko eher auf seiner Seite.",
+        },
+        {
+          titel: "Vergleichsdruck Arbeitsgericht",
+          risiko: "medium",
+          detail: "Güterichter wird auf Vergleich drängen. Mandantin sollte Mindest-Abfindungsvorstellung haben (Empfehlung: 0,5 Bruttomonatsgehälter pro Beschäftigungsjahr).",
+        },
+        {
+          titel: "Sozialauswahl-Argument",
+          risiko: "low",
+          detail: "Bei betriebsbedingter Hilfsbegründung müsste Sozialauswahl überprüft werden — Arbeitgeber dürfte hier nicht punkten.",
+        },
+      ],
+      handlungsoptionen: [
+        {
+          titel: "Klageerwiderung mit Fokus auf Formfehler & fehlende Tatsachendarstellung",
+          pros: [
+            "Hohe Erfolgsaussichten (94%)",
+            "Erlaubt aggressives Verhandeln in Güteverhandlung",
+            "Setzt Arbeitgeber unter Beweisdruck",
+          ],
+          cons: [
+            "Vergleich vor Urteil dauert länger",
+            "Kein 'Zermürbungs-Risiko' für Mandantin",
+          ],
+          empfehlung: true,
+        },
+        {
+          titel: "Direkter Aufhebungsvertrag verhandeln",
+          pros: ["Schneller Abschluss", "Planungssicherheit"],
+          cons: [
+            "Mandantin hätte schwächere Verhandlungsposition",
+            "Abfindung wahrscheinlich niedriger (Ø 0,3 Monatsgehälter)",
+          ],
+          empfehlung: false,
+        },
+      ],
+      empfohlene_strategie:
+        "**Klageerwiderung einreichen**, Fokus auf §626 BGB Formfehler. Strategie: harten Schriftsatz formulieren, der Arbeitgeber zur Konkretisierung zwingt. In Güteverhandlung mit Mindest-Vorstellung 24.000€ Abfindung (≈ 4× Bruttomonatsgehalt) eintreten. Bei Ablehnung: Kammertermin, dort 80% Vergleichswahrscheinlichkeit zu unseren Konditionen.",
+      schriftsatz_skizze:
+        "I. Sachverhalt — chronologisch, mit Attest als Beweismittel\nII. Rechtliche Würdigung — §626 BGB-Anforderungen, BAG-Rechtsprechung\nIII. Verhältnismäßigkeit — keine Abmahnung erfolgt, mildere Mittel verfügbar\nIV. Antrag — Feststellung Unwirksamkeit, hilfsweise Abfindung nach §§9, 10 KSchG\nV. Beweisangebote — Attest, Zeugen, Personalakte",
+      naechste_schritte: [
+        { titel: "Klageerwiderung-Entwurf prüfen und einreichen", bis: "2026-04-30" },
+        { titel: "Zeugenliste mit Mandantin abstimmen", bis: "2026-05-02" },
+        { titel: "Attest-Original beim behandelnden Arzt anfordern", bis: "2026-05-05" },
+        { titel: "Verhandlungsstrategie für Güteverhandlung vorbereiten", bis: "2026-05-10" },
+      ],
+    },
+  },
+];
+
+export const teamStats: TeamMemberStats[] = [
+  {
+    user_id: "usr_1",
+    aktive_mandate: 47,
+    pipeline_eur: 412000,
+    auslastung_pct: 87,
+    ai_eskalationen_24h: 5,
+    reaktion_avg_min: 24,
+    erfolgsquote_pct: 94,
+    umsatz_ytd_eur: 184500,
+  },
+  {
+    user_id: "usr_2",
+    aktive_mandate: 31,
+    pipeline_eur: 168000,
+    auslastung_pct: 78,
+    ai_eskalationen_24h: 3,
+    reaktion_avg_min: 18,
+    erfolgsquote_pct: 91,
+    umsatz_ytd_eur: 142800,
+  },
+  {
+    user_id: "usr_3",
+    aktive_mandate: 23,
+    pipeline_eur: 195000,
+    auslastung_pct: 71,
+    ai_eskalationen_24h: 2,
+    reaktion_avg_min: 35,
+    erfolgsquote_pct: 89,
+    umsatz_ytd_eur: 121000,
+  },
+  {
+    user_id: "usr_4",
+    aktive_mandate: 0,
+    pipeline_eur: 0,
+    auslastung_pct: 65,
+    ai_eskalationen_24h: 0,
+    reaktion_avg_min: 8,
+    erfolgsquote_pct: 0,
+    umsatz_ytd_eur: 0,
+  },
+];
+
+export const findStrategie = (akte_id: string) =>
+  strategien.find((s) => s.akte_id === akte_id);
+export const activitiesForMandant = (mandant_id: string) =>
+  activities
+    .filter((a) => a.mandant_id === mandant_id)
+    .sort((a, b) => b.ts.localeCompare(a.ts));
+export const activitiesForAkte = (akte_id: string) =>
+  activities
+    .filter((a) => a.akte_id === akte_id)
+    .sort((a, b) => b.ts.localeCompare(a.ts));
+export const findTeamStats = (user_id: string) =>
+  teamStats.find((s) => s.user_id === user_id);
 
 export const findMandant = (id?: string) =>
   mandanten.find((m) => m.id === id);

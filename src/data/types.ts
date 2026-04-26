@@ -207,3 +207,69 @@ export interface AuditEvent {
   ip_address: string;
   details?: string;
 }
+
+export type ActivityType =
+  | "voice_call"
+  | "email_in"
+  | "email_out"
+  | "whatsapp"
+  | "document_upload"
+  | "document_analyzed"
+  | "termin_created"
+  | "termin_completed"
+  | "rechnung_sent"
+  | "rechnung_paid"
+  | "mahnung_sent"
+  | "akte_status_change"
+  | "ai_strategy_generated"
+  | "anwalt_note"
+  | "mandant_status_change";
+
+export interface Activity {
+  id: string;
+  tenant_id: string;
+  mandant_id?: string;
+  akte_id?: string;
+  ts: string;
+  type: ActivityType;
+  actor: "ai" | "anwalt" | "mandant" | "system";
+  actor_name: string;
+  title: string;
+  detail?: string;
+  link_to?: { module: string; id: string };
+}
+
+export type StrategyStatus = "draft" | "review" | "freigegeben" | "veraltet";
+
+export interface AnwaltsStrategie {
+  id: string;
+  tenant_id: string;
+  akte_id: string;
+  version: number;
+  status: StrategyStatus;
+  generated_by: "ai" | "anwalt";
+  generated_at: string;
+  modell?: string;
+  konfidenz?: number;
+  sections: {
+    sachverhalt: string;
+    rechtliche_einordnung: string;
+    risiken: { titel: string; risiko: "low" | "medium" | "high"; detail: string }[];
+    handlungsoptionen: { titel: string; pros: string[]; cons: string[]; empfehlung: boolean }[];
+    empfohlene_strategie: string;
+    schriftsatz_skizze?: string;
+    naechste_schritte: { titel: string; bis: string }[];
+  };
+  iteration_prompt?: string;
+}
+
+export interface TeamMemberStats {
+  user_id: string;
+  aktive_mandate: number;
+  pipeline_eur: number;
+  auslastung_pct: number;
+  ai_eskalationen_24h: number;
+  reaktion_avg_min: number;
+  erfolgsquote_pct: number;
+  umsatz_ytd_eur: number;
+}
