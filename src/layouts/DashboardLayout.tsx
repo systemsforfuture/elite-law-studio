@@ -21,9 +21,11 @@ import {
   ShieldCheck,
   UsersRound,
   ChevronDown,
+  Search,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useRealtimeSubscriptions } from "@/lib/queries/use-realtime";
+import { CommandPalette, useCommandPalette } from "@/components/dashboard/CommandPalette";
 
 interface NavGroup {
   label: string;
@@ -88,6 +90,7 @@ const DashboardLayout = () => {
   const { tenant } = useTenant();
   const title = titleByPath[location.pathname] ?? "Dashboard";
   useRealtimeSubscriptions();
+  const cmdk = useCommandPalette();
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -205,7 +208,17 @@ const DashboardLayout = () => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60 transition-all border border-border/50">
+            <button
+              onClick={() => cmdk.setOpen(true)}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60 transition-all border border-border/50"
+            >
+              <Search className="h-3 w-3" />
+              <span>Suchen…</span>
+              <kbd className="ml-2 px-1.5 py-0.5 rounded bg-background border border-border/50 font-mono text-[9px]">
+                ⌘K
+              </kbd>
+            </button>
+            <button className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60 transition-all border border-border/50">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Alle KI-Agenten aktiv
               <ChevronDown className="h-3 w-3" />
@@ -219,6 +232,8 @@ const DashboardLayout = () => {
             </div>
           </div>
         </header>
+
+        <CommandPalette open={cmdk.open} onOpenChange={cmdk.setOpen} />
 
         <main className="p-6 lg:p-8 max-w-7xl">
           <Outlet />
