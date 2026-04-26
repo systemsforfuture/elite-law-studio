@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Dokument, DokumentStatus } from "@/data/types";
-import { useDokumenteQuery, useUploadDokument } from "@/lib/queries/use-dokumente";
+import { useDokumenteQuery, useUploadDokument, useSignedUrl } from "@/lib/queries/use-dokumente";
 import { useTenant } from "@/contexts/TenantContext";
 import { toast } from "sonner";
 import { useRef } from "react";
@@ -45,6 +45,7 @@ const DokumentePage = () => {
   const upload = useUploadDokument();
   const { tenant } = useTenant();
   const fileRef = useRef<HTMLInputElement>(null);
+  const { url: previewUrl } = useSignedUrl(selected?.storage_path);
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -99,12 +100,33 @@ const DokumentePage = () => {
               </div>
             </div>
 
-            <div className="bg-muted/30 rounded-xl p-12 flex items-center justify-center mb-4 border border-border/40">
-              <div className="text-center">
-                <FileText className="h-16 w-16 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-xs text-muted-foreground">PDF-Vorschau</p>
+            {previewUrl ? (
+              selected.mime_type?.startsWith("image/") ? (
+                <img
+                  src={previewUrl}
+                  alt={selected.dateiname}
+                  className="w-full rounded-xl mb-4 border border-border/40 max-h-[480px] object-contain bg-muted/20"
+                />
+              ) : (
+                <iframe
+                  src={previewUrl}
+                  title={selected.dateiname}
+                  className="w-full h-[480px] rounded-xl mb-4 border border-border/40 bg-white"
+                />
+              )
+            ) : (
+              <div className="bg-muted/30 rounded-xl p-12 flex items-center justify-center mb-4 border border-border/40">
+                <div className="text-center">
+                  <FileText className="h-16 w-16 text-muted-foreground/30 mx-auto mb-3" />
+                  <p className="text-xs text-muted-foreground">
+                    Vorschau nicht verfügbar
+                  </p>
+                  <p className="text-[10px] text-muted-foreground/60 mt-1">
+                    Datei im Demo-Modus oder Storage nicht erreichbar
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-2 text-sm">
               <Field

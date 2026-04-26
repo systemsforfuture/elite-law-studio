@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { dokumente as mockDokumente } from "@/data/mockData";
@@ -99,10 +100,44 @@ export const useAnalyzeDocument = () => {
   });
 };
 
-export const useDokumentSignedUrl = async (storage_path: string) => {
-  if (!supabase) return null;
-  const { data } = await supabase.storage
-    .from(TENANT_BUCKET)
-    .createSignedUrl(storage_path, 60 * 5);
-  return data?.signedUrl ?? null;
+/**
+ * Hook: liefert eine Signed-URL für ein Storage-Objekt (5 Min gültig).
+ * Refreshed automatisch alle 4 Minuten.
+ */
+export const useSignedUrl = (storage_path: string | null | undefined) => {
+  const [url, setUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!storage_path) {
+      setUrl(null);
+      return;
+    }
+    if (useMockFallback()) {
+      setUrl(null);
+      return;
+    }
+    let cancelled = false;
+    const fetchUrl = async () => {
+      const { data, error: e } = await supabase!.storage
+        .from(TENANT_BUCKET)
+        .createSignedUrl(storage_path, 60 * 5);
+      if (cancelled) return;
+      if (e) {
+        setError(e.message);
+        setUrl(null);
+      } else {
+        setUrl(data?.signedUrl ?? null);
+        setError(null);
+      }
+    };
+    fetchUrl();
+    const t = setInterval(fetchUrl, 4 * 60 * 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(t);
+    };
+  }, [storage_path]);
+
+  return { url, error };
 };

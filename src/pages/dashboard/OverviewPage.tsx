@@ -124,6 +124,13 @@ const OverviewPage = () => {
                 <h3 className="text-lg font-display font-bold text-foreground flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-accent" />
                   Was Ihre KI in den letzten 24h erledigt hat
+                  <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full ml-2">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500/60" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                    </span>
+                    Live
+                  </span>
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
                   {aiHandled24h} automatisch · {escalated24h} an Sie eskaliert

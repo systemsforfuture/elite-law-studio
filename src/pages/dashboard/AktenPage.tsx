@@ -30,6 +30,7 @@ import { useActivitiesForAkte } from "@/lib/queries/use-activities";
 import type { Akte, AktenStufe } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
+import EmptyState from "@/components/dashboard/EmptyState";
 import { toast } from "sonner";
 
 const stufenSeq: AktenStufe[] = [
@@ -545,6 +546,14 @@ const AktenPage = () => {
         />
       </div>
 
+      {akten.length === 0 ? (
+        <EmptyState
+          icon={FolderOpen}
+          title="Noch keine Akten"
+          description="Akten entstehen automatisch aus Erstgesprächen oder werden manuell beim Mandanten angelegt. Sobald Sie Mandanten haben, erscheinen ihre Akten hier."
+          hint="KI-Strategie-Generator wartet auf Ihre erste Akte"
+        />
+      ) : (
       <div className="space-y-3">
         {akten.map((a) => {
           const md = findMandant(a.mandant_id);
@@ -607,6 +616,7 @@ const AktenPage = () => {
           );
         })}
       </div>
+      )}
     </div>
   );
 };
