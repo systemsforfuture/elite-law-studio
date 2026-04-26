@@ -13,8 +13,9 @@ import { findMandant, mandantName } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
 import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/dashboard/EmptyState";
 
 const statusLabel: Record<RechnungStatus, string> = {
   entwurf: "Entwurf",
@@ -71,7 +72,7 @@ const eskalationsStufen = [
 
 const MahnwesenPage = () => {
   const [selected, setSelected] = useState<Rechnung | null>(null);
-  const { data: rechnungen = [] } = useRechnungenQuery();
+  const { data: rechnungen = [], isLoading } = useRechnungenQuery();
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
   const generateMahnung = useGenerateMahnung();
   const [generatedText, setGeneratedText] = useState<string | null>(null);
@@ -297,6 +298,13 @@ const MahnwesenPage = () => {
         </Button>
       </div>
 
+      {!isLoading && rechnungen.length === 0 ? (
+        <EmptyState
+          icon={Receipt}
+          title="Noch keine offenen Rechnungen"
+          description="Sobald Sie Rechnungen erstellen oder Mandanten Honorar-Forderungen offen haben, übernimmt der Mahnungs-Eskalator. Stufen 1-3 vollautomatisch."
+        />
+      ) : (
       <div className="glass-card border-border/50 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -371,6 +379,7 @@ const MahnwesenPage = () => {
           </table>
         </div>
       </div>
+      )}
     </div>
   );
 };

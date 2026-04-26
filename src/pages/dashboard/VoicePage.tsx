@@ -20,6 +20,7 @@ import type { Konversation } from "@/data/types";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
+import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
 
 const VoicePage = () => {
   const { tenant } = useTenant();
@@ -27,7 +28,7 @@ const VoicePage = () => {
   const [selected, setSelected] = useState<Konversation | null>(null);
   const [playing, setPlaying] = useState(false);
   const voiceAgent = kiAgents.find((a) => a.slug === "voice_receptionist")!;
-  const { data: konversationen = [] } = useKonversationenQuery();
+  const { data: konversationen = [], isLoading } = useKonversationenQuery();
   const voiceCalls = konversationen.filter((k) => k.kanal === "voice");
 
   if (selected) {
@@ -279,6 +280,25 @@ const VoicePage = () => {
               </div>
             </div>
             <div className="divide-y divide-border/40">
+              {isLoading && voiceCalls.length === 0 && (
+                <>
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <SkeletonRow key={i} />
+                  ))}
+                </>
+              )}
+              {!isLoading && voiceCalls.length === 0 && (
+                <div className="p-12 text-center">
+                  <Phone className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+                  <p className="text-sm text-foreground font-medium">
+                    Keine Anrufe protokolliert
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                    Sobald jemand auf Ihrer Kanzlei-Nummer anruft, übernimmt
+                    der Voice-Receptionist und Sie sehen das Protokoll hier.
+                  </p>
+                </div>
+              )}
               {voiceCalls.map((c) => {
                 const md = findMandant(c.mandant_id);
                 return (
