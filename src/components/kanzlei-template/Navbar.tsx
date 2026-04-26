@@ -53,12 +53,7 @@ const Navbar = () => {
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-accent rounded-full transition-all duration-300 group-hover:w-2/3" />
             </a>
           ))}
-          <Link to="/dashboard" className="ml-4">
-            <button className="text-sm font-medium text-primary-foreground/70 hover:text-accent transition-colors px-4 py-2 tracking-wide uppercase">
-              Live-Demo
-            </button>
-          </Link>
-          <Link to="/login">
+          <Link to="/portal" className="ml-4">
             <Button variant="gold" size="sm" className="rounded-xl glow-sm-gold">
               Mandanten-Portal
             </Button>
@@ -91,12 +86,7 @@ const Navbar = () => {
                 {item}
               </a>
             ))}
-            <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="mt-2">
-              <Button variant="outline" size="sm" className="w-full rounded-xl border-accent/30 text-accent hover:bg-accent/10">
-                Live-Demo ansehen
-              </Button>
-            </Link>
-            <Link to="/login" onClick={() => setMobileOpen(false)}>
+            <Link to="/portal" onClick={() => setMobileOpen(false)} className="mt-2">
               <Button variant="gold" size="sm" className="w-full rounded-xl">
                 Mandanten-Portal
               </Button>
