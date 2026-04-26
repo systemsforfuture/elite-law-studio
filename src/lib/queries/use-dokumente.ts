@@ -68,7 +68,32 @@ export const useUploadDokument = () => {
         .single();
       if (dbErr) throw dbErr;
 
+      // Trigger KI-Analyse asynchron (UI muss nicht warten)
+      void supabase!.functions
+        .invoke("analyze-document", { body: { dokument_id: data.id } })
+        .then((res) => {
+          if (res.error) {
+            console.warn("[dokumente] analyze fehlgeschlagen:", res.error);
+          }
+        });
+
       return data as unknown as Dokument;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["dokumente"] }),
+  });
+};
+
+export const useAnalyzeDocument = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (dokument_id: string) => {
+      if (useMockFallback()) return null;
+      const { data, error } = await supabase!.functions.invoke(
+        "analyze-document",
+        { body: { dokument_id } },
+      );
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["dokumente"] }),
   });

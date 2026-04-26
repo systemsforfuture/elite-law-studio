@@ -20,11 +20,17 @@ import {
   findUser,
   mandantName,
 } from "@/data/mockData";
-import { useAktenQuery, useStrategieQuery, useStrategienQuery } from "@/lib/queries/use-akten";
+import {
+  useAktenQuery,
+  useGenerateStrategie,
+  useStrategieQuery,
+  useStrategienQuery,
+} from "@/lib/queries/use-akten";
 import { useActivitiesForAkte } from "@/lib/queries/use-activities";
 import type { Akte, AktenStufe } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
+import { toast } from "sonner";
 
 const stufenSeq: AktenStufe[] = [
   "fallaufnahme",
@@ -45,11 +51,29 @@ const AktenPage = () => {
   const [selected, setSelected] = useState<Akte | null>(null);
   const [tab, setTab] = useState<DetailTab>("ueberblick");
   const [iterationPrompt, setIterationPrompt] = useState("");
-  const [iterating, setIterating] = useState(false);
   const { data: akten = [] } = useAktenQuery();
   const { data: strategie } = useStrategieQuery(selected?.id);
   const { data: allStrategien = [] } = useStrategienQuery();
   const { data: acts = [] } = useActivitiesForAkte(selected?.id);
+  const generateStrategie = useGenerateStrategie();
+  const iterating = generateStrategie.isPending;
+
+  const triggerGenerate = async (akteId: string, prompt?: string) => {
+    const t = toast.loading(
+      prompt ? "SYSTEMS-KI verfeinert die Strategie…" : "SYSTEMS-KI analysiert die Akte…",
+      { description: "Sachverhalt · Risiken · Handlungsoptionen werden ausgearbeitet" },
+    );
+    try {
+      await generateStrategie.mutateAsync({ akte_id: akteId, iteration_prompt: prompt });
+      toast.success("Neue Strategie-Version steht zur Review bereit", { id: t });
+      setIterationPrompt("");
+    } catch (e) {
+      toast.error("Strategie-Generierung fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  };
 
   if (selected) {
     const md = findMandant(selected.mandant_id);
@@ -202,9 +226,24 @@ const AktenPage = () => {
                   schlägt eine vollständige Anwalts-Strategie vor — mit
                   Risiko-Bewertung, Handlungsoptionen und Schriftsatz-Skizze.
                 </p>
-                <Button variant="gold" size="lg" className="rounded-xl glow-sm-gold">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Strategie jetzt generieren
+                <Button
+                  variant="gold"
+                  size="lg"
+                  className="rounded-xl glow-sm-gold"
+                  disabled={iterating}
+                  onClick={() => selected && triggerGenerate(selected.id)}
+                >
+                  {iterating ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      KI denkt nach…
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Strategie jetzt generieren
+                    </>
+                  )}
                 </Button>
                 <div className="text-[11px] text-muted-foreground/60 mt-3">
                   ~12 Sek · SYSTEMS Strategie-KI · im Tarif inklusive
@@ -417,11 +456,7 @@ const AktenPage = () => {
                       className="rounded-xl"
                       disabled={!iterationPrompt.trim() || iterating}
                       onClick={() => {
-                        setIterating(true);
-                        setTimeout(() => {
-                          setIterating(false);
-                          setIterationPrompt("");
-                        }, 1500);
+                        if (selected) triggerGenerate(selected.id, iterationPrompt);
                       }}
                     >
                       {iterating ? (

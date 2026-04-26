@@ -12,7 +12,10 @@ import {
 } from "lucide-react";
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Dokument, DokumentStatus } from "@/data/types";
-import { useDokumenteQuery } from "@/lib/queries/use-dokumente";
+import { useDokumenteQuery, useUploadDokument } from "@/lib/queries/use-dokumente";
+import { useTenant } from "@/contexts/TenantContext";
+import { toast } from "sonner";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 
 const statusBadge: Record<DokumentStatus, { label: string; cls: string }> = {
@@ -39,6 +42,31 @@ const DokumentePage = () => {
   const [selected, setSelected] = useState<Dokument | null>(null);
   const [query, setQuery] = useState("");
   const { data: dokumente = [] } = useDokumenteQuery();
+  const upload = useUploadDokument();
+  const { tenant } = useTenant();
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    if (file.size > 25 * 1024 * 1024) {
+      toast.error("Datei zu groß", { description: "Maximal 25 MB" });
+      return;
+    }
+    const t = toast.loading(`Lade ${file.name} hoch…`);
+    try {
+      await upload.mutateAsync({ tenant_id: tenant.id, file });
+      toast.success("Upload abgeschlossen", {
+        id: t,
+        description: "KI-Analyse läuft im Hintergrund.",
+      });
+    } catch (err) {
+      toast.error("Upload fehlgeschlagen", {
+        id: t,
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
+  };
 
   if (selected) {
     const md = findMandant(selected.mandant_id);
@@ -258,7 +286,21 @@ const DokumentePage = () => {
       </div>
 
       <div className="grid lg:grid-cols-[1fr_3fr] gap-6">
-        <div className="glass-card p-6 border-2 border-dashed border-accent/20 bg-accent/[0.02] text-center">
+        <div
+          className="glass-card p-6 border-2 border-dashed border-accent/20 bg-accent/[0.02] text-center"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            handleFiles(e.dataTransfer.files);
+          }}
+        >
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".pdf,image/png,image/jpeg"
+            className="hidden"
+            onChange={(e) => handleFiles(e.target.files)}
+          />
           <div className="w-14 h-14 rounded-2xl bg-accent/15 flex items-center justify-center mx-auto mb-3">
             <Upload className="h-6 w-6 text-accent" />
           </div>
@@ -268,8 +310,14 @@ const DokumentePage = () => {
           <p className="text-xs text-muted-foreground mb-4">
             Drag & Drop oder klicken
           </p>
-          <Button variant="gold" size="sm" className="rounded-xl">
-            Datei auswählen
+          <Button
+            variant="gold"
+            size="sm"
+            className="rounded-xl"
+            disabled={upload.isPending}
+            onClick={() => fileRef.current?.click()}
+          >
+            {upload.isPending ? "Lade hoch…" : "Datei auswählen"}
           </Button>
           <p className="text-[10px] text-muted-foreground/60 mt-3">
             PDF, JPG, PNG · Max 25 MB

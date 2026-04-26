@@ -75,15 +75,37 @@ export const useStrategieQuery = (akte_id: string | undefined | null) =>
     },
   });
 
+export interface GenerateStrategieInput {
+  akte_id: string;
+  iteration_prompt?: string;
+}
+
 export const useGenerateStrategie = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (akte_id: string): Promise<AnwaltsStrategie | null> => {
-      // KI-Strategie-Generierung: in Sprint 3 via Edge Function. Vorerst No-op.
-      console.info("[strategie] Generate-Mock für", akte_id);
-      return mockStrategien.find((s) => s.akte_id === akte_id) ?? null;
+    mutationFn: async ({
+      akte_id,
+      iteration_prompt,
+    }: GenerateStrategieInput): Promise<AnwaltsStrategie | null> => {
+      if (useMockFallback()) {
+        console.info("[strategie] Mock-Generation für", akte_id);
+        await new Promise((r) => setTimeout(r, 1500));
+        return mockStrategien.find((s) => s.akte_id === akte_id) ?? null;
+      }
+      const { data, error } = await supabase!.functions.invoke(
+        "generate-strategie",
+        {
+          body: { akte_id, iteration_prompt },
+        },
+      );
+      if (error) throw error;
+      const strategie = (data as { strategie?: AnwaltsStrategie })?.strategie;
+      if (!strategie) throw new Error("Keine Strategie zurückgegeben");
+      return strategie;
     },
-    onSuccess: (_, akte_id) =>
-      qc.invalidateQueries({ queryKey: ["strategien", akte_id] }),
+    onSuccess: (_, { akte_id }) => {
+      qc.invalidateQueries({ queryKey: ["strategien", akte_id] });
+      qc.invalidateQueries({ queryKey: ["strategien"] });
+    },
   });
 };
