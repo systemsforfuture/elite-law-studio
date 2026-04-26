@@ -166,25 +166,25 @@ const Onboarding = () => {
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-purple-500/[0.04] rounded-full blur-[150px]" />
 
       <header className="relative border-b border-white/[0.06] backdrop-blur-xl bg-navy-dark/60">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
+        <div className="container mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
               <Cpu className="h-4 w-4 text-accent" />
             </div>
-            <span className="font-display font-bold text-primary-foreground">
+            <span className="font-display font-bold text-primary-foreground truncate">
               SYSTEMS<sup className="text-accent">™</sup>
             </span>
           </Link>
           <Link
             to="/login"
-            className="text-xs text-primary-foreground/40 hover:text-primary-foreground transition-colors"
+            className="text-xs text-primary-foreground/40 hover:text-primary-foreground transition-colors shrink-0"
           >
-            Schon Kunde? Login
+            <span className="hidden sm:inline">Schon Kunde? </span>Login
           </Link>
         </div>
       </header>
 
-      <main className="relative container mx-auto px-6 py-10 max-w-3xl">
+      <main className="relative container mx-auto px-3 sm:px-6 py-6 sm:py-10 max-w-3xl">
         <div className="mb-10">
           <div className="flex items-center justify-between mb-4 overflow-x-auto pb-2">
             {steps.map((s, i) => {
@@ -222,7 +222,7 @@ const Onboarding = () => {
           </div>
         </div>
 
-        <div className="glass-dark p-8 lg:p-10 mb-6">
+        <div className="glass-dark p-5 sm:p-8 lg:p-10 mb-6">
           {step === 0 && (
             <div className="space-y-6">
               <div>
@@ -650,15 +650,16 @@ const Onboarding = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <Button
             variant="ghost"
             onClick={prev}
             disabled={step === 0}
-            className="text-primary-foreground/60 hover:text-primary-foreground hover:bg-white/[0.04]"
+            size="sm"
+            className="text-primary-foreground/60 hover:text-primary-foreground hover:bg-white/[0.04] shrink-0"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Zurück
+            <ArrowLeft className="mr-1 sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Zurück</span>
           </Button>
 
           <div className="text-xs text-primary-foreground/40 hidden sm:block">
@@ -666,7 +667,7 @@ const Onboarding = () => {
           </div>
 
           {step < steps.length - 1 ? (
-            <Button variant="gold" onClick={next} className="rounded-xl">
+            <Button variant="gold" onClick={next} className="rounded-xl shrink-0">
               Weiter
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -674,27 +675,30 @@ const Onboarding = () => {
             <Button
               variant="outline"
               onClick={() => navigate("/login")}
-              className="rounded-xl border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/10"
+              size="sm"
+              className="rounded-xl border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/10 shrink-0"
             >
               <CheckCircle2 className="mr-2 h-4 w-4" />
-              Magic-Link gesendet — zum Login
+              <span className="truncate">Zum Login</span>
             </Button>
           ) : (
             <Button
               variant="gold"
               onClick={finish}
-              className="rounded-xl glow-sm-gold"
+              className="rounded-xl glow-sm-gold shrink-0"
               disabled={finishing}
             >
               {finishing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Tenant wird angelegt…
+                  <span className="hidden sm:inline">Tenant wird angelegt…</span>
+                  <span className="sm:hidden">Anlegen…</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Tenant anlegen & Magic-Link erhalten
+                  <span className="hidden sm:inline">Tenant anlegen & Magic-Link erhalten</span>
+                  <span className="sm:hidden">Tenant anlegen</span>
                 </>
               )}
             </Button>
