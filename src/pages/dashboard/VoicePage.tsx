@@ -21,6 +21,7 @@ import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
+import VoiceTestDialog from "@/components/dashboard/VoiceTestDialog";
 
 const VoicePage = () => {
   const { tenant } = useTenant();
@@ -30,6 +31,7 @@ const VoicePage = () => {
   const voiceAgent = kiAgents.find((a) => a.slug === "voice_receptionist")!;
   const { data: konversationen = [], isLoading } = useKonversationenQuery();
   const voiceCalls = konversationen.filter((k) => k.kanal === "voice");
+  const [testOpen, setTestOpen] = useState(false);
 
   if (selected) {
     return (
@@ -262,6 +264,20 @@ const VoicePage = () => {
             />
             <Stat label="Ø Dauer" value="3:24" sub="min:sek" />
           </div>
+
+          <div className="flex justify-end">
+            <Button
+              variant="gold"
+              size="sm"
+              className="rounded-xl glow-sm-gold"
+              onClick={() => setTestOpen(true)}
+            >
+              <PhoneIncoming className="mr-2 h-3.5 w-3.5" />
+              Test-Anruf simulieren
+            </Button>
+          </div>
+
+          <VoiceTestDialog open={testOpen} onOpenChange={setTestOpen} />
 
           <div className="glass-card border-border/50 overflow-hidden">
             <div className="p-5 border-b border-border/50 flex items-center justify-between">
