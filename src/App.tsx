@@ -8,6 +8,28 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TenantProvider } from "@/contexts/TenantContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MandantAuthProvider } from "@/contexts/MandantAuthContext";
+import { ErrorBoundary } from "@/lib/sentry";
+
+const ErrorFallback = () => (
+  <div className="min-h-screen bg-background flex items-center justify-center px-6">
+    <div className="text-center max-w-md">
+      <div className="text-5xl mb-4">⚠️</div>
+      <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+        Etwas ist schief gelaufen
+      </h1>
+      <p className="text-sm text-muted-foreground mb-6">
+        Wir haben den Fehler aufgezeichnet und werden ihn beheben. Versuchen
+        Sie die Seite neu zu laden.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-6 py-2 rounded-xl bg-accent text-accent-foreground font-semibold hover:bg-gold-dark transition-colors"
+      >
+        Neu laden
+      </button>
+    </div>
+  </div>
+);
 
 // Eager: critical landing routes (first paint matters)
 import Index from "./pages/Index.tsx";
@@ -47,6 +69,7 @@ const RouteFallback = () => (
 );
 
 const App = () => (
+  <ErrorBoundary fallback={<ErrorFallback />}>
   <QueryClientProvider client={queryClient}>
     <ThemeProvider
       attribute="class"
@@ -96,6 +119,7 @@ const App = () => (
       </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

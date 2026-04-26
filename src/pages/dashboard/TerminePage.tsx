@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   Calendar as CalIcon,
+  CalendarPlus,
   ChevronLeft,
   ChevronRight,
   Plus,
@@ -14,6 +15,7 @@ import { findMandant, findUser, mandantName } from "@/data/mockData";
 import type { TerminTyp } from "@/data/types";
 import { useTermineQuery } from "@/lib/queries/use-termine";
 import { useAktenQuery } from "@/lib/queries/use-akten";
+import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 
 const typLabel: Record<TerminTyp, string> = {
@@ -35,6 +37,7 @@ const TerminePage = () => {
   const [refMonth, setRefMonth] = useState(new Date(2026, 4, 1));
   const { data: termine = [] } = useTermineQuery();
   const { data: akten = [] } = useAktenQuery();
+  const { tenant } = useTenant();
 
   const monthStart = new Date(refMonth.getFullYear(), refMonth.getMonth(), 1);
   const monthEnd = new Date(refMonth.getFullYear(), refMonth.getMonth() + 1, 0);
@@ -221,6 +224,23 @@ const TerminePage = () => {
                           {mandantName(md)}
                         </div>
                       )}
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          const { downloadIcs } = await import(
+                            "@/lib/generate-ics"
+                          );
+                          downloadIcs({
+                            termin: t,
+                            anwalt: u,
+                            mandant: md,
+                            kanzlei_name: tenant.kanzlei_name,
+                          });
+                        }}
+                        className="text-[10px] text-accent hover:text-gold-dark mt-2 flex items-center gap-1"
+                      >
+                        <CalendarPlus className="h-3 w-3" /> .ics herunterladen
+                      </button>
                     </div>
                   );
                 })}
