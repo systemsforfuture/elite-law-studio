@@ -58,6 +58,14 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["users"]["Row"]>;
       };
+      mandanten: GenericTable;
+      audit_log: GenericTable;
+      dokumente: GenericTable;
+      akten: GenericTable;
+      termine: GenericTable;
+      rechnungen: GenericTable;
+      konversationen: GenericTable;
+      activities: GenericTable;
     };
     Views: Record<string, never>;
     Functions: {
@@ -65,7 +73,18 @@ export interface Database {
         Args: Record<string, never>;
         Returns: string;
       };
+      invite_user: {
+        Args: { p_email: string; p_name: string; p_role: string };
+        Returns: Json;
+      };
     };
     Enums: Record<string, never>;
   };
+}
+
+type GenericRow = { [key: string]: Json | string | number | boolean | null | undefined };
+interface GenericTable {
+  Row: GenericRow;
+  Insert: GenericRow;
+  Update: GenericRow;
 }
