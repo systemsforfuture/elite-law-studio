@@ -189,22 +189,22 @@ const PortalDashboard = () => {
         {tab === "ueberblick" && aktiveAkte && (
           <div className="space-y-6">
             {/* Status-Tracker */}
-            <section className="glass-card p-8 border-border/50">
+            <section className="glass-card p-5 sm:p-8 border-border/50">
               <h2 className="text-lg font-display font-bold text-foreground mb-1">
                 Fallstatus-Tracker
               </h2>
-              <p className="text-sm text-muted-foreground mb-8">
+              <p className="text-sm text-muted-foreground mb-6 sm:mb-8">
                 Wo stehen wir gerade in Ihrem Verfahren?
               </p>
-              <div className="flex items-center justify-between">
+              <div className="flex items-start sm:items-center justify-between gap-1">
                 {stufenSeq.map((st, i) => {
                   const done = i < stufeIdx;
                   const current = i === stufeIdx;
                   return (
-                    <div key={st} className="flex items-center flex-1">
-                      <div className="flex flex-col items-center text-center flex-1">
+                    <div key={st} className="flex items-start sm:items-center flex-1 min-w-0">
+                      <div className="flex flex-col items-center text-center flex-1 min-w-0">
                         <div
-                          className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-3 transition-all ${
+                          className={`w-9 h-9 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center mb-2 sm:mb-3 transition-all shrink-0 ${
                             done
                               ? "bg-navy text-primary-foreground shadow-md shadow-navy/20"
                               : current
@@ -213,18 +213,18 @@ const PortalDashboard = () => {
                           }`}
                         >
                           {done ? (
-                            <CheckCircle2 className="h-5 w-5" />
+                            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
                           ) : current ? (
-                            <Clock className="h-5 w-5" />
+                            <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
                           ) : (
-                            <Circle className="h-5 w-5" />
+                            <Circle className="h-4 w-4 sm:h-5 sm:w-5" />
                           )}
                         </div>
-                        <span className="text-xs font-medium text-foreground">
+                        <span className="text-[10px] sm:text-xs font-medium text-foreground leading-tight">
                           {i + 1}. {stufeLabel[st]}
                         </span>
                         <span
-                          className={`text-[10px] mt-1 font-medium ${
+                          className={`text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 font-medium leading-tight ${
                             done
                               ? "text-navy"
                               : current
@@ -233,15 +233,15 @@ const PortalDashboard = () => {
                           }`}
                         >
                           {done
-                            ? "(Abgeschlossen)"
+                            ? "Erledigt"
                             : current
-                              ? "(In Bearbeitung)"
-                              : "(Ausstehend)"}
+                              ? "Aktiv"
+                              : "Offen"}
                         </span>
                       </div>
                       {i < stufenSeq.length - 1 && (
                         <div
-                          className={`h-px flex-1 mx-3 -mt-6 ${
+                          className={`h-px flex-1 mx-1 sm:mx-3 mt-4 sm:mt-0 sm:-mt-6 min-w-[8px] ${
                             done ? "bg-navy" : "bg-border"
                           }`}
                         />
@@ -252,7 +252,7 @@ const PortalDashboard = () => {
               </div>
 
               {aktiveAkte.next_step && (
-                <div className="mt-8 p-4 rounded-xl bg-accent/[0.04] border border-accent/15">
+                <div className="mt-6 sm:mt-8 p-4 rounded-xl bg-accent/[0.04] border border-accent/15">
                   <div className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1">
                     Nächster Schritt
                   </div>
@@ -548,10 +548,10 @@ const PortalDashboard = () => {
               meineRechnungen.map((r) => (
                 <div
                   key={r.id}
-                  className="glass-card p-5 border-border/50 flex items-center justify-between"
+                  className="glass-card p-4 sm:p-5 border-border/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
                 >
-                  <div>
-                    <div className="text-sm font-semibold text-foreground font-mono">
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-foreground font-mono truncate">
                       {r.rechnungsnummer}
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5">
@@ -559,19 +559,19 @@ const PortalDashboard = () => {
                       {new Date(r.faelligkeit).toLocaleDateString("de-DE")}
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:text-right">
                     <div className="text-lg font-display font-bold text-foreground tabular-nums">
                       {r.betrag_brutto.toLocaleString("de-DE")}€
                     </div>
                     {r.status === "bezahlt" ? (
-                      <span className="text-[10px] uppercase font-bold text-emerald-700">
+                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded">
                         Bezahlt
                       </span>
                     ) : (
                       <Button
                         variant="gold"
                         size="sm"
-                        className="rounded-lg mt-1"
+                        className="rounded-lg"
                         disabled={checkout.isPending}
                         onClick={() => handlePay(r.id)}
                       >
@@ -590,8 +590,8 @@ const PortalDashboard = () => {
         )}
       </main>
 
-      <footer className="border-t border-border/50 px-6 py-6 mt-12">
-        <div className="container mx-auto max-w-5xl flex justify-between items-center text-xs text-muted-foreground/60">
+      <footer className="border-t border-border/50 px-3 sm:px-6 py-6 mt-12">
+        <div className="container mx-auto max-w-5xl flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center text-xs text-muted-foreground/60">
           <span>
             Mandanten-Portal · powered by SYSTEMS™
           </span>
