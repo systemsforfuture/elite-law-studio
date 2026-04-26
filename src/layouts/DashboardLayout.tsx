@@ -28,6 +28,7 @@ import { useRealtimeSubscriptions } from "@/lib/queries/use-realtime";
 import { CommandPalette, useCommandPalette } from "@/components/dashboard/CommandPalette";
 import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
+import WelcomeTour from "@/components/dashboard/WelcomeTour";
 
 interface NavGroup {
   label: string;
@@ -234,6 +235,7 @@ const DashboardLayout = () => {
         </header>
 
         <CommandPalette open={cmdk.open} onOpenChange={cmdk.setOpen} />
+        <WelcomeTour />
 
         <main className="p-6 lg:p-8 max-w-7xl">
           <Outlet />
