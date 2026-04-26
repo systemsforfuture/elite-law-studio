@@ -12,9 +12,10 @@ import {
   Activity,
   Network,
 } from "lucide-react";
-import { kiAgents } from "@/data/mockData";
 import type { AgentSlug, KIAgent, Tonalitaet } from "@/data/types";
 import { Button } from "@/components/ui/button";
+import { useAgentsQuery, useUpdateAgentConfig } from "@/lib/queries/use-agent-config";
+import { toast } from "sonner";
 
 const iconMap: Record<AgentSlug, typeof Mic> = {
   voice_receptionist: Mic,
@@ -38,7 +39,77 @@ const colorMap: Record<AgentSlug, { color: string; bg: string }> = {
 };
 
 const AgentenPage = () => {
-  const [active, setActive] = useState<KIAgent>(kiAgents[0]);
+  const { data: kiAgents = [] } = useAgentsQuery();
+  const updateConfig = useUpdateAgentConfig();
+  const [activeSlug, setActiveSlug] = useState<AgentSlug>("voice_receptionist");
+  const active = kiAgents.find((a) => a.slug === activeSlug) ?? kiAgents[0];
+  const [draftPrompt, setDraftPrompt] = useState<string>(
+    active?.custom_prompt_addition ?? "",
+  );
+  const [draftThreshold, setDraftThreshold] = useState<number>(
+    active?.konfidenz_threshold ?? 0.85,
+  );
+  const [draftTonalitaet, setDraftTonalitaet] = useState<Tonalitaet>(
+    active?.tonalitaet ?? "freundlich",
+  );
+
+  // Sync drafts when active changes
+  if (active && active.slug !== activeSlug) {
+    // No-op: state is updated on click handler below
+  }
+
+  const handleAgentSwitch = (a: KIAgent) => {
+    setActiveSlug(a.slug);
+    setDraftPrompt(a.custom_prompt_addition ?? "");
+    setDraftThreshold(a.konfidenz_threshold);
+    setDraftTonalitaet(a.tonalitaet);
+  };
+
+  const handleSave = async () => {
+    if (!active) return;
+    const t = toast.loading(`Konfiguration für ${active.name} wird gespeichert…`);
+    try {
+      await updateConfig.mutateAsync({
+        slug: active.slug,
+        patch: {
+          konfidenz_threshold: draftThreshold,
+          tonalitaet: draftTonalitaet,
+          custom_prompt_addition: draftPrompt || null,
+        },
+      });
+      toast.success("Gespeichert", {
+        id: t,
+        description: "Edge Functions nutzen die neuen Werte ab dem nächsten Aufruf.",
+      });
+    } catch (err) {
+      toast.error("Speichern fehlgeschlagen", {
+        id: t,
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    if (!active) return;
+    const newStatus = active.status === "aktiv" ? "pausiert" : "aktiv";
+    try {
+      await updateConfig.mutateAsync({
+        slug: active.slug,
+        patch: { status: newStatus },
+      });
+      toast.success(
+        newStatus === "aktiv"
+          ? `${active.name} aktiviert`
+          : `${active.name} pausiert`,
+      );
+    } catch (err) {
+      toast.error("Statuswechsel fehlgeschlagen", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    }
+  };
+
+  if (!active) return null;
   const Icon = iconMap[active.slug];
   const colors = colorMap[active.slug];
 
@@ -98,7 +169,7 @@ const AgentenPage = () => {
             return (
               <button
                 key={a.slug}
-                onClick={() => setActive(a)}
+                onClick={() => handleAgentSwitch(a)}
                 className={`w-full text-left p-4 rounded-2xl border transition-all ${
                   isActive
                     ? "border-accent/40 bg-accent/[0.04] shadow-lg"
@@ -158,6 +229,8 @@ const AgentenPage = () => {
                 variant={active.status === "aktiv" ? "outline" : "gold"}
                 size="sm"
                 className="rounded-xl"
+                onClick={handleToggleStatus}
+                disabled={updateConfig.isPending}
               >
                 {active.status === "aktiv" ? (
                   <>
@@ -229,8 +302,10 @@ const AgentenPage = () => {
                     (t) => (
                       <button
                         key={t}
+                        type="button"
+                        onClick={() => setDraftTonalitaet(t)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors capitalize ${
-                          active.tonalitaet === t
+                          draftTonalitaet === t
                             ? "bg-accent/15 text-accent border border-accent/30"
                             : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted"
                         }`}
@@ -252,11 +327,12 @@ const AgentenPage = () => {
                     min="0.5"
                     max="0.99"
                     step="0.01"
-                    defaultValue={active.konfidenz_threshold}
+                    value={draftThreshold}
+                    onChange={(e) => setDraftThreshold(parseFloat(e.target.value))}
                     className="flex-1 accent-accent"
                   />
                   <span className="text-sm font-bold text-foreground tabular-nums w-12">
-                    {(active.konfidenz_threshold * 100).toFixed(0)}%
+                    {(draftThreshold * 100).toFixed(0)}%
                   </span>
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1.5">
@@ -270,15 +346,21 @@ const AgentenPage = () => {
                 </label>
                 <textarea
                   rows={4}
-                  defaultValue={active.custom_prompt_addition ?? ""}
+                  value={draftPrompt}
+                  onChange={(e) => setDraftPrompt(e.target.value)}
                   placeholder="Optional: zusätzliche Anweisungen, die diesem Agenten injiziert werden …"
                   className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 font-mono"
                 />
               </div>
 
-              <Button variant="gold" className="w-full rounded-xl">
+              <Button
+                variant="gold"
+                className="w-full rounded-xl"
+                onClick={handleSave}
+                disabled={updateConfig.isPending}
+              >
                 <Sparkles className="mr-2 h-4 w-4" />
-                Konfiguration speichern
+                {updateConfig.isPending ? "Speichere…" : "Konfiguration speichern"}
               </Button>
             </div>
           </div>
