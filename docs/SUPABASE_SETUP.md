@@ -90,13 +90,15 @@ Wenn das klappt: **Schema, RLS, Auth funktionieren.** Backend-Foundation steht.
 
 ## 5b. KI-Edge-Functions konfigurieren (für echte KI-Antworten)
 
-Drei Edge Functions sind im Repo (`supabase/functions/`):
+Fünf Edge Functions sind im Repo (`supabase/functions/`):
 
 | Function | Zweck | Auth |
 |---|---|---|
 | `generate-strategie` | Anwalts-Strategie aus Akte generieren | User-JWT |
 | `triage-inbox` | Email/WhatsApp kategorisieren + Antwort vorschlagen | User-JWT |
+| `analyze-document` | Dokumente analysieren (PDF/Image), Klauseln/Fristen extrahieren | User-JWT |
 | `capture-lead` | Lead aus Kontakt-Formular speichern | öffentlich |
+| `create-tenant` | Onboarding-Wizard: Tenant + Owner-Einladung anlegen | öffentlich |
 
 ### Deployment
 
@@ -104,10 +106,12 @@ Per CLI:
 ```bash
 supabase functions deploy generate-strategie
 supabase functions deploy triage-inbox
+supabase functions deploy analyze-document
 supabase functions deploy capture-lead --no-verify-jwt
+supabase functions deploy create-tenant --no-verify-jwt
 ```
 
-`capture-lead` braucht `--no-verify-jwt` weil das Formular auf der White-Label-Seite ohne Login aufgerufen wird.
+`capture-lead` und `create-tenant` brauchen `--no-verify-jwt` weil sie ohne Login aufgerufen werden (Marketing-Forms bzw. Wizard).
 
 ### Anthropic-API-Key setzen
 

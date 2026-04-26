@@ -17,6 +17,9 @@ import {
   Zap,
 } from "lucide-react";
 import type { SubscriptionTier, Tonalitaet } from "@/data/types";
+import { useCreateTenant } from "@/lib/queries/use-create-tenant";
+import { toast } from "sonner";
+import { Loader2, CheckCircle2 } from "lucide-react";
 
 interface FormState {
   tier: SubscriptionTier;
@@ -109,7 +112,51 @@ const Onboarding = () => {
 
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const prev = () => setStep((s) => Math.max(s - 1, 0));
-  const finish = () => navigate("/dashboard");
+  const createTenant = useCreateTenant();
+  const [magicSent, setMagicSent] = useState(false);
+
+  const finish = async () => {
+    if (!form.kanzlei_name.trim() || !form.email.trim() || !form.inhaber_name.trim()) {
+      toast.error("Bitte Kanzlei-Name, Inhaber und E-Mail ausfüllen");
+      setStep(0);
+      return;
+    }
+    const t = toast.loading("Tenant wird angelegt…", {
+      description: "Schema, Voice-Endpoint, Branding werden konfiguriert.",
+    });
+    try {
+      const result = await createTenant.mutateAsync({
+        kanzlei_name: form.kanzlei_name,
+        inhaber_name: form.inhaber_name,
+        email: form.email.trim(),
+        telefon: form.telefon || undefined,
+        domain: form.domain || undefined,
+        team_size: form.team_size,
+        rechtsgebiete: form.rechtsgebiete,
+        notfall_nummer: form.notfall_nummer || undefined,
+        tier: form.tier,
+        branding_config: {
+          primary_color: form.primary_color,
+          accent_color: form.accent_color,
+          tonalitaet: form.tonalitaet,
+          greeting: form.greeting || undefined,
+          voice_choice: form.voice_choice,
+        },
+        daten_quelle: form.daten_quelle,
+      });
+      toast.success("Willkommen bei SYSTEMS™", {
+        id: t,
+        description: result.message,
+      });
+      setMagicSent(true);
+    } catch (e) {
+      toast.error("Setup fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  };
+  const finishing = createTenant.isPending;
 
   return (
     <div className="min-h-screen bg-navy-dark relative overflow-hidden">
@@ -560,19 +607,43 @@ const Onboarding = () => {
                 />
               </div>
 
-              <div className="p-5 rounded-xl border border-accent/20 bg-accent/[0.04]">
-                <div className="flex items-start gap-3">
-                  <Phone className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-                  <div className="text-sm text-primary-foreground/70">
-                    <strong className="text-primary-foreground">
-                      Welcome-Call in T+2h:
-                    </strong>{" "}
-                    Customer-Success-Lead ruft Sie zu Ihrem hinterlegten
-                    Telefon zurück. Ihre SYSTEMS-Telefonnummer ist in 12h aktiv.
-                    Live-Schaltung in 24h.
+              {magicSent ? (
+                <div className="p-5 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.04]">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                    <div className="text-sm text-primary-foreground/80">
+                      <strong className="text-emerald-400">
+                        Magic-Link gesendet ✓
+                      </strong>
+                      <div className="mt-1">
+                        Wir haben Ihnen einen Login-Link an{" "}
+                        <strong className="text-primary-foreground">
+                          {form.email}
+                        </strong>{" "}
+                        gesendet. Öffnen Sie den Link auf demselben Gerät — Sie
+                        werden direkt als Owner Ihrer Kanzlei eingeloggt.
+                      </div>
+                      <div className="mt-3 text-xs text-primary-foreground/50">
+                        Welcome-Call in T+2h. Customer-Success-Lead meldet sich.
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="p-5 rounded-xl border border-accent/20 bg-accent/[0.04]">
+                  <div className="flex items-start gap-3">
+                    <Phone className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                    <div className="text-sm text-primary-foreground/70">
+                      <strong className="text-primary-foreground">
+                        Welcome-Call in T+2h:
+                      </strong>{" "}
+                      Customer-Success-Lead ruft Sie zu Ihrem hinterlegten
+                      Telefon zurück. Ihre SYSTEMS-Telefonnummer ist in 12h aktiv.
+                      Live-Schaltung in 24h.
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -597,10 +668,33 @@ const Onboarding = () => {
               Weiter
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
+          ) : magicSent ? (
+            <Button
+              variant="outline"
+              onClick={() => navigate("/login")}
+              className="rounded-xl border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/10"
+            >
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              Magic-Link gesendet — zum Login
+            </Button>
           ) : (
-            <Button variant="gold" onClick={finish} className="rounded-xl glow-sm-gold">
-              <Sparkles className="mr-2 h-4 w-4" />
-              Tenant anlegen & Dashboard öffnen
+            <Button
+              variant="gold"
+              onClick={finish}
+              className="rounded-xl glow-sm-gold"
+              disabled={finishing}
+            >
+              {finishing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Tenant wird angelegt…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Tenant anlegen & Magic-Link erhalten
+                </>
+              )}
             </Button>
           )}
         </div>
