@@ -13,7 +13,9 @@ import { ErrorBoundary } from "@/lib/sentry";
 const ErrorFallback = () => (
   <div className="min-h-screen bg-background flex items-center justify-center px-6">
     <div className="text-center max-w-md">
-      <div className="text-5xl mb-4">⚠️</div>
+      <div className="w-14 h-14 rounded-2xl bg-accent/15 border border-accent/30 flex items-center justify-center mx-auto mb-4">
+        <span className="block w-2 h-2 rounded-full bg-accent" />
+      </div>
       <h1 className="text-2xl font-display font-bold text-foreground mb-2">
         Etwas ist schief gelaufen
       </h1>

@@ -615,7 +615,7 @@ const Onboarding = () => {
                     <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
                     <div className="text-sm text-primary-foreground/80">
                       <strong className="text-emerald-400">
-                        Magic-Link gesendet ✓
+                        Magic-Link gesendet
                       </strong>
                       <div className="mt-1">
                         Wir haben Ihnen einen Login-Link an{" "}
