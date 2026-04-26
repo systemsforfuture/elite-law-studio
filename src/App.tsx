@@ -7,6 +7,7 @@ import { TenantProvider } from "@/contexts/TenantContext";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
+import KanzleiTemplate from "./pages/KanzleiTemplate.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import DashboardLayout from "./layouts/DashboardLayout.tsx";
 import OverviewPage from "./pages/dashboard/OverviewPage.tsx";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/template/kanzlei" element={<KanzleiTemplate />} />
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<OverviewPage />} />
               <Route path="voice" element={<VoicePage />} />

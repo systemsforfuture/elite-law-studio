@@ -1,4 +1,5 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { Link } from "react-router-dom";
 import {
   Phone,
   MessagesSquare,
@@ -7,6 +8,7 @@ import {
   Receipt,
   Sparkles,
   ArrowUpRight,
+  ArrowRight,
 } from "lucide-react";
 
 const modules = [
@@ -129,6 +131,24 @@ const ModulesSection = () => {
             Erstanruf bis zur bezahlten Rechnung — vollständig automatisiert,
             wo es geht. Eskalation an den Anwalt, wo es muss.
           </p>
+        </div>
+
+        <div className="mb-10 flex justify-center">
+          <Link
+            to="/template/kanzlei"
+            className="group inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-accent/30 bg-accent/[0.04] hover:bg-accent/[0.08] hover:border-accent/50 transition-all"
+          >
+            <Sparkles className="h-5 w-5 text-accent" />
+            <div className="text-left">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-accent font-bold">
+                Live-Vorschau
+              </div>
+              <div className="text-sm font-semibold text-foreground">
+                Funnel-Template für Kanzleien — sehen Sie 1:1 Ihre eigene Seite
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-accent transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
