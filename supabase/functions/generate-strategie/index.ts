@@ -117,6 +117,27 @@ Deno.serve(async (req: Request) => {
       .limit(1)
       .maybeSingle();
 
+    // Tenant agent_config für custom_prompt_addition
+    const { data: tenantData } = await admin
+      .from("tenants")
+      .select("agent_config")
+      .eq("id", ctx.tenant_id)
+      .single();
+    const stratCfg = ((tenantData?.agent_config ?? {}) as Record<string, {
+      status?: string;
+      custom_prompt_addition?: string | null;
+    }>)["dokumenten_analyst"];
+    if (stratCfg?.status === "pausiert") {
+      return new Response(
+        JSON.stringify({ error: "Strategie-KI ist für diese Kanzlei pausiert" }),
+        {
+          status: 423,
+          headers: { ...corsHeaders, "content-type": "application/json" },
+        },
+      );
+    }
+    const customAddition = stratCfg?.custom_prompt_addition ?? "";
+
     const userPrompt = `
 KONTEXT:
 Akte: ${akte.titel} (${akte.aktenzeichen})
@@ -145,6 +166,7 @@ ${
         : ""
     }
 ${iteration_prompt ? `\nANPASSUNGSWUNSCH: ${iteration_prompt}\n` : ""}
+${customAddition ? `\nKANZLEI-SPEZIFISCHE ANWEISUNGEN:\n${customAddition}\n` : ""}
 
 Erstelle die Strategie als JSON nach Schema.`.trim();
 
