@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
-  Bell,
   Menu,
-  User,
   LogOut,
   Cpu,
   LayoutDashboard,
@@ -20,7 +18,6 @@ import {
   CreditCard,
   ShieldCheck,
   UsersRound,
-  ChevronDown,
   Search,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
@@ -100,6 +97,12 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-xl focus:bg-accent focus:text-navy-dark focus:shadow-xl focus:font-medium focus:text-sm"
+      >
+        Zum Hauptinhalt springen
+      </a>
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-72 bg-navy-dark transform transition-transform duration-500 ease-out lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -224,11 +227,14 @@ const DashboardLayout = () => {
                 ⌘K
               </kbd>
             </button>
-            <button className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60 transition-all border border-border/50">
+            <div
+              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground bg-muted/30 border border-border/50"
+              role="status"
+              aria-label="KI-Agenten Status"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Alle KI-Agenten aktiv
-              <ChevronDown className="h-3 w-3" />
-            </button>
+            </div>
             <ThemeToggle />
             <NotificationsDropdown />
             <ProfileMenu />
@@ -238,7 +244,7 @@ const DashboardLayout = () => {
         <CommandPalette open={cmdk.open} onOpenChange={cmdk.setOpen} />
         <WelcomeTour />
 
-        <main className="p-6 lg:p-8 max-w-7xl">
+        <main id="main-content" className="p-6 lg:p-8 max-w-7xl">
           <Outlet />
         </main>
 
