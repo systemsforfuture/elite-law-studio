@@ -4,7 +4,7 @@ import { currentTenant as mockTenant } from "@/data/mockData";
 import type { BrandingConfig, Tenant } from "@/data/types";
 import { useAuth } from "@/contexts/AuthContext";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 /**
  * Liefert den Tenant des aktuell eingeloggten Users.
@@ -14,7 +14,7 @@ export const useTenantQuery = () => {
   return useQuery({
     queryKey: ["tenant", user?.id],
     queryFn: async (): Promise<Tenant> => {
-      if (useMockFallback() || !user?.id) return mockTenant;
+      if (shouldMock() || !user?.id) return mockTenant;
 
       const { data: u } = await supabase!
         .from("users")
@@ -42,7 +42,7 @@ export const useUpdateBranding = () => {
     mutationFn: async (
       patch: Partial<BrandingConfig>,
     ): Promise<Tenant | null> => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         await new Promise((r) => setTimeout(r, 600));
         return null;
       }

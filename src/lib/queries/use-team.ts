@@ -3,13 +3,13 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { users as mockUsers, teamStats as mockStats } from "@/data/mockData";
 import type { User, TeamMemberStats } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 export const useTeamQuery = () =>
   useQuery({
     queryKey: ["team"],
     queryFn: async (): Promise<User[]> => {
-      if (useMockFallback()) return mockUsers;
+      if (shouldMock()) return mockUsers;
       const { data, error } = await supabase!
         .from("users")
         .select("*")
@@ -43,7 +43,7 @@ export const useInviteUser = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ email, name, role = "mitarbeiter" }: InviteInput) => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         console.info("[team] Mock-Einladung an", email);
         return null;
       }

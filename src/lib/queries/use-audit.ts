@@ -3,13 +3,13 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { auditLog as mockAuditLog } from "@/data/mockData";
 import type { AuditEvent } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 export const useAuditLog = (limit = 100) =>
   useQuery({
     queryKey: ["audit_log", limit],
     queryFn: async (): Promise<AuditEvent[]> => {
-      if (useMockFallback()) return mockAuditLog;
+      if (shouldMock()) return mockAuditLog;
       const { data, error } = await supabase!
         .from("audit_log")
         .select("id, ts, action, entity_type, entity_id, ip_address, details, user_id")

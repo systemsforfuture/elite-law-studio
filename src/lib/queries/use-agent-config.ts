@@ -3,7 +3,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { kiAgents as mockAgents } from "@/data/mockData";
 import type { AgentSlug, KIAgent, Tonalitaet } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 export interface AgentConfig {
   status: "aktiv" | "pausiert" | "nicht_konfiguriert";
@@ -19,7 +19,7 @@ export const useAgentsQuery = () =>
   useQuery({
     queryKey: ["agent_config"],
     queryFn: async (): Promise<KIAgent[]> => {
-      if (useMockFallback()) return mockAgents;
+      if (shouldMock()) return mockAgents;
 
       const { data, error } = await supabase!
         .from("tenants")
@@ -54,7 +54,7 @@ export const useUpdateAgentConfig = () => {
       slug: AgentSlug;
       patch: Partial<AgentConfig>;
     }) => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         await new Promise((r) => setTimeout(r, 400));
         return null;
       }

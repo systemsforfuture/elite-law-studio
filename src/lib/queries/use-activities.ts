@@ -7,13 +7,13 @@ import {
 } from "@/data/mockData";
 import type { Activity } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 export const useActivitiesQuery = () =>
   useQuery({
     queryKey: ["activities"],
     queryFn: async (): Promise<Activity[]> => {
-      if (useMockFallback()) return mockActivities;
+      if (shouldMock()) return mockActivities;
       const { data, error } = await supabase!
         .from("activities")
         .select("*")
@@ -30,7 +30,7 @@ export const useActivitiesForMandant = (mandant_id: string | undefined | null) =
     enabled: Boolean(mandant_id),
     queryFn: async (): Promise<Activity[]> => {
       if (!mandant_id) return [];
-      if (useMockFallback()) return mockActivitiesForMandant(mandant_id);
+      if (shouldMock()) return mockActivitiesForMandant(mandant_id);
       const { data, error } = await supabase!
         .from("activities")
         .select("*")
@@ -47,7 +47,7 @@ export const useActivitiesForAkte = (akte_id: string | undefined | null) =>
     enabled: Boolean(akte_id),
     queryFn: async (): Promise<Activity[]> => {
       if (!akte_id) return [];
-      if (useMockFallback()) return mockActivitiesForAkte(akte_id);
+      if (shouldMock()) return mockActivitiesForAkte(akte_id);
       const { data, error } = await supabase!
         .from("activities")
         .select("*")

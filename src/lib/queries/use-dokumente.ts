@@ -4,7 +4,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { dokumente as mockDokumente } from "@/data/mockData";
 import type { Dokument } from "@/data/types";
 
-const useMockFallback = () => !isSupabaseConfigured || !supabase;
+const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 const TENANT_BUCKET = "tenant-files";
 
@@ -12,7 +12,7 @@ export const useDokumenteQuery = () =>
   useQuery({
     queryKey: ["dokumente"],
     queryFn: async (): Promise<Dokument[]> => {
-      if (useMockFallback()) return mockDokumente;
+      if (shouldMock()) return mockDokumente;
       const { data, error } = await supabase!
         .from("dokumente")
         .select("*")
@@ -42,7 +42,7 @@ export const useUploadDokument = () => {
       mandant_id,
       akte_id,
     }: UploadInput): Promise<Dokument | null> => {
-      if (useMockFallback()) {
+      if (shouldMock()) {
         console.info("[dokumente] mock upload:", file.name);
         return null;
       }
@@ -88,7 +88,7 @@ export const useAnalyzeDocument = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (dokument_id: string) => {
-      if (useMockFallback()) return null;
+      if (shouldMock()) return null;
       const { data, error } = await supabase!.functions.invoke(
         "analyze-document",
         { body: { dokument_id } },
@@ -113,7 +113,7 @@ export const useSignedUrl = (storage_path: string | null | undefined) => {
       setUrl(null);
       return;
     }
-    if (useMockFallback()) {
+    if (shouldMock()) {
       setUrl(null);
       return;
     }
