@@ -11,7 +11,9 @@ import {
 } from "lucide-react";
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
-import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const statusLabel: Record<RechnungStatus, string> = {
@@ -71,6 +73,26 @@ const MahnwesenPage = () => {
   const [selected, setSelected] = useState<Rechnung | null>(null);
   const { data: rechnungen = [] } = useRechnungenQuery();
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
+  const generateMahnung = useGenerateMahnung();
+  const [generatedText, setGeneratedText] = useState<string | null>(null);
+
+  const handleGenerate = async (id: string) => {
+    const t = toast.loading("SYSTEMS-Mahnwesen-KI formuliert…", {
+      description: "Juristisch korrekte Formulierungen werden geprüft",
+    });
+    try {
+      const result = await generateMahnung.mutateAsync(id);
+      if (result) {
+        setGeneratedText(result.mahn_text);
+        toast.success(`Mahnung Stufe ${result.stufe} generiert`, { id: t });
+      }
+    } catch (e) {
+      toast.error("Generierung fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  };
   const summeOffen = offen.reduce((s, r) => s + r.betrag_brutto, 0);
   const zurueckGeholt = 18420;
 
@@ -175,25 +197,47 @@ const MahnwesenPage = () => {
                       </p>
                       {aktiv && (
                         <>
-                          <div className="text-xs text-foreground p-3 rounded-lg bg-background/60 border border-border/50 mb-3 italic">
-                            „{s.text}"
+                          <div className="text-xs text-foreground p-3 rounded-lg bg-background/60 border border-border/50 mb-3 whitespace-pre-line">
+                            {generatedText ?? s.text}
                           </div>
                           <div className="flex gap-2">
                             <Button
                               variant="gold"
                               size="sm"
                               className="rounded-lg"
+                              disabled={generateMahnung.isPending}
+                              onClick={() => handleGenerate(selected.id)}
                             >
-                              <Sparkles className="mr-2 h-3 w-3" />
-                              KI-Vorschlag senden
+                              {generateMahnung.isPending ? (
+                                <>
+                                  <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                                  Formuliere…
+                                </>
+                              ) : generatedText ? (
+                                <>
+                                  <Sparkles className="mr-2 h-3 w-3" />
+                                  Erneut generieren
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="mr-2 h-3 w-3" />
+                                  KI-Mahn-Text generieren
+                                </>
+                              )}
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="rounded-lg"
-                            >
-                              Anpassen
-                            </Button>
+                            {generatedText && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-lg"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(generatedText);
+                                  toast.success("In Zwischenablage kopiert");
+                                }}
+                              >
+                                Text kopieren
+                              </Button>
+                            )}
                           </div>
                         </>
                       )}
