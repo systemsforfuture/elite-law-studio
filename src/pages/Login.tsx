@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Cpu, ArrowRight, Sparkles, CheckCircle2, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 const Login = () => {
+  useDocumentTitle("Anmelden");
   const [role, setRole] = useState<"kanzlei" | "admin">("kanzlei");
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);

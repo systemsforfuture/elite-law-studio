@@ -13,10 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
 import { useMandantAuth } from "@/contexts/MandantAuthContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { toast } from "sonner";
 
 const PortalLogin = () => {
   const { tenant } = useTenant();
+  useDocumentTitle(`Mandanten-Portal · ${tenant.kanzlei_name}`);
   const mandantAuth = useMandantAuth();
   const [email, setEmail] = useState("");
   const [aktenzeichen, setAktenzeichen] = useState("");

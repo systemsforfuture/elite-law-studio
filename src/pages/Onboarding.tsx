@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import type { SubscriptionTier, Tonalitaet } from "@/data/types";
 import { useCreateTenant } from "@/lib/queries/use-create-tenant";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { toast } from "sonner";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
@@ -62,6 +63,7 @@ const rechtsgebiete = [
 ];
 
 const Onboarding = () => {
+  useDocumentTitle("Onboarding");
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const initialTier = (params.get("tier") as SubscriptionTier) || "growth";

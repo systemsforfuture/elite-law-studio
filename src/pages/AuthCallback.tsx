@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Cpu, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 const AuthCallback = () => {
+  useDocumentTitle("Anmeldung wird verifiziert");
   const navigate = useNavigate();
   const { loading, session } = useAuth();
   const [error, setError] = useState<string | null>(null);

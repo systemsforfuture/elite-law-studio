@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { ArrowLeft, Cpu, LayoutDashboard, Home, Sparkles } from "lucide-react";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 const links = [
   { to: "/", icon: Home, label: "Startseite", desc: "SYSTEMS™ Plattform" },
@@ -10,6 +11,7 @@ const links = [
 ];
 
 const NotFound = () => {
+  useDocumentTitle("404 — Nicht gefunden");
   const location = useLocation();
 
   useEffect(() => {
