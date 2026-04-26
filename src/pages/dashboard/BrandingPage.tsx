@@ -1,12 +1,44 @@
 import { useState } from "react";
-import { Palette, Globe, Mic, Sparkles, ExternalLink } from "lucide-react";
+import { Palette, Globe, Mic, Sparkles, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
+import { useUpdateBranding } from "@/lib/queries/use-tenant";
+import { toast } from "sonner";
+import type { Tonalitaet } from "@/data/types";
 
 const BrandingPage = () => {
   const { tenant } = useTenant();
   const [primary, setPrimary] = useState(tenant.branding_config.primary_color);
   const [accent, setAccent] = useState(tenant.branding_config.accent_color);
+  const [tonalitaet, setTonalitaet] = useState<Tonalitaet>(
+    tenant.branding_config.tonalitaet,
+  );
+  const [greeting, setGreeting] = useState(
+    tenant.branding_config.greeting ?? "",
+  );
+  const updateBranding = useUpdateBranding();
+
+  const handleSave = async () => {
+    const t = toast.loading("Branding wird gespeichert…");
+    try {
+      await updateBranding.mutateAsync({
+        primary_color: primary,
+        accent_color: accent,
+        tonalitaet,
+        greeting,
+      });
+      toast.success("Branding gespeichert", {
+        id: t,
+        description: "Voice-Engine + Mandanten-Portal nutzen ab sofort die neuen Werte.",
+      });
+    } catch (err) {
+      toast.error("Speichern fehlgeschlagen", {
+        id: t,
+        description:
+          err instanceof Error ? err.message : "Bitte erneut versuchen.",
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -102,7 +134,8 @@ const BrandingPage = () => {
               </label>
               <textarea
                 rows={3}
-                defaultValue={tenant.branding_config.greeting}
+                value={greeting}
+                onChange={(e) => setGreeting(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
               />
             </div>
@@ -111,7 +144,8 @@ const BrandingPage = () => {
                 Tonalität
               </label>
               <select
-                defaultValue={tenant.branding_config.tonalitaet}
+                value={tonalitaet}
+                onChange={(e) => setTonalitaet(e.target.value as Tonalitaet)}
                 className="w-full px-4 py-3 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
               >
                 <option value="formal">Formal</option>
@@ -136,9 +170,23 @@ const BrandingPage = () => {
       </div>
 
       <div className="flex justify-end">
-        <Button variant="gold" className="rounded-xl">
-          <Sparkles className="mr-2 h-4 w-4" />
-          Branding speichern & deployen
+        <Button
+          variant="gold"
+          className="rounded-xl glow-sm-gold"
+          onClick={handleSave}
+          disabled={updateBranding.isPending}
+        >
+          {updateBranding.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Speichere…
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Branding speichern & deployen
+            </>
+          )}
         </Button>
       </div>
     </div>
