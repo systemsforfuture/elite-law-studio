@@ -10,6 +10,8 @@ import Login from "./pages/Login.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 import KanzleiTemplate from "./pages/KanzleiTemplate.tsx";
+import PortalLogin from "./pages/portal/PortalLogin.tsx";
+import PortalDashboard from "./pages/portal/PortalDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import DashboardLayout from "./layouts/DashboardLayout.tsx";
 import OverviewPage from "./pages/dashboard/OverviewPage.tsx";
@@ -43,6 +45,8 @@ const App = () => (
               <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/template/kanzlei" element={<KanzleiTemplate />} />
+              <Route path="/portal" element={<PortalLogin />} />
+              <Route path="/portal/dashboard" element={<PortalDashboard />} />
               <Route path="/dashboard" element={<DashboardLayout />}>
                 <Route index element={<OverviewPage />} />
                 <Route path="voice" element={<VoicePage />} />
