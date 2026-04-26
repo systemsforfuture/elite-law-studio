@@ -3,21 +3,21 @@ import { X, Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const without = [
-  "Unsicherheit über Ihre Erfolgschancen",
-  "Verpasste Fristen kosten bares Geld",
-  "Schwächere Verhandlungsposition",
-  "Unterschätzung der Anspruchshöhe",
-  "Stress und schlaflose Nächte",
-  "Risiko nachteiliger Vereinbarungen",
+  "30–40% aller Erstanrufer in der Mailbox",
+  "Standard-Mails kosten 90 Min/Tag manuell",
+  "Fristen in Excel und Outlook = Haftungsrisiko",
+  "Mahnwesen wird liegen gelassen — 12k€ pro Jahr abgeschrieben",
+  "Mandanten warten Tage auf Termin-Bestätigung",
+  "Keine Sicht auf KPIs und Pipeline",
 ];
 
 const with_lawyer = [
-  "Klare Strategie & realistische Einschätzung",
-  "Alle Fristen werden professionell überwacht",
-  "Maximale Verhandlungskraft auf Ihrer Seite",
-  "Volle Ausschöpfung aller Ansprüche",
-  "Sie konzentrieren sich aufs Wesentliche",
-  "97% Erfolgsquote bei unseren Mandanten",
+  "Voice-Agent fängt 100% der Anrufe ab — auch nachts",
+  "KI-Triagist beantwortet Standard-Mails in Sekunden",
+  "Fristenkontrolle automatisch, mit Eskalations-Logik",
+  "Mahnwesen Stufe 1–4 vollautomatisch",
+  "Mandanten buchen selbst — konfliktfreie Slots",
+  "Live-KPIs: Pipeline, Auslastung, Forderungen, Mandate",
 ];
 
 const ComparisonSection = () => {
@@ -35,10 +35,10 @@ const ComparisonSection = () => {
             <span className="w-8 h-px bg-accent/50" />
           </span>
           <h2 className="text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-5 tracking-[-0.03em]">
-            Mit oder ohne <span className="text-gradient-gold">starken Anwalt</span>
+            Mit oder ohne <span className="text-gradient-gold">SYSTEMS</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light">
-            Ein Vergleich, der Klarheit schafft. Entscheiden Sie selbst, was Ihnen Ihr Recht wert ist.
+            Konkret. Messbar. Was sich für Ihre Kanzlei verändert.
           </p>
         </div>
 
@@ -54,7 +54,7 @@ const ComparisonSection = () => {
               <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
                 <X className="h-5 w-5 text-destructive" />
               </div>
-              <h3 className="text-lg font-display font-bold text-foreground">Ohne Anwalt</h3>
+              <h3 className="text-lg font-display font-bold text-foreground">Ohne SYSTEMS — Status quo</h3>
             </div>
             <ul className="space-y-4">
               {without.map((item) => (
@@ -80,7 +80,7 @@ const ComparisonSection = () => {
               <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center">
                 <Check className="h-5 w-5 text-accent" />
               </div>
-              <h3 className="text-lg font-display font-bold text-foreground">Mit Kanzlei Bergmann</h3>
+              <h3 className="text-lg font-display font-bold text-foreground">Mit SYSTEMS™ Plattform</h3>
             </div>
             <ul className="space-y-4">
               {with_lawyer.map((item) => (
@@ -94,9 +94,9 @@ const ComparisonSection = () => {
         </div>
 
         <div className={`text-center mt-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`} style={{ transitionDelay: "600ms" }}>
-          <a href="#kontakt">
+          <a href="#preise">
             <Button variant="gold" className="rounded-2xl group" size="lg">
-              Jetzt auf die sichere Seite wechseln
+              Tarife ansehen
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </a>

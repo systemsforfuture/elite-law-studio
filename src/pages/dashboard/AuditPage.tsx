@@ -1,0 +1,208 @@
+import {
+  ShieldCheck,
+  Activity,
+  Eye,
+  Download,
+  Sparkles,
+  Bot,
+  User,
+  LogIn,
+  Pencil,
+  Trash2,
+  Plus,
+  ArrowDownToLine,
+} from "lucide-react";
+import { auditLog } from "@/data/mockData";
+import type { AuditEvent } from "@/data/types";
+import { Button } from "@/components/ui/button";
+
+const actionMeta: Record<
+  AuditEvent["action"],
+  { label: string; icon: typeof Eye; cls: string }
+> = {
+  read: { label: "Read", icon: Eye, cls: "bg-sky-500/15 text-sky-700" },
+  create: { label: "Create", icon: Plus, cls: "bg-emerald-500/15 text-emerald-700" },
+  update: { label: "Update", icon: Pencil, cls: "bg-amber-500/15 text-amber-700" },
+  delete: { label: "Delete", icon: Trash2, cls: "bg-rose-500/15 text-rose-700" },
+  export: {
+    label: "Export",
+    icon: ArrowDownToLine,
+    cls: "bg-purple-500/15 text-purple-700",
+  },
+  login: { label: "Login", icon: LogIn, cls: "bg-muted text-muted-foreground" },
+  ai_action: {
+    label: "KI-Aktion",
+    icon: Sparkles,
+    cls: "bg-accent/15 text-accent",
+  },
+};
+
+const AuditPage = () => {
+  return (
+    <div className="space-y-6">
+      <div className="grid sm:grid-cols-3 gap-4">
+        <div className="glass-card p-5 border-emerald-500/30 bg-emerald-500/[0.04]">
+          <div className="flex items-center gap-2 mb-2">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <span className="text-xs uppercase tracking-wider font-semibold text-emerald-700">
+              DSGVO-Status
+            </span>
+          </div>
+          <div className="text-2xl font-display font-bold text-foreground">
+            Konform
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Audit-Log 1 Jahr · AVV signiert · TDE aktiv
+          </div>
+        </div>
+        <div className="glass-card p-5 border-border/50">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+            Events 24h
+          </div>
+          <div className="text-3xl font-display font-black text-foreground tabular-nums">
+            247
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            142 KI · 105 Nutzer
+          </div>
+        </div>
+        <div className="glass-card p-5 border-border/50">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+            Sicherheits-Vorfälle
+          </div>
+          <div className="text-3xl font-display font-black text-emerald-600 tabular-nums">
+            0
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Letzte 90 Tage
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h3 className="font-display font-bold text-foreground flex items-center gap-2">
+          <Activity className="h-4 w-4 text-accent" />
+          Live Audit-Log
+        </h3>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="rounded-xl">
+            <Download className="mr-2 h-3.5 w-3.5" />
+            DSGVO-Export
+          </Button>
+          <Button variant="outline" size="sm" className="rounded-xl">
+            Filter
+          </Button>
+        </div>
+      </div>
+
+      <div className="glass-card border-border/50 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-xs uppercase tracking-wider text-muted-foreground/70 bg-muted/20">
+              <tr>
+                <th className="text-left p-4 font-semibold">Zeitpunkt</th>
+                <th className="text-left p-4 font-semibold">Akteur</th>
+                <th className="text-left p-4 font-semibold">Aktion</th>
+                <th className="text-left p-4 font-semibold">Entität</th>
+                <th className="text-left p-4 font-semibold">IP / Quelle</th>
+                <th className="text-left p-4 font-semibold">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditLog.map((e) => {
+                const meta = actionMeta[e.action];
+                const Icon = meta.icon;
+                const isAI = e.action === "ai_action";
+                return (
+                  <tr
+                    key={e.id}
+                    className="border-t border-border/30 hover:bg-muted/20 transition-colors"
+                  >
+                    <td className="p-4 font-mono text-xs text-muted-foreground whitespace-nowrap">
+                      {new Date(e.ts).toLocaleString("de-DE")}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        {isAI ? (
+                          <Bot className="h-3.5 w-3.5 text-accent" />
+                        ) : (
+                          <User className="h-3.5 w-3.5 text-muted-foreground" />
+                        )}
+                        <span className="font-medium text-foreground">
+                          {e.user_name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 text-[10px] uppercase font-bold px-2 py-1 rounded ${meta.cls}`}
+                      >
+                        <Icon className="h-3 w-3" />
+                        {meta.label}
+                      </span>
+                    </td>
+                    <td className="p-4 font-mono text-xs text-foreground">
+                      {e.entity_type}
+                      {e.entity_id ? `:${e.entity_id.slice(0, 8)}` : ""}
+                    </td>
+                    <td className="p-4 font-mono text-xs text-muted-foreground">
+                      {e.ip_address}
+                    </td>
+                    <td className="p-4 text-xs text-muted-foreground">
+                      {e.details ?? "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="glass-card p-6 border-border/50">
+        <h3 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 text-accent" />
+          Compliance-Status
+        </h3>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            { label: "Hosting EU (Frankfurt)", status: "ok" },
+            { label: "AVV signiert", status: "ok" },
+            { label: "Verschlüsselung at-Rest pro Tenant", status: "ok" },
+            { label: "TLS 1.3 + HSTS", status: "ok" },
+            { label: "Audit-Log 365 Tage", status: "ok" },
+            { label: "2FA für Owner-Rolle", status: "ok" },
+            { label: "DSGVO-Datenexport", status: "ok" },
+            { label: "Soft-Delete + Hard-Delete", status: "ok" },
+            { label: "ISO 27001", status: "in_progress" },
+          ].map((c) => (
+            <div
+              key={c.label}
+              className={`p-3 rounded-xl border text-xs flex items-center gap-2 ${
+                c.status === "ok"
+                  ? "border-emerald-500/30 bg-emerald-500/[0.03] text-foreground"
+                  : "border-amber-500/30 bg-amber-500/[0.03] text-foreground"
+              }`}
+            >
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  c.status === "ok" ? "bg-emerald-500" : "bg-amber-500"
+                }`}
+              />
+              <span className="flex-1 font-medium">{c.label}</span>
+              <span
+                className={`text-[10px] uppercase font-bold ${
+                  c.status === "ok" ? "text-emerald-700" : "text-amber-700"
+                }`}
+              >
+                {c.status === "ok" ? "OK" : "WIP"}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AuditPage;

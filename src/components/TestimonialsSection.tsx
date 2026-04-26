@@ -3,48 +3,48 @@ import { Star, Quote, CheckCircle, ShieldCheck } from "lucide-react";
 
 const testimonials = [
   {
-    name: "Dr. Michael Schneider",
-    role: "Geschäftsführer, Schneider GmbH",
-    text: "Kanzlei Bergmann hat unsere Unternehmensrestrukturierung mit beeindruckender Expertise begleitet. Die strategische Beratung war erstklassig – wir konnten über 2,3 Mio. Euro sichern.",
+    name: "Dr. Maximilian Bergmann",
+    role: "Inhaber, Kanzlei Bergmann · Berlin",
+    text: "Wir hatten 30% verlorene Anrufe. Drei Monate nach Live-Schaltung: Null. Die KI fängt alles ab und bucht die richtigen Termine. ROI war im zweiten Monat schwarz.",
     rating: 5,
     image: "https://randomuser.me/api/portraits/men/42.jpg",
-    caseType: "Unternehmensrecht",
+    caseType: "Foundation → Growth",
     verified: true,
     date: "vor 2 Wochen",
-    platform: "Google",
+    platform: "Trustpilot",
   },
   {
     name: "Sarah Keller",
-    role: "Marketing Direktorin",
-    text: "Nach meiner Kündigung fühlte ich mich hilflos. Herr Bergmann hat nicht nur eine faire Abfindung von 85.000€ verhandelt, sondern mir auch menschlich Halt gegeben. Absolute Empfehlung.",
+    role: "Geschäftsführerin, Keller & Partner · München",
+    text: "Mahnwesen war für mich Horror. Jetzt läuft das in 3 Stufen automatisch und Stufe 4 geht aufs gerichtliche Mahnverfahren. Wir holen Geld rein, das sonst abgeschrieben wäre.",
     rating: 5,
     image: "https://randomuser.me/api/portraits/women/65.jpg",
-    caseType: "Arbeitsrecht",
+    caseType: "Premium",
     verified: true,
     date: "vor 1 Monat",
-    platform: "Google",
+    platform: "Trustpilot",
   },
   {
     name: "Thomas Braun",
-    role: "Unternehmer",
-    text: "Die Erbschaftsangelegenheit unserer Familie war komplex und emotional. Frau Dr. Weber hat mit Fingerspitzengefühl eine Lösung gefunden, die alle Seiten zufriedenstellt.",
+    role: "Senior Partner, Braun Rechtsanwälte · Hamburg",
+    text: "Die Datenmigration aus DATEV war meine größte Sorge. Hat einen Vormittag gedauert. Plus: Voice-Cloning meiner Stimme klingt so gut, dass die Mandanten anrufen und denken, ich gehe selbst dran.",
     rating: 5,
     image: "https://randomuser.me/api/portraits/men/55.jpg",
-    caseType: "Erbrecht",
+    caseType: "Premium",
     verified: true,
     date: "vor 3 Wochen",
-    platform: "Google",
+    platform: "Trustpilot",
   },
   {
-    name: "Anna-Lena Fischer",
-    role: "Ärztin, Praxisinhaberin",
-    text: "Bei meinem Mietrechtsstreit ging es um meine Praxisräume – meine Existenz. Kanzlei Bergmann hat vor Gericht alles gegeben und gewonnen. Professionell, schnell, souverän.",
+    name: "Dr. Anna-Lena Fischer",
+    role: "Fachanwältin Familienrecht · Köln",
+    text: "Was mich überzeugt: Die KI eskaliert. Sie versucht nicht, schlauer zu sein als ich. Bei juristischen Fragen geht's sofort an mich. Bei Terminbuchung, Rückfragen, Mailbox — komplett autonom.",
     rating: 5,
     image: "https://randomuser.me/api/portraits/women/44.jpg",
-    caseType: "Immobilienrecht",
+    caseType: "Growth",
     verified: true,
     date: "vor 5 Tagen",
-    platform: "Google",
+    platform: "Trustpilot",
   },
 ];
 
@@ -60,14 +60,14 @@ const TestimonialsSection = () => {
         <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent mb-4">
             <span className="w-8 h-px bg-accent/50" />
-            Mandantenstimmen
+            500+ Kanzleien live
             <span className="w-8 h-px bg-accent/50" />
           </span>
           <h2 className="text-4xl md:text-6xl font-display font-black text-primary-foreground mt-3 mb-5 tracking-[-0.03em]">
-            Was unsere <span className="text-gradient-gold">Mandanten</span> sagen
+            Was Kanzleien über <span className="text-gradient-gold">SYSTEMS</span> sagen
           </h2>
           <p className="text-primary-foreground/40 max-w-2xl mx-auto text-lg font-light">
-            Über 5.000 zufriedene Mandanten vertrauen auf unsere Expertise.
+            Über 500 Kanzleien in DACH nutzen die Plattform produktiv. Hier ein Auszug.
           </p>
         </div>
 
