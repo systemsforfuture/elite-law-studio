@@ -7,7 +7,7 @@ const trustPoints = [
   { icon: Lock, title: "Verschlüsselung pro Tenant", desc: "AES-256 at-Rest, eigener KMS-Schlüssel" },
   { icon: Award, title: "Multi-Tenant Postgres RLS", desc: "Drei unabhängige Isolations-Layer" },
   { icon: TrendingUp, title: "Permanent-Assisted-Onboarding", desc: "Customer-Success-Lead von Tag 1" },
-  { icon: Clock, title: "EU-Hosting Frankfurt", desc: "Vercel EU + Supabase EU, keine US-Server" },
+  { icon: Clock, title: "Hosting in Deutschland", desc: "Frankfurt am Main · keine US-Server" },
   { icon: HeartHandshake, title: "Beschlagnahmefreiheit", desc: "Keine Behörde bekommt direkten Zugriff" },
 ];
 

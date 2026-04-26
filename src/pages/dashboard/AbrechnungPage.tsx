@@ -49,7 +49,7 @@ const AbrechnungPage = () => {
           <div className="flex items-center gap-2 mb-2">
             <Phone className="h-4 w-4 text-accent" />
             <h3 className="text-sm font-display font-bold text-foreground">
-              Vapi-Telefon-Guthaben
+              Telefon-Guthaben
             </h3>
           </div>
           <div className="text-3xl font-display font-black text-foreground tabular-nums">
@@ -100,14 +100,14 @@ const AbrechnungPage = () => {
                   {
                     nr: "SYS-2026-04-018",
                     period: "Apr 2026",
-                    pos: "Growth-Subscription · Vapi 187€",
+                    pos: "Growth-Subscription · Telefon 187€",
                     sum: 1177,
                     status: "Bezahlt",
                   },
                   {
                     nr: "SYS-2026-03-012",
                     period: "Mär 2026",
-                    pos: "Growth-Subscription · Vapi 142€",
+                    pos: "Growth-Subscription · Telefon 142€",
                     sum: 1132,
                     status: "Bezahlt",
                   },

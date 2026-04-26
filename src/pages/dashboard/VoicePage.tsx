@@ -358,7 +358,7 @@ const VoicePage = () => {
                 +49 30 555 99 88
               </div>
               <div className="text-xs text-muted-foreground">
-                Vapi-Endpoint: vapi-bergmann-de.live
+                SYSTEMS Voice-Engine · 24/7 verfügbar
               </div>
             </div>
             <div className="border-t border-border/40 pt-5">
@@ -380,8 +380,8 @@ const VoicePage = () => {
                     <div className="text-sm font-semibold text-foreground">
                       Voice-Cloning · Dr. Bergmann
                     </div>
-                    <div className="text-xs text-muted-foreground font-mono">
-                      voice_bergmann_clone_v2 · ElevenLabs
+                    <div className="text-xs text-muted-foreground">
+                      Eigene Stimme geklont · 99% Naturklang
                     </div>
                   </div>
                 </div>

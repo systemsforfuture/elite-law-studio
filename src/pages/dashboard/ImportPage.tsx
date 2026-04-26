@@ -54,7 +54,7 @@ const ImportPage = () => {
         </div>
         <p className="text-sm text-muted-foreground">
           Migration aus Ihrem bestehenden System in 30 Minuten. Idempotenter
-          Background-Job (Inngest) — bei Fehlern automatischer Restart ohne
+          Sicherer Hintergrund-Job — bei Fehlern automatischer Restart ohne
           Duplikate.
         </p>
       </div>
@@ -156,7 +156,7 @@ const ImportPage = () => {
             </span>
           </div>
           <p className="text-xs text-muted-foreground mb-5">
-            Claude hat Ihre Spalten automatisch dem SYSTEMS-Schema zugeordnet.
+            Die SYSTEMS-KI hat Ihre Spalten automatisch zugeordnet.
             Korrigieren Sie wo nötig.
           </p>
 

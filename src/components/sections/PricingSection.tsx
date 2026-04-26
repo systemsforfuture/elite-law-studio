@@ -95,8 +95,9 @@ const PricingSection = () => {
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg font-light">
             Setup-Fee einmalig, Subscription monatlich. Inklusive
-            Permanent-Assisted-Onboarding. Vapi-Telefonie wird nach Verbrauch
-            abgerechnet (~€60–240/Monat je nach Volumen).
+            persönlicher Onboarding-Begleitung. Telefon-Minuten sind im Tarif
+            inkludiert (Foundation 200, Growth 500, Premium 1.500) — darüber
+            hinaus Pre-Paid.
           </p>
         </div>
 

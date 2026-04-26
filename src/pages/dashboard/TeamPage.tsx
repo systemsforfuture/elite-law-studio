@@ -236,7 +236,7 @@ const TeamPage = () => {
             Team-Management
           </h2>
           <p className="text-sm text-muted-foreground">
-            {users.length} Mitglieder · Magic-Link-Einladungen via Supabase Auth
+            {users.length} Mitglieder · Magic-Link-Einladungen per E-Mail
           </p>
         </div>
         <Button variant="gold" size="sm" className="rounded-xl">

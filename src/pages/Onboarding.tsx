@@ -568,7 +568,7 @@ const Onboarding = () => {
                       Welcome-Call in T+2h:
                     </strong>{" "}
                     Customer-Success-Lead ruft Sie zu Ihrem hinterlegten
-                    Telefon zurück. Vapi-Telefonnummer ist in 12h aktiv.
+                    Telefon zurück. Ihre SYSTEMS-Telefonnummer ist in 12h aktiv.
                     Live-Schaltung in 24h.
                   </div>
                 </div>

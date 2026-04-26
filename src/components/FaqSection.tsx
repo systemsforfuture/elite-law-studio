@@ -6,23 +6,23 @@ import { Button } from "@/components/ui/button";
 const faqs = [
   {
     q: "Ist das mit dem anwaltlichen Berufsgeheimnis vereinbar?",
-    a: "Ja. §43e BRAO erlaubt Cloud-Nutzung explizit, wenn Verschlüsselung und Vertraulichkeit gewährleistet sind. Wir hosten ausschließlich in Frankfurt (Supabase EU + Vercel EU), verschlüsseln at-Rest pro-Tenant, schließen den Auftragsverarbeitungs-Vertrag mit Ihnen ab und legen die Daten so ab, dass keine Behörde direkten Zugriff bekommt (Beschlagnahmefreiheit).",
+    a: "Ja. §43e BRAO erlaubt Cloud-Nutzung explizit, wenn Verschlüsselung und Vertraulichkeit gewährleistet sind. Wir hosten ausschließlich in Deutschland (Frankfurt), verschlüsseln Ihre Daten mit einem eigenen Schlüssel pro Kanzlei, schließen den Auftragsverarbeitungs-Vertrag mit Ihnen ab und legen die Daten so ab, dass keine Behörde direkten Zugriff bekommt (Beschlagnahmefreiheit).",
   },
   {
     q: "Wie schnell sind wir live?",
-    a: "24 Stunden ab Vertragsabschluss bis zum ersten echten Anruf. Permanent-Assisted-Onboarding mit unserem Customer-Success-Lead. Datenmigration aus RA-MICRO, DATEV, Advoware oder Excel ist im Setup enthalten.",
+    a: "24 Stunden ab Vertragsabschluss bis zum ersten echten Anruf. Persönliche Begleitung durch unser Customer-Success-Team. Datenmigration aus RA-MICRO, DATEV, Advoware oder Excel ist im Setup enthalten.",
   },
   {
     q: "Was passiert bei juristischen Fragen — entscheidet die KI selbständig?",
-    a: "Niemals. Die KI ist auf Empfangs- und Verwaltungs-Aufgaben begrenzt. Bei juristischen Fragen, Notfällen oder unsicheren Konfidenz-Werten eskaliert sie automatisch an den zuständigen Anwalt — per Push, SMS oder Anruf. Sie entscheiden, was eskaliert wird.",
+    a: "Niemals. Die KI ist auf Empfangs- und Verwaltungs-Aufgaben begrenzt. Bei juristischen Fragen, Notfällen oder unsicheren Situationen eskaliert sie automatisch an den zuständigen Anwalt — per Push, SMS oder Anruf. Sie entscheiden, was eskaliert wird.",
   },
   {
     q: "Bleiben unsere Telefonnummer und unser Branding erhalten?",
-    a: "Komplett. Sie behalten Ihre Telefonnummer (Port zu Vapi), Ihre Domain, Ihr Logo, Ihre Farben. Premium-Tarif: Voice-Cloning Ihrer eigenen Stimme. Mandanten merken nicht, dass eine KI antwortet — sie hören Ihre Stimme oder eine professionelle Empfangsstimme im Branding der Kanzlei.",
+    a: "Komplett. Sie behalten Ihre Telefonnummer, Ihre Domain, Ihr Logo, Ihre Farben. Premium-Tarif: Klonen Ihrer eigenen Stimme — Mandanten hören Sie selbst antworten, auch wenn die KI im Hintergrund läuft.",
   },
   {
-    q: "Was kostet die Vapi-Telefonie zusätzlich?",
-    a: "Vapi-Minuten werden nach Verbrauch abgerechnet (~0.30€/Min). Für eine Kanzlei mit 200 Anruf-Minuten/Monat sind das ~60€. Premium-Kanzleien mit 800 Min ~240€. Diese Kosten sind transparent im Dashboard sichtbar — Sie laden Guthaben einmalig auf, der Rest läuft automatisch.",
+    q: "Was kostet die Telefonie zusätzlich?",
+    a: "Im Tarif-Preis sind Telefon-Minuten inkludiert (Foundation 200, Growth 500, Premium 1.500). Darüber hinaus Pre-Paid-Aufladung. Volle Transparenz im Dashboard — Sie laden Guthaben einmalig auf, der Rest läuft automatisch.",
   },
   {
     q: "Was, wenn wir nach 14 Tagen merken, dass es nichts ist?",

@@ -25,7 +25,7 @@ const modules = [
       "Eskalations-Logik konfigurierbar",
     ],
     accent: "from-accent/30 to-accent/10",
-    badge: "VAPI · CLAUDE",
+    badge: "VOICE · KI",
   },
   {
     icon: MessagesSquare,
@@ -34,13 +34,13 @@ const modules = [
     detail:
       "Sortiert eingehende Mails (Mandant/Behörde/Werbung/Spam), antwortet auf Standardfragen, schickt Termin-Links. WhatsApp-Conversationalist mit Krisen-Erkennung im Familienrecht.",
     bullets: [
-      "360dialog WhatsApp Business API",
-      "Resend Inbound Email",
+      "WhatsApp Business integriert",
+      "E-Mail vollständig automatisch",
       "Tonalität pro Kanzlei einstellbar",
       "Confidence-Threshold = Auto-Eskalation",
     ],
     accent: "from-emerald-500/30 to-emerald-500/10",
-    badge: "360DIALOG · RESEND",
+    badge: "INBOX · KI",
   },
   {
     icon: CalendarClock,
@@ -51,11 +51,11 @@ const modules = [
     bullets: [
       "Konfliktfreie Slot-Vorschläge",
       "Fristenkontrolle mit Eskalations-Stufen",
-      "ICS-Export für Mandanten",
+      "Mandanten-Buchung per Link",
       "Re-Scheduling automatisch",
     ],
     accent: "from-sky-400/30 to-sky-400/10",
-    badge: "GOOGLE · OUTLOOK",
+    badge: "KALENDER · KI",
   },
   {
     icon: FileSearch,
@@ -64,13 +64,13 @@ const modules = [
     detail:
       "Vertragsparteien, Fristen, kritische Klauseln werden automatisch extrahiert. Risikobewertung pro Klausel. Fehlende Dokumente werden automatisch beim Mandanten nachgefordert.",
     bullets: [
-      "Vision-fähige Klausel-Analyse",
+      "Klausel- & Vertragsanalyse",
       "Risiko-Scoring (low/med/high)",
       "Fristen-Extraktion automatisch",
-      "DSGVO-konform verschlüsselt at Rest",
+      "DSGVO-konform verschlüsselt",
     ],
     accent: "from-purple-400/30 to-purple-400/10",
-    badge: "CLAUDE VISION",
+    badge: "DOKUMENTEN-KI",
   },
   {
     icon: Receipt,
@@ -81,11 +81,11 @@ const modules = [
     bullets: [
       "Stufe 1–3 vollautomatisch",
       "Vorlage gerichtl. Mahnverfahren",
-      "Stripe / Mollie Payment-Webhooks",
-      "DATEV-Export ein-Klick",
+      "Online-Zahlung integriert",
+      "Buchhaltungs-Export ein-Klick",
     ],
     accent: "from-amber-400/30 to-amber-400/10",
-    badge: "DATEV · STRIPE",
+    badge: "FORDERUNGEN",
   },
   {
     icon: Sparkles,

@@ -116,7 +116,7 @@ const AgentenPage = () => {
                       {a.name}
                     </div>
                     <div className="text-[10px] text-muted-foreground">
-                      {a.modell}
+                      SYSTEMS-KI · Deutsches Recht
                     </div>
                   </div>
                   <span
@@ -173,19 +173,19 @@ const AgentenPage = () => {
 
             <div className="grid sm:grid-cols-3 gap-3">
               <Mini
-                label="Modell"
-                value={active.modell.split(" ")[0]}
-                sub="Anthropic"
+                label="Spezialisiert auf"
+                value="DE-Recht"
+                sub="Trainiert auf BGB · BAG · BGH"
               />
               <Mini
-                label="Confidence"
+                label="Sicherheits-Schwelle"
                 value={`${(active.konfidenz_threshold * 100).toFixed(0)}%`}
-                sub="Threshold"
+                sub="darunter Eskalation"
               />
               <Mini
                 label="Tonalität"
                 value={active.tonalitaet}
-                sub="—"
+                sub="Pro Kanzlei einstellbar"
               />
             </div>
           </div>

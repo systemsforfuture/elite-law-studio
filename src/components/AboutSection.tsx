@@ -30,15 +30,15 @@ const AboutSection = () => {
               Wir bauen keine generische SaaS. Wir bauen die spezialisierte
               Plattform für Anwaltskanzleien — auf den deutschen Rechtsalltag,
               das deutsche Berufsrecht und die deutsche DSGVO zugeschnitten.
-              Permanent-Assisted-Onboarding, EU-Hosting, eigenes Engineering-Team.
+              Persönliche Begleitung, deutsches Hosting, deutsches Team.
             </p>
 
             <div className="space-y-5">
               {[
-                "Hosting in Frankfurt — Vercel EU + Supabase EU",
-                "Anthropic Claude Sonnet 4.7 für höchste juristische Tonalität",
-                "Vapi.ai für Sprach-Layer, Eigenbau ab Skalierungs-Stufe 2",
-                "Engineering-Team in Deutschland, persönlicher CSM",
+                "Hosting ausschließlich in Frankfurt am Main",
+                "Eigene SYSTEMS-Sprach-KI für deutsches Recht trainiert",
+                "Verschlüsselung pro Kanzlei mit individuellem Schlüssel",
+                "Engineering- & Support-Team in Deutschland",
               ].map((item, i) => (
                 <div
                   key={item}

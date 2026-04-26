@@ -139,9 +139,7 @@ const InboxPage = () => {
               />
               <div className="flex justify-between items-center mt-3">
                 <span className="text-xs text-muted-foreground">
-                  Wird via{" "}
-                  {selected.kanal === "whatsapp" ? "360dialog" : "Resend"}{" "}
-                  zugestellt
+                  Wird über SYSTEMS Mail-Engine zugestellt
                 </span>
                 <Button variant="gold" size="sm" className="rounded-xl">
                   <Send className="mr-2 h-3.5 w-3.5" />

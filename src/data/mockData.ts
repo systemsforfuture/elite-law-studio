@@ -608,7 +608,7 @@ export const kiAgents: KIAgent[] = [
     beschreibung:
       "Nimmt Anrufe 24/7 entgegen, qualifiziert Mandanten, bucht Termine, eskaliert Notfälle.",
     status: "aktiv",
-    modell: "claude-sonnet-4-7 + Vapi",
+    modell: "SYSTEMS Voice-KI",
     letzte_24h: { calls: 47, resolved: 38, escalated: 9 },
     konfidenz_threshold: 0.9,
     tonalitaet: "freundlich",
@@ -619,7 +619,7 @@ export const kiAgents: KIAgent[] = [
     beschreibung:
       "Sortiert eingehende Mails (Mandant/Behörde/Spam), beantwortet Standardfragen, eskaliert juristische Themen.",
     status: "aktiv",
-    modell: "claude-sonnet-4-7",
+    modell: "SYSTEMS-KI",
     letzte_24h: { calls: 142, resolved: 119, escalated: 23 },
     konfidenz_threshold: 0.85,
     tonalitaet: "freundlich",
@@ -630,7 +630,7 @@ export const kiAgents: KIAgent[] = [
     beschreibung:
       "Empathische Erstaufnahme im Familienrecht, erkennt emotionale Krisen und reagiert angemessen.",
     status: "aktiv",
-    modell: "claude-sonnet-4-7",
+    modell: "SYSTEMS-KI",
     letzte_24h: { calls: 28, resolved: 22, escalated: 6 },
     konfidenz_threshold: 0.92,
     tonalitaet: "empathisch",
@@ -641,7 +641,7 @@ export const kiAgents: KIAgent[] = [
     beschreibung:
       "Extrahiert aus Mandanten-Uploads: Vertragsparteien, Fristen, kritische Klauseln, Risikobewertung.",
     status: "aktiv",
-    modell: "claude-sonnet-4-7 (Vision)",
+    modell: "SYSTEMS Dokumenten-KI",
     letzte_24h: { calls: 18, resolved: 18, escalated: 0 },
     konfidenz_threshold: 0.85,
     tonalitaet: "formal",
@@ -652,7 +652,7 @@ export const kiAgents: KIAgent[] = [
     beschreibung:
       "Plant Termine konfliktfrei, sendet Erinnerungen, re-scheduled bei Mandanten-Anfrage automatisch.",
     status: "aktiv",
-    modell: "claude-sonnet-4-7 + Google Calendar",
+    modell: "SYSTEMS Kalender-KI",
     letzte_24h: { calls: 31, resolved: 31, escalated: 0 },
     konfidenz_threshold: 0.88,
     tonalitaet: "freundlich",
@@ -663,7 +663,7 @@ export const kiAgents: KIAgent[] = [
     beschreibung:
       "Generiert Mahnungen in 3 Stufen mit korrekten juristischen Formulierungen, übergibt Stufe 4 ans gerichtliche Mahnverfahren.",
     status: "aktiv",
-    modell: "claude-sonnet-4-7",
+    modell: "SYSTEMS-KI",
     letzte_24h: { calls: 12, resolved: 12, escalated: 1 },
     konfidenz_threshold: 0.95,
     tonalitaet: "formal",
@@ -766,7 +766,7 @@ export const activities: Activity[] = [
     ts: "2026-04-25T10:42:00Z",
     type: "ai_strategy_generated",
     actor: "ai",
-    actor_name: "Claude Sonnet 4.7",
+    actor_name: "SYSTEMS-KI",
     title: "Anwalts-Strategie v2 generiert",
     detail: "Aktualisierte Strategie für Klageerwiderung Weber, 92% Konfidenz.",
     link_to: { module: "akten", id: "akte_2" },
@@ -851,7 +851,7 @@ export const strategien: AnwaltsStrategie[] = [
     status: "review",
     generated_by: "ai",
     generated_at: "2026-04-25T10:42:00Z",
-    modell: "claude-sonnet-4-7",
+    modell: "SYSTEMS-KI",
     konfidenz: 0.92,
     sections: {
       sachverhalt:

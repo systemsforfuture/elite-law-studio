@@ -5,7 +5,7 @@ const steps = [
   {
     hour: "T+0h",
     title: "Vertragsabschluss",
-    detail: "Digital signiert (DocuSign), Stripe Setup, Tenant erstellt, Slack-Channel offen.",
+    detail: "Digital signiert, Setup abgeschlossen, Account erstellt, Support-Kanal offen.",
   },
   {
     hour: "T+2h",
