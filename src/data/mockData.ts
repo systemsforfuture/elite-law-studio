@@ -7,11 +7,14 @@ import type {
   KIAgent,
   Konversation,
   Mandant,
+  MitarbeiterKontingent,
   Rechnung,
   TeamMemberStats,
   Tenant,
   Termin,
+  UrlaubAntrag,
   User,
+  Zeiterfassung,
 } from "./types";
 
 export const currentTenant: Tenant = {
@@ -968,6 +971,238 @@ export const activitiesForAkte = (akte_id: string) =>
     .sort((a, b) => b.ts.localeCompare(a.ts));
 export const findTeamStats = (user_id: string) =>
   teamStats.find((s) => s.user_id === user_id);
+
+// HR / Personal-Modul Mock-Daten
+const today = new Date();
+const isoDate = (d: Date) => d.toISOString().slice(0, 10);
+const daysAgo = (n: number) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() - n);
+  return isoDate(d);
+};
+const daysAhead = (n: number) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() + n);
+  return isoDate(d);
+};
+
+export const zeiterfassungen: Zeiterfassung[] = [
+  {
+    id: "ze_1",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_2",
+    datum: daysAgo(0),
+    start: "09:00",
+    ende: "11:30",
+    dauer_min: 150,
+    akte_id: "akt_2",
+    mandant_id: "md_2",
+    beschreibung: "Schriftsatz Güteverhandlung Weber",
+    art: "billable",
+    tarif_eur: 280,
+    created_at: `${daysAgo(0)}T09:00:00Z`,
+  },
+  {
+    id: "ze_2",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_2",
+    datum: daysAgo(0),
+    start: "13:00",
+    ende: "14:30",
+    dauer_min: 90,
+    akte_id: "akt_2",
+    mandant_id: "md_2",
+    beschreibung: "Telefonat mit Mandantin + Vorbereitung Termin",
+    art: "billable",
+    tarif_eur: 280,
+    created_at: `${daysAgo(0)}T13:00:00Z`,
+  },
+  {
+    id: "ze_3",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_1",
+    datum: daysAgo(0),
+    start: "10:00",
+    ende: "12:00",
+    dauer_min: 120,
+    akte_id: "akt_1",
+    mandant_id: "md_1",
+    beschreibung: "Aufnahme Sachverhalt Scheidung Müller",
+    art: "billable",
+    tarif_eur: 320,
+    created_at: `${daysAgo(0)}T10:00:00Z`,
+  },
+  {
+    id: "ze_4",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_3",
+    datum: daysAgo(1),
+    start: "08:30",
+    ende: "12:00",
+    dauer_min: 210,
+    akte_id: "akt_3",
+    beschreibung: "Vertragsentwurf Schmidt Logistik",
+    art: "billable",
+    tarif_eur: 290,
+    created_at: `${daysAgo(1)}T08:30:00Z`,
+  },
+  {
+    id: "ze_5",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_4",
+    datum: daysAgo(1),
+    start: "09:00",
+    ende: "17:30",
+    dauer_min: 510,
+    beschreibung: "Mandantenakquise · Telefonate · KI-Inbox-Triage",
+    art: "intern",
+    created_at: `${daysAgo(1)}T09:00:00Z`,
+  },
+  {
+    id: "ze_6",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_2",
+    datum: daysAgo(2),
+    start: "09:00",
+    ende: "17:00",
+    dauer_min: 480,
+    beschreibung: "Diverse Mandate · Schriftsätze",
+    art: "billable",
+    tarif_eur: 280,
+    created_at: `${daysAgo(2)}T09:00:00Z`,
+  },
+  {
+    id: "ze_7",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_3",
+    datum: daysAgo(3),
+    start: "10:00",
+    ende: "16:00",
+    dauer_min: 360,
+    beschreibung: "Schulung neue ZPO-Reform 2026",
+    art: "training",
+    created_at: `${daysAgo(3)}T10:00:00Z`,
+  },
+];
+
+export const urlaubsantraege: UrlaubAntrag[] = [
+  {
+    id: "ua_1",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_2",
+    von: daysAhead(14),
+    bis: daysAhead(21),
+    tage: 6,
+    art: "urlaub",
+    status: "pending",
+    kommentar: "Sommerurlaub Italien",
+    created_at: daysAgo(2),
+  },
+  {
+    id: "ua_2",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_3",
+    von: daysAgo(40),
+    bis: daysAgo(35),
+    tage: 4,
+    art: "urlaub",
+    status: "approved",
+    approver_id: "usr_1",
+    approved_at: daysAgo(45),
+    kommentar: "Skiurlaub Tirol",
+    created_at: daysAgo(50),
+  },
+  {
+    id: "ua_3",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_4",
+    von: daysAgo(7),
+    bis: daysAgo(5),
+    tage: 3,
+    art: "krankheit",
+    status: "approved",
+    approver_id: "usr_1",
+    approved_at: daysAgo(7),
+    kommentar: "AU-Bescheinigung eingereicht",
+    created_at: daysAgo(7),
+  },
+  {
+    id: "ua_4",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_3",
+    von: daysAhead(3),
+    bis: daysAhead(3),
+    tage: 1,
+    art: "home_office",
+    status: "pending",
+    kommentar: "Konzentrationsarbeit Schriftsatz",
+    created_at: daysAgo(0),
+  },
+  {
+    id: "ua_5",
+    tenant_id: "tnt_bergmann",
+    mitarbeiter_id: "usr_2",
+    von: daysAhead(35),
+    bis: daysAhead(45),
+    tage: 8,
+    art: "urlaub",
+    status: "pending",
+    kommentar: "Herbstferien mit Familie",
+    created_at: daysAgo(1),
+  },
+];
+
+export const kontingente: MitarbeiterKontingent[] = [
+  {
+    mitarbeiter_id: "usr_1",
+    jahr: 2026,
+    urlaubstage_total: 30,
+    urlaubstage_genommen: 8,
+    urlaubstage_offen: 22,
+    kranktage_genommen: 0,
+    ueberstunden_min: 1240,
+    ist_stunden_woche: 47.5,
+    soll_stunden_woche: 40,
+  },
+  {
+    mitarbeiter_id: "usr_2",
+    jahr: 2026,
+    urlaubstage_total: 28,
+    urlaubstage_genommen: 6,
+    urlaubstage_offen: 22,
+    kranktage_genommen: 1,
+    ueberstunden_min: 480,
+    ist_stunden_woche: 42,
+    soll_stunden_woche: 40,
+  },
+  {
+    mitarbeiter_id: "usr_3",
+    jahr: 2026,
+    urlaubstage_total: 28,
+    urlaubstage_genommen: 4,
+    urlaubstage_offen: 24,
+    kranktage_genommen: 0,
+    ueberstunden_min: 220,
+    ist_stunden_woche: 41,
+    soll_stunden_woche: 40,
+  },
+  {
+    mitarbeiter_id: "usr_4",
+    jahr: 2026,
+    urlaubstage_total: 26,
+    urlaubstage_genommen: 0,
+    urlaubstage_offen: 26,
+    kranktage_genommen: 3,
+    ueberstunden_min: 0,
+    ist_stunden_woche: 39,
+    soll_stunden_woche: 40,
+  },
+];
+
+export const findKontingent = (mitarbeiter_id: string, jahr = new Date().getFullYear()) =>
+  kontingente.find(
+    (k) => k.mitarbeiter_id === mitarbeiter_id && k.jahr === jahr,
+  );
 
 export const findMandant = (id?: string) =>
   mandanten.find((m) => m.id === id);

@@ -18,6 +18,7 @@ import {
   CreditCard,
   ShieldCheck,
   UsersRound,
+  Clock4,
   Search,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
@@ -58,11 +59,17 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    label: "Team & Personal",
+    items: [
+      { to: "/dashboard/team", icon: UsersRound, label: "Team" },
+      { to: "/dashboard/personal", icon: Clock4, label: "Personal", badge: "2" },
+    ],
+  },
+  {
     label: "Setup",
     items: [
       { to: "/dashboard/import", icon: DatabaseZap, label: "Daten-Import" },
       { to: "/dashboard/branding", icon: Palette, label: "White-Label" },
-      { to: "/dashboard/team", icon: UsersRound, label: "Team" },
       { to: "/dashboard/abrechnung", icon: CreditCard, label: "Abrechnung" },
       { to: "/dashboard/audit", icon: ShieldCheck, label: "Audit-Log" },
     ],
@@ -82,6 +89,7 @@ const titleByPath: Record<string, string> = {
   "/dashboard/import": "Daten-Import",
   "/dashboard/branding": "White-Label",
   "/dashboard/team": "Team",
+  "/dashboard/personal": "Personal · Zeit & Urlaub",
   "/dashboard/abrechnung": "Abrechnung",
   "/dashboard/audit": "Audit-Log",
 };
