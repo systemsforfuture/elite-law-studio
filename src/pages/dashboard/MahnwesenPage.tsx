@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Receipt,
   AlertOctagon,
@@ -15,6 +15,7 @@ import type { Rechnung, RechnungStatus } from "@/data/types";
 import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { useSendMessage } from "@/lib/queries/use-send-message";
 import { useProviderHealth } from "@/lib/queries/use-provider-config";
+import { isWithinLastDays } from "@/lib/date-utils";
 import { useTenant } from "@/contexts/TenantContext";
 import { exportRechnungenDatev, downloadCsv } from "@/lib/datev-export";
 import MahnwesenAutopilot from "@/components/dashboard/MahnwesenAutopilot";
@@ -117,7 +118,40 @@ const MahnwesenPage = () => {
     }
   };
   const summeOffen = offen.reduce((s, r) => s + r.betrag_brutto, 0);
-  const zurueckGeholt = 18420;
+
+  // »Zurückgeholt 30 Tage« = bezahlte Rechnungen die mahnstufe > 0 hatten,
+  // bezahlt_am in den letzten 30 Tagen.
+  const zurueckGeholt = useMemo(
+    () =>
+      rechnungen
+        .filter(
+          (r) =>
+            r.status === "bezahlt" &&
+            r.mahnstufe > 0 &&
+            r.bezahlt_am &&
+            isWithinLastDays(r.bezahlt_am, 30),
+        )
+        .reduce((s, r) => s + r.betrag_brutto, 0),
+    [rechnungen],
+  );
+
+  // Ø Außenstand in Tagen: Durchschnitt zwischen rechnungsdatum und bezahlt_am
+  // für alle bezahlten Rechnungen der letzten 90 Tage.
+  const avgOutstandingDays = useMemo(() => {
+    const recent = rechnungen.filter(
+      (r) =>
+        r.status === "bezahlt" &&
+        r.bezahlt_am &&
+        isWithinLastDays(r.bezahlt_am, 90),
+    );
+    if (recent.length === 0) return null;
+    const totalDays = recent.reduce((s, r) => {
+      const start = new Date(r.rechnungsdatum).getTime();
+      const end = new Date(r.bezahlt_am as string).getTime();
+      return s + Math.max(0, (end - start) / 86_400_000);
+    }, 0);
+    return Math.round(totalDays / recent.length);
+  }, [rechnungen]);
 
   if (selected) {
     const md = findMandant(selected.mandant_id);
@@ -377,8 +411,8 @@ const MahnwesenPage = () => {
         />
         <Stat
           label="Ø Außenstand"
-          value="11 Tage"
-          sub="−42% vs. Vorquartal"
+          value={avgOutstandingDays === null ? "—" : `${avgOutstandingDays} Tage`}
+          sub={avgOutstandingDays === null ? "Noch keine bezahlten Rechnungen" : "Schnitt der letzten 90 Tage"}
           accent="emerald"
         />
       </div>
