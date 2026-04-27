@@ -453,10 +453,25 @@ const WhatsappCard = ({ config }: { config: WhatsappIntegration }) => {
           )}
         </Button>
         {config.phone_number && config.verification_status !== "verified" && (
-          <div className="text-xs text-muted-foreground">
-            Status: <strong className="text-foreground">Verifizierung läuft.</strong>{" "}
-            Wir benachrichtigen Sie sobald Mandanten WhatsApps schicken können
-            (typisch 1–3 Tage, Meta-Approval-Prozess).
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.03] p-3 space-y-1">
+            <div className="text-xs">
+              <strong className="text-foreground">Verifizierung läuft.</strong>{" "}
+              Eingereicht{" "}
+              {config.requested_at
+                ? `am ${new Date(config.requested_at).toLocaleDateString("de-DE")}`
+                : "vor kurzem"}
+              .
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Typisch 1–3 Werktage. Sie bekommen eine Benachrichtigung sobald
+              Mandanten WhatsApps schicken können.
+            </div>
+          </div>
+        )}
+        {config.phone_number && config.verification_status === "verified" && config.verified_at && (
+          <div className="text-[11px] text-muted-foreground">
+            Verifiziert am{" "}
+            {new Date(config.verified_at).toLocaleDateString("de-DE")}.
           </div>
         )}
       </div>
