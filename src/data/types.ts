@@ -320,6 +320,7 @@ export interface MitarbeiterKontingent {
   urlaubstage_offen: number;
   kranktage_genommen: number;
   ueberstunden_min: number;
-  ist_stunden_woche: number;
+  /** Frontend-computed (aus zeiterfassung der letzten 7 Tage); kann undefined sein wenn vom View geladen */
+  ist_stunden_woche?: number;
   soll_stunden_woche: number;
 }

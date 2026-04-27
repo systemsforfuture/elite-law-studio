@@ -203,8 +203,16 @@ const PersonalPage = () => {
           <div className="grid md:grid-cols-2 gap-3">
             {team.map((u) => {
               const k = kontingente.find((x) => x.mitarbeiter_id === u.id);
-              const auslastungPct = k
-                ? Math.round((k.ist_stunden_woche / k.soll_stunden_woche) * 100)
+              // ist_stunden_woche kann fehlen wenn vom DB-View geladen → fallback aus zeiten letzte 7 Tage
+              const cutoff = new Date();
+              cutoff.setDate(cutoff.getDate() - 7);
+              const cutoffIso = cutoff.toISOString().slice(0, 10);
+              const minLetzte7 = zeiten
+                .filter((z) => z.mitarbeiter_id === u.id && z.datum >= cutoffIso)
+                .reduce((s, z) => s + z.dauer_min, 0);
+              const istHWoche = k?.ist_stunden_woche ?? minLetzte7 / 60;
+              const auslastungPct = k && k.soll_stunden_woche
+                ? Math.round((istHWoche / k.soll_stunden_woche) * 100)
                 : 0;
               return (
                 <div key={u.id} className="glass-card p-5 border-border/50">
@@ -230,7 +238,7 @@ const PersonalPage = () => {
                       />
                       <Row
                         label="Wochenstunden"
-                        value={`${k.ist_stunden_woche.toFixed(1)} h`}
+                        value={`${istHWoche.toFixed(1)} h`}
                         sub={`Soll ${k.soll_stunden_woche} h`}
                       />
                       <Row
