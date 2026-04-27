@@ -6,7 +6,7 @@
 // Stufe 4: Vorlage für gerichtliches Mahnverfahren.
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
-import { complete } from "../_shared/anthropic.ts";
+import { complete } from "../_shared/llm.ts";
 import { callerContext, supabaseAdmin } from "../_shared/supabase-admin.ts";
 
 interface RequestBody {
@@ -112,11 +112,10 @@ ${mahnCfg?.custom_prompt_addition ? `\nKANZLEI-SPEZIFISCHE ANWEISUNGEN:\n${mahnC
 Erstelle den Brieftext.`.trim();
 
     const llm = await complete({
-      tier: "balanced",
+      task: "mahnung_gen",
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
-      max_tokens: 1024,
-      temperature: 0.2,
+      tenant_id: ctx.tenant_id,
     });
 
     // Status der Rechnung anpassen

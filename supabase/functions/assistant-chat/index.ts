@@ -7,7 +7,7 @@
 // Sicherheit: Authentifizierung über Caller-JWT, RLS sorgt für Tenant-Scope.
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
-import { complete } from "../_shared/anthropic.ts";
+import { complete } from "../_shared/llm.ts";
 import { callerContext, supabaseAdmin } from "../_shared/supabase-admin.ts";
 
 interface ChatMessage {
@@ -118,9 +118,10 @@ Deno.serve(async (req) => {
     ];
 
     const result = await complete({
-      tier: "balanced",
+      task: "assistant_chat",
       system: SYSTEM_PROMPT(ctx),
       messages,
+      tenant_id: caller.tenant_id,
       max_tokens: 1024,
       temperature: 0.4,
     });

@@ -5,7 +5,7 @@
 // und einen KI-Vorschlag haben will.
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
-import { complete, tryParseJson } from "../_shared/anthropic.ts";
+import { complete, tryParseJson } from "../_shared/llm.ts";
 import { callerContext, supabaseAdmin } from "../_shared/supabase-admin.ts";
 
 interface RequestBody {
@@ -134,12 +134,18 @@ ${konv.inhalt ?? konv.preview ?? ""}
 
 Triage und Antwortvorschlag als JSON.`.trim();
 
+    // Channel-spezifischer Task — voice/whatsapp nutzt billigeres Modell
+    const triageTask =
+      konv.kanal === "voice"
+        ? "voice_triage"
+        : konv.kanal === "whatsapp"
+          ? "whatsapp_chat"
+          : "email_triage";
     const llm = await complete({
-      tier: "balanced",
+      task: triageTask,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
-      max_tokens: 1024,
-      temperature: 0.4,
+      tenant_id: ctx.tenant_id,
     });
 
     const result = tryParseJson<TriageResult>(llm.text);

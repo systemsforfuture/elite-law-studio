@@ -10,7 +10,7 @@
 //   });
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
-import { complete, tryParseJson } from "../_shared/anthropic.ts";
+import { complete, tryParseJson } from "../_shared/llm.ts";
 import { callerContext, supabaseAdmin } from "../_shared/supabase-admin.ts";
 
 interface RequestBody {
@@ -174,11 +174,10 @@ ${customAddition ? `\nKANZLEI-SPEZIFISCHE ANWEISUNGEN:\n${customAddition}\n` : "
 Erstelle die Strategie als JSON nach Schema.`.trim();
 
     const llm = await complete({
-      tier: "deep", // Opus für komplexe juristische Analyse
+      task: "strategy_gen",
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
-      max_tokens: 4096,
-      temperature: 0.2,
+      tenant_id: ctx.tenant_id,
     });
 
     const sections = tryParseJson<StrategieSections>(llm.text);

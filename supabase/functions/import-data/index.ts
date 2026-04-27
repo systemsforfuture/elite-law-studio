@@ -5,7 +5,7 @@
 // auf das SYSTEMS-Schema, Validation läuft, Bulk-Insert in Batches.
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
-import { complete, tryParseJson } from "../_shared/anthropic.ts";
+import { complete, tryParseJson } from "../_shared/llm.ts";
 import { callerContext, supabaseAdmin } from "../_shared/supabase-admin.ts";
 
 interface RequestBody {
@@ -124,7 +124,8 @@ Deno.serve(async (req: Request) => {
       mapKonfidenz = 1.0;
     } else if (Deno.env.get("ANTHROPIC_API_KEY")) {
       const llm = await complete({
-        tier: "fast",
+        task: "lead_capture",
+        tenant_id: ctx.tenant_id,
         system: MAPPING_SYSTEM_PROMPT,
         messages: [
           {
