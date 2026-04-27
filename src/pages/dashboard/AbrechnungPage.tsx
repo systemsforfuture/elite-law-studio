@@ -1,7 +1,9 @@
-import { CreditCard, Phone, Sparkles, ArrowUpRight, Download, Cpu, AlertCircle, TrendingUp, Zap } from "lucide-react";
+import { CreditCard, Phone, ArrowUpRight, Download, Cpu, AlertCircle, TrendingUp, Zap, Plug } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
 import { useLlmUsage, useLlmUsageDaily, LlmUsageDayRow } from "@/lib/queries/use-llm-usage";
+import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { detectAnomaly } from "@/lib/cost-anomaly";
 
 const tierMeta = {
@@ -26,6 +28,8 @@ const AbrechnungPage = () => {
   const tier = tierMeta[tenant.subscription_tier];
   const { data: llmUsage = [] } = useLlmUsage();
   const { data: llmDaily = [] } = useLlmUsageDaily();
+  const { data: health } = useProviderHealth();
+  const voiceActive = health?.voice?.enabled && health?.voice?.status === "active";
 
   const totalTokens = llmUsage.reduce((s, r) => s + r.input_tokens_sum + r.output_tokens_sum, 0);
   const totalCost = llmUsage.reduce((s, r) => s + Number(r.cost_eur_sum), 0);
@@ -74,25 +78,31 @@ const AbrechnungPage = () => {
               Telefon-Guthaben
             </h3>
           </div>
-          <div className="text-3xl font-display font-black text-foreground tabular-nums">
-            184<span className="text-lg text-muted-foreground">€</span>
-          </div>
-          <div className="text-xs text-muted-foreground mb-4">
-            ~610 Restminuten · 12 Tage
-          </div>
-          <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-4">
-            <div
-              className="h-full bg-gradient-to-r from-accent to-gold-dark"
-              style={{ width: "61%" }}
-            />
-          </div>
-          <Button variant="gold" size="sm" className="w-full rounded-xl">
-            <Sparkles className="mr-2 h-3.5 w-3.5" />
-            300€ aufladen
-          </Button>
-          <div className="text-[10px] text-muted-foreground mt-2 text-center">
-            Auto-Top-up bei &lt; 50€ aktivierbar
-          </div>
+          {voiceActive ? (
+            <>
+              <div className="text-2xl font-display font-bold text-muted-foreground tabular-nums mb-1">
+                —
+              </div>
+              <div className="text-xs text-muted-foreground mb-4">
+                Live-Saldo aus dem Voice-Provider wird in einer kommenden
+                Version angezeigt. Aktuelle Verbrauchskosten finden Sie unten
+                bei »SYSTEMS-KI-Verbrauch«.
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-xs text-muted-foreground mb-4">
+                Voice-Integration ist noch nicht aktiv. Sobald die KI-Hotline
+                eingerichtet ist, sehen Sie hier Ihr Guthaben.
+              </div>
+              <Link to="/dashboard/integrationen">
+                <Button variant="outline" size="sm" className="w-full rounded-xl">
+                  <Plug className="mr-2 h-3.5 w-3.5" />
+                  Voice einrichten
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* KI-Verbrauch im aktuellen Monat */}
