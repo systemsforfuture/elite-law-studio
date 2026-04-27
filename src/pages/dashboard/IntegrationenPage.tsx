@@ -158,8 +158,17 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
   const escalated24h = calls24h.filter((k) => k.status === "escalated").length;
 
   const handleTestCall = async () => {
-    if (!/^\+\d{10,15}$/.test(testNumber.trim())) {
+    const trimmed = testNumber.trim();
+    if (!/^\+\d{10,15}$/.test(trimmed)) {
       toast.error("Format: +491701234567");
+      return;
+    }
+    // Selbst-Anruf vermeiden — würde KI-zu-KI-Loop oder Vapi-Reject erzeugen
+    const ownNumber = config.phone_number?.replace(/[\s-]/g, "");
+    if (ownNumber && trimmed === ownNumber) {
+      toast.error("Eigene KI-Nummer kann nicht angerufen werden", {
+        description: "Bitte deine Mobil-/Festnetznummer eintragen.",
+      });
       return;
     }
     const t = toast.loading("Ihre KI wählt jetzt…");
