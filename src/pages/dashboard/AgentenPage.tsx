@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Mic,
   Inbox,
@@ -15,7 +15,17 @@ import {
 import type { AgentSlug, KIAgent, Tonalitaet } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useAgentsQuery, useUpdateAgentConfig } from "@/lib/queries/use-agent-config";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useDokumenteQuery } from "@/lib/queries/use-dokumente";
+import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { isWithinLastHours } from "@/lib/date-utils";
 import { toast } from "sonner";
+
+const slugToKanal: Partial<Record<AgentSlug, "voice" | "email" | "whatsapp">> = {
+  voice_receptionist: "voice",
+  email_triagist: "email",
+  whatsapp_conversationalist: "whatsapp",
+};
 
 const iconMap: Record<AgentSlug, typeof Mic> = {
   voice_receptionist: Mic,
@@ -41,6 +51,43 @@ const colorMap: Record<AgentSlug, { color: string; bg: string }> = {
 const AgentenPage = () => {
   const { data: kiAgents = [] } = useAgentsQuery();
   const updateConfig = useUpdateAgentConfig();
+  const { data: konversationen = [] } = useKonversationenQuery();
+  const { data: dokumente = [] } = useDokumenteQuery();
+  const { data: rechnungen = [] } = useRechnungenQuery();
+
+  // Live letzte-24h-Stats pro Agent-Slug aus echten Daten.
+  const liveStats = useMemo(() => {
+    const last24Konv = konversationen.filter((k) => isWithinLastHours(k.zeitpunkt, 24));
+    const result: Record<AgentSlug, { resolved: number; escalated: number }> = {
+      voice_receptionist: { resolved: 0, escalated: 0 },
+      email_triagist: { resolved: 0, escalated: 0 },
+      whatsapp_conversationalist: { resolved: 0, escalated: 0 },
+      dokumenten_analyst: { resolved: 0, escalated: 0 },
+      termin_koordinator: { resolved: 0, escalated: 0 },
+      mahnungs_eskalator: { resolved: 0, escalated: 0 },
+    };
+    for (const k of last24Konv) {
+      const slug = (Object.keys(slugToKanal) as AgentSlug[]).find(
+        (s) => slugToKanal[s] === k.kanal,
+      );
+      if (!slug) continue;
+      if (k.status === "escalated") result[slug].escalated++;
+      else if (k.ai_handled) result[slug].resolved++;
+    }
+    // dokumenten_analyst: Dokumente mit ai_extracted in letzten 24h.
+    result.dokumenten_analyst.resolved = dokumente.filter(
+      (d) => d.ai_extracted && isWithinLastHours(d.uploaded_at, 24),
+    ).length;
+    // mahnungs_eskalator: Rechnungen mit mahnstufe>0 deren naechste_aktion_am in den
+    // letzten 24h fiel ODER schon vorbei ist (Eskalation läuft).
+    result.mahnungs_eskalator.resolved = rechnungen.filter(
+      (r) =>
+        r.mahnstufe > 0 &&
+        r.naechste_aktion_am &&
+        isWithinLastHours(r.naechste_aktion_am, 24),
+    ).length;
+    return result;
+  }, [konversationen, dokumente, rechnungen]);
   const [activeSlug, setActiveSlug] = useState<AgentSlug>("voice_receptionist");
   const active = kiAgents.find((a) => a.slug === activeSlug) ?? kiAgents[0];
   const [draftPrompt, setDraftPrompt] = useState<string>(
@@ -113,11 +160,12 @@ const AgentenPage = () => {
   const Icon = iconMap[active.slug];
   const colors = colorMap[active.slug];
 
-  const totalActions = kiAgents.reduce(
-    (s, a) => s + a.letzte_24h.resolved + a.letzte_24h.escalated,
+  const totalActions = Object.values(liveStats).reduce(
+    (s, v) => s + v.resolved + v.escalated,
     0,
   );
-  const totalResolved = kiAgents.reduce((s, a) => s + a.letzte_24h.resolved, 0);
+  const totalResolved = Object.values(liveStats).reduce((s, v) => s + v.resolved, 0);
+  const autoQuotePct = totalActions === 0 ? null : (totalResolved / totalActions) * 100;
 
   return (
     <div className="space-y-6">
@@ -130,10 +178,10 @@ const AgentenPage = () => {
             </span>
           </div>
           <div className="text-2xl font-display font-bold text-foreground">
-            Aktiv · 6/6 Agenten
+            Aktiv · {kiAgents.filter((a) => a.status === "aktiv").length}/{kiAgents.length} Agenten
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            Routing-Logic gesund · Latenz Ø 187ms
+            Routing-Logic gesund · Multi-Provider-Fallback aktiv
           </div>
         </div>
         <div className="glass-card p-5 border-border/50">
@@ -152,10 +200,10 @@ const AgentenPage = () => {
             Auto-Quote
           </div>
           <div className="text-3xl font-display font-black text-emerald-600 tabular-nums">
-            {((totalResolved / totalActions) * 100).toFixed(0)}%
+            {autoQuotePct === null ? "—" : `${autoQuotePct.toFixed(0)}%`}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            Ohne Eskalation gelöst
+            {autoQuotePct === null ? "Noch keine Aktionen heute" : "Ohne Eskalation gelöst"}
           </div>
         </div>
       </div>
@@ -199,8 +247,8 @@ const AgentenPage = () => {
                   />
                 </div>
                 <div className="flex gap-3 text-[10px] text-muted-foreground">
-                  <span>{a.letzte_24h.resolved} gelöst</span>
-                  <span>{a.letzte_24h.escalated} eskaliert</span>
+                  <span>{liveStats[a.slug].resolved} gelöst</span>
+                  <span>{liveStats[a.slug].escalated} eskaliert</span>
                 </div>
               </button>
             );
@@ -271,16 +319,16 @@ const AgentenPage = () => {
             <div className="grid grid-cols-3 gap-4">
               <Big
                 label="Aktionen"
-                value={String(active.letzte_24h.calls)}
+                value={String(liveStats[active.slug].resolved + liveStats[active.slug].escalated)}
               />
               <Big
                 label="Auto-gelöst"
-                value={String(active.letzte_24h.resolved)}
+                value={String(liveStats[active.slug].resolved)}
                 accent="emerald"
               />
               <Big
                 label="Eskaliert"
-                value={String(active.letzte_24h.escalated)}
+                value={String(liveStats[active.slug].escalated)}
                 accent="amber"
               />
             </div>
