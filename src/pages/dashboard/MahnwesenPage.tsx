@@ -14,6 +14,7 @@ import { findMandant, mandantName, mandanten as allMandanten } from "@/data/mock
 import type { Rechnung, RechnungStatus } from "@/data/types";
 import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { useSendMessage } from "@/lib/queries/use-send-message";
+import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { useTenant } from "@/contexts/TenantContext";
 import { exportRechnungenDatev, downloadCsv } from "@/lib/datev-export";
 import MahnwesenAutopilot from "@/components/dashboard/MahnwesenAutopilot";
@@ -83,6 +84,10 @@ const MahnwesenPage = () => {
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
   const generateMahnung = useGenerateMahnung();
   const sendMessage = useSendMessage();
+  const { data: providerHealth } = useProviderHealth();
+  const emailReady = Boolean(
+    providerHealth?.email?.enabled && providerHealth?.email?.verification_status === "verified",
+  );
   const [generatedText, setGeneratedText] = useState<string | null>(null);
 
   // Rechnungen die für die nächste Eskalations-Stufe fällig sind:
@@ -280,7 +285,16 @@ const MahnwesenPage = () => {
                                   variant="gold"
                                   size="sm"
                                   className="rounded-lg"
+                                  disabled={!emailReady}
+                                  title={!emailReady ? "E-Mail-Integration nicht eingerichtet — siehe Setup → Integrationen" : undefined}
                                   onClick={async () => {
+                                    if (!emailReady) {
+                                      toast.error("E-Mail-Integration nicht aktiv", {
+                                        description:
+                                          "Setup → Integrationen → E-Mail einrichten + DNS verifizieren.",
+                                      });
+                                      return;
+                                    }
                                     const md = findMandant(selected.mandant_id);
                                     if (!md?.email) {
                                       toast.error("Mandant hat keine Email-Adresse");
