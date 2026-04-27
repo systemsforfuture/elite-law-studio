@@ -1,7 +1,8 @@
-import { CreditCard, Phone, Sparkles, ArrowUpRight, Download, Cpu, AlertCircle, TrendingUp } from "lucide-react";
+import { CreditCard, Phone, Sparkles, ArrowUpRight, Download, Cpu, AlertCircle, TrendingUp, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
 import { useLlmUsage, useLlmUsageDaily, LlmUsageDayRow } from "@/lib/queries/use-llm-usage";
+import { detectAnomaly } from "@/lib/cost-anomaly";
 
 const tierMeta = {
   foundation: { label: "Foundation", monthly: 490, setup: 3900, kiTokens: 300_000 },
@@ -31,6 +32,7 @@ const AbrechnungPage = () => {
   const totalCalls = llmUsage.reduce((s, r) => s + r.call_count, 0);
   const limitPct = Math.min(100, (totalTokens / tier.kiTokens) * 100);
   const overLimit = totalTokens > tier.kiTokens;
+  const anomaly = detectAnomaly(llmDaily);
 
   return (
     <div className="space-y-6">
@@ -149,6 +151,30 @@ const AbrechnungPage = () => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Anomalie-Banner */}
+          {anomaly.isAnomaly && (
+            <div className="mb-4 rounded-xl border border-amber-500/40 bg-amber-500/[0.06] p-4">
+              <div className="flex items-start gap-3">
+                <Zap className="h-5 w-5 mt-0.5 shrink-0 text-amber-600" />
+                <div className="text-sm flex-1 min-w-0">
+                  <div className="font-display font-bold text-amber-700">
+                    Ungewöhnlicher KI-Verbrauch heute
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Heute: {(anomaly.todayTokens / 1000).toFixed(0)}k Tokens — das ist{" "}
+                    <span className="font-semibold text-amber-700">
+                      {anomaly.factor.toFixed(1)}× mehr
+                    </span>{" "}
+                    als der Durchschnitt der letzten 7 Tage ({(anomaly.baselineMedian / 1000).toFixed(0)}k).
+                    Mögliche Ursachen: ungewöhnlich hohes Anruf-/E-Mail-Aufkommen, ein
+                    nicht-menschlicher Bot, oder ein Workflow-Problem. Wenn Sie nichts
+                    Ungewöhnliches feststellen, kontaktieren Sie SYSTEMS-Support.
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
