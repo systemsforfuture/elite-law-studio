@@ -186,6 +186,20 @@ const PortalDashboard = () => {
           ))}
         </div>
 
+        {tab === "ueberblick" && !aktiveAkte && (
+          <div className="glass-card p-12 border-border/50 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-muted/50 mx-auto mb-3 flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-base font-display font-bold text-foreground mb-1">
+              Noch keine Akte
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+              Sobald Ihre Kanzlei eine Akte für Sie anlegt, sehen Sie hier
+              den Status, anstehende Termine und alle Dokumente.
+            </p>
+          </div>
+        )}
         {tab === "ueberblick" && aktiveAkte && (
           <div className="space-y-6">
             {/* Status-Tracker */}

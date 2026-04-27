@@ -89,7 +89,12 @@ const AssistantWidget = () => {
     setHistory((h) => [...h, userMsg]);
     setInput("");
     try {
-      const res = await ask.mutateAsync({ message: msg, history });
+      // Frühere Fehler-Messages NICHT als Kontext zur KI schicken — würde
+      // 'assistant: Fehler: 503' als legitime Aussage interpretieren.
+      const cleanHistory = history.filter(
+        (m) => m.role !== "assistant" || !m.content.startsWith("Fehler:"),
+      );
+      const res = await ask.mutateAsync({ message: msg, history: cleanHistory });
       setHistory((h) => [...h, { role: "assistant", content: res.reply }]);
     } catch (e) {
       setHistory((h) => [
