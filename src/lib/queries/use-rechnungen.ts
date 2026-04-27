@@ -37,8 +37,20 @@ export const useGenerateMahnung = () => {
         const r = mockRechnungen.find((x) => x.id === id);
         if (!r) return null;
         const stufe = Math.min(r.mahnstufe + 1, 4) as 1 | 2 | 3 | 4;
+        // Mock-Mode: tatsächlich Mock-Array mutieren, damit die
+        // Liste nach Autopilot-Approve die neue Stufe zeigt
+        // (Production-DB macht das via UPDATE in der Edge Function).
+        r.mahnstufe = stufe;
+        r.status =
+          stufe === 1
+            ? "mahnung_1"
+            : stufe === 2
+              ? "mahnung_2"
+              : stufe === 3
+                ? "mahnung_3"
+                : "gerichtlich";
         return {
-          rechnung: { ...r, mahnstufe: stufe } as Rechnung,
+          rechnung: r,
           stufe,
           mahn_text:
             "[Mock] Sehr geehrter Mandant,\n\nleider haben wir Ihre Zahlung der Rechnung " +
