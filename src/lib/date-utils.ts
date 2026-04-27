@@ -16,3 +16,12 @@ export const isWithinLastHours = (iso: string, hours: number): boolean => {
 
 export const isWithinLastDays = (iso: string, days: number): boolean =>
   isWithinLastHours(iso, days * 24);
+
+/** Tageszeit-abhängige Begrüßung. Berlin-Lokalzeit über Date-getHours(). */
+export const greetingForTime = (now: Date = new Date()): string => {
+  const h = now.getHours();
+  if (h < 5) return "Noch wach";
+  if (h < 11) return "Guten Morgen";
+  if (h < 18) return "Guten Tag";
+  return "Guten Abend";
+};

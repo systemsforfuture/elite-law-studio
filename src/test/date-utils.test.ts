@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isSameDay, isWithinLastHours, isWithinLastDays } from "@/lib/date-utils";
+import { isSameDay, isWithinLastHours, isWithinLastDays, greetingForTime } from "@/lib/date-utils";
 
 describe("date-utils", () => {
   it("isSameDay erkennt heute", () => {
@@ -31,5 +31,21 @@ describe("date-utils", () => {
     fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
     expect(isWithinLastDays(fiveDaysAgo.toISOString(), 7)).toBe(true);
     expect(isWithinLastDays(fiveDaysAgo.toISOString(), 3)).toBe(false);
+  });
+
+  describe("greetingForTime", () => {
+    const at = (h: number) => new Date(2026, 3, 15, h, 0, 0);
+    it("3 Uhr → Noch wach", () => {
+      expect(greetingForTime(at(3))).toBe("Noch wach");
+    });
+    it("8 Uhr → Guten Morgen", () => {
+      expect(greetingForTime(at(8))).toBe("Guten Morgen");
+    });
+    it("13 Uhr → Guten Tag", () => {
+      expect(greetingForTime(at(13))).toBe("Guten Tag");
+    });
+    it("20 Uhr → Guten Abend", () => {
+      expect(greetingForTime(at(20))).toBe("Guten Abend");
+    });
   });
 });

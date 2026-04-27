@@ -30,7 +30,7 @@ import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, Plug } from "lucide-react";
 import { toast } from "sonner";
-import { isSameDay, isWithinLastHours, isWithinLastDays } from "@/lib/date-utils";
+import { isSameDay, isWithinLastHours, isWithinLastDays, greetingForTime } from "@/lib/date-utils";
 
 const OverviewPage = () => {
   const { tenant } = useTenant();
@@ -181,7 +181,7 @@ const OverviewPage = () => {
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">
-            Guten Morgen, {tenant.inhaber_name.split(" ").pop()}.
+            {greetingForTime()}, {tenant.inhaber_name.split(" ").pop()}.
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
             {new Date().toLocaleDateString("de-DE", {
@@ -191,7 +191,13 @@ const OverviewPage = () => {
               year: "numeric",
             })}{" "}
             · Plattform-Status:{" "}
-            <span className="text-emerald-600 font-medium">Alle Systeme grün</span>
+            {integrationsReady === integrationsTotal ? (
+              <span className="text-emerald-600 font-medium">Alle Systeme grün</span>
+            ) : (
+              <span className="text-amber-600 font-medium">
+                {integrationsReady}/{integrationsTotal} Integrationen aktiv
+              </span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 text-xs font-medium">
