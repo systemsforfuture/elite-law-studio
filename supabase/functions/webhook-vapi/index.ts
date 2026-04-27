@@ -24,7 +24,7 @@ interface VapiWebhookPayload {
   call?: {
     id: string;
     customer?: { number?: string };
-    phoneNumber?: { number?: string };
+    phoneNumber?: { id?: string; number?: string };
     startedAt?: string;
     endedAt?: string;
     duration?: number;
@@ -50,19 +50,31 @@ Deno.serve(async (req: Request) => {
     const payload: VapiWebhookPayload = JSON.parse(rawBody);
     const admin = supabaseAdmin();
 
-    // Tenant via angerufene Nummer auflösen
+    // Tenant resolven: Vapi-phoneNumber.id (Indexed) bevorzugt, fallback auf
+    // notfall_nummer-Match. Beide-Pfade decken auch Legacy-Tenants ab.
+    const phoneNumberId = payload.call?.phoneNumber?.id;
     const calledNumber = normalizePhone(payload.call?.phoneNumber?.number);
     let tenant_id: string | null = null;
     let tenantWebhookSecret: string | null = null;
-    if (calledNumber) {
+    if (phoneNumberId) {
+      const { data: t } = await admin
+        .from("tenants")
+        .select("id, provider_config")
+        .eq("voice_phone_number_id", phoneNumberId)
+        .maybeSingle();
+      tenant_id = t?.id ?? null;
+      const cfg = (t?.provider_config ?? {}) as { voice?: { webhook_secret?: string } };
+      tenantWebhookSecret = cfg.voice?.webhook_secret ?? null;
+    }
+    if (!tenant_id && calledNumber) {
       const { data: t } = await admin
         .from("tenants")
         .select("id, provider_config")
         .eq("notfall_nummer", calledNumber)
         .maybeSingle();
       tenant_id = t?.id ?? null;
-      const cfg = (t?.provider_config ?? {}) as { vapi?: { webhook_secret?: string } };
-      tenantWebhookSecret = cfg.vapi?.webhook_secret ?? null;
+      const cfg = (t?.provider_config ?? {}) as { voice?: { webhook_secret?: string } };
+      tenantWebhookSecret = cfg.voice?.webhook_secret ?? null;
     }
     // Kein Fallback auf Demo-Tenant — sonst landen unbekannte Anrufe in fremdem Tenant.
     if (!tenant_id) {

@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useAuditLog } from "@/lib/queries/use-audit";
 import {
   useProviderConfig,
   useProvisionVoice,
@@ -89,8 +90,48 @@ const IntegrationenPage = () => {
           <WhatsappCard config={cfg.whatsapp} />
           <EmailCard config={cfg.email} />
           <StripeCard config={cfg.stripe} />
+          <ProvisioningHistoryTile />
         </div>
       )}
+    </div>
+  );
+};
+
+const ProvisioningHistoryTile = () => {
+  const { data: audit = [] } = useAuditLog();
+  const provisioningEvents = audit
+    .filter((e) =>
+      [
+        "voice_provisioning",
+        "whatsapp_provisioning",
+        "email_domain",
+        "stripe_connect",
+      ].includes(e.entity_type),
+    )
+    .slice(0, 5);
+
+  if (provisioningEvents.length === 0) return null;
+
+  return (
+    <div className="glass-card border-border/50 p-5">
+      <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-3">
+        Letzte Setup-Aktionen
+      </div>
+      <div className="space-y-2">
+        {provisioningEvents.map((e) => (
+          <div key={e.id} className="flex items-start gap-3 text-sm">
+            <span className="text-[10px] font-mono text-muted-foreground/70 mt-0.5 shrink-0 w-32">
+              {new Date(e.ts).toLocaleString("de-DE", {
+                day: "2-digit",
+                month: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+            <span className="text-foreground/80 flex-1">{e.details ?? e.entity_type}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -453,10 +494,25 @@ const WhatsappCard = ({ config }: { config: WhatsappIntegration }) => {
           )}
         </Button>
         {config.phone_number && config.verification_status !== "verified" && (
-          <div className="text-xs text-muted-foreground">
-            Status: <strong className="text-foreground">Verifizierung läuft.</strong>{" "}
-            Wir benachrichtigen Sie sobald Mandanten WhatsApps schicken können
-            (typisch 1–3 Tage, Meta-Approval-Prozess).
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.03] p-3 space-y-1">
+            <div className="text-xs">
+              <strong className="text-foreground">Verifizierung läuft.</strong>{" "}
+              Eingereicht{" "}
+              {config.requested_at
+                ? `am ${new Date(config.requested_at).toLocaleDateString("de-DE")}`
+                : "vor kurzem"}
+              .
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Typisch 1–3 Werktage. Sie bekommen eine Benachrichtigung sobald
+              Mandanten WhatsApps schicken können.
+            </div>
+          </div>
+        )}
+        {config.phone_number && config.verification_status === "verified" && config.verified_at && (
+          <div className="text-[11px] text-muted-foreground">
+            Verifiziert am{" "}
+            {new Date(config.verified_at).toLocaleDateString("de-DE")}.
           </div>
         )}
       </div>
