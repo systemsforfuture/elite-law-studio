@@ -20,6 +20,7 @@ import {
   useVerifyEmailDomain,
   useConnectStripe,
   usePatchProviderConfig,
+  useVoiceTestCall,
 } from "@/lib/queries/use-provider-config";
 import type {
   EmailIntegration,
@@ -100,9 +101,35 @@ const IntegrationenPage = () => {
 const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: string }) => {
   const provision = useProvisionVoice();
   const patch = usePatchProviderConfig();
+  const testCall = useVoiceTestCall();
   const [areaCode, setAreaCode] = useState("030");
   const [greeting, setGreeting] = useState(config.greeting ?? "");
+  const [testNumber, setTestNumber] = useState("");
   const [open, setOpen] = useState(!config.phone_number);
+
+  const handleTestCall = async () => {
+    if (!/^\+\d{10,15}$/.test(testNumber.trim())) {
+      toast.error("Format: +491701234567");
+      return;
+    }
+    const t = toast.loading("Ihre KI wählt jetzt…");
+    try {
+      const res = await testCall.mutateAsync({ call_to: testNumber.trim() });
+      if (res.ok) {
+        toast.success("Test-Anruf läuft", {
+          id: t,
+          description: res.message ?? "Bitte annehmen.",
+        });
+      } else {
+        toast.error("Anruf fehlgeschlagen", { id: t, description: res.message });
+      }
+    } catch (e) {
+      toast.error("Fehler", {
+        id: t,
+        description: e instanceof Error ? e.message : "Unbekannt",
+      });
+    }
+  };
 
   const handleSaveGreeting = async () => {
     const t = toast.loading("Begrüßung wird gespeichert…");
@@ -212,6 +239,39 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
               "Begrüßung speichern"
             )}
           </Button>
+
+          <div className="border-t border-border/50 pt-4 mt-4">
+            <h4 className="text-xs font-semibold text-foreground mb-2 uppercase tracking-wider">
+              Test-Anruf
+            </h4>
+            <p className="text-xs text-muted-foreground mb-3">
+              Ihre KI ruft Sie auf der hinterlegten Nummer an, damit Sie einmal
+              live testen können.
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              <input
+                type="tel"
+                value={testNumber}
+                onChange={(e) => setTestNumber(e.target.value)}
+                placeholder="+491701234567"
+                className="flex-1 min-w-[180px] px-3 py-2 rounded-lg border border-border bg-background text-sm font-mono focus:outline-none focus:ring-2 focus:ring-accent/30"
+              />
+              <Button
+                variant="outline"
+                onClick={handleTestCall}
+                disabled={!testNumber.trim() || testCall.isPending}
+              >
+                {testCall.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                    Wählt…
+                  </>
+                ) : (
+                  "Test-Anruf starten"
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">

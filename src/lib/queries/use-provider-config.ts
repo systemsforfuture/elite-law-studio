@@ -134,6 +134,40 @@ export const usePatchProviderConfig = () => {
 };
 
 // =============================================================
+// Voice — Test-Anruf auslösen
+// =============================================================
+
+interface TestCallInput {
+  call_to: string;
+}
+
+interface TestCallResult {
+  ok: boolean;
+  message?: string;
+}
+
+export const useVoiceTestCall = () => {
+  return useMutation<TestCallResult, Error, TestCallInput>({
+    mutationFn: async (input) => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 1200));
+        return {
+          ok: true,
+          message: `Demo-Modus: Ihre KI würde jetzt ${input.call_to} anrufen.`,
+        };
+      }
+      const { data, error } = await supabase!.functions.invoke<TestCallResult>(
+        "voice-test-call",
+        { body: input },
+      );
+      if (error) throw error;
+      if (!data) throw new Error("Keine Antwort");
+      return data;
+    },
+  });
+};
+
+// =============================================================
 // Voice — KI-Telefonnummer provisionieren
 // =============================================================
 
