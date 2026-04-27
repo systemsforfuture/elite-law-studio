@@ -8,11 +8,13 @@ import {
   CheckCircle2,
   ArrowLeft,
   TrendingUp,
+  Download,
 } from "lucide-react";
-import { findMandant, mandantName } from "@/data/mockData";
+import { findMandant, mandantName, mandanten as allMandanten } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
 import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { useTenant } from "@/contexts/TenantContext";
+import { exportRechnungenDatev, downloadCsv } from "@/lib/datev-export";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -307,19 +309,45 @@ const MahnwesenPage = () => {
       </div>
 
       <div className="glass-card p-5 border-accent/20 bg-accent/[0.04]">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="h-4 w-4 text-accent" />
-          <h3 className="text-sm font-display font-bold text-foreground">
-            Mahnungs-Eskalator schlägt vor
-          </h3>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Sparkles className="h-4 w-4 text-accent" />
+              <h3 className="text-sm font-display font-bold text-foreground">
+                Mahnungs-Eskalator schlägt vor
+              </h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">
+              3 Rechnungen sind heute fällig für die nächste Eskalations-Stufe.
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="gold" size="sm" className="rounded-xl">
+                <TrendingUp className="mr-2 h-3.5 w-3.5" />
+                Alle 3 Vorschläge prüfen
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl"
+                onClick={() => {
+                  if (rechnungen.length === 0) {
+                    toast.info("Keine Rechnungen zum Exportieren");
+                    return;
+                  }
+                  const csv = exportRechnungenDatev(rechnungen, allMandanten);
+                  const today = new Date().toISOString().slice(0, 10);
+                  downloadCsv(csv, `DATEV-Rechnungen_${today}.csv`);
+                  toast.success(`${rechnungen.length} Rechnungen exportiert`, {
+                    description: "DATEV-Buchungsstapel · UTF-8 + BOM",
+                  });
+                }}
+              >
+                <Download className="mr-2 h-3.5 w-3.5" />
+                DATEV-Export
+              </Button>
+            </div>
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground mb-4">
-          3 Rechnungen sind heute fällig für die nächste Eskalations-Stufe.
-        </p>
-        <Button variant="gold" size="sm" className="rounded-xl">
-          <TrendingUp className="mr-2 h-3.5 w-3.5" />
-          Alle 3 Vorschläge prüfen
-        </Button>
       </div>
 
       {!isLoading && rechnungen.length === 0 ? (
