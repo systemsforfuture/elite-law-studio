@@ -18,7 +18,8 @@ Damit die obigen Module funktionieren, müssen folgende Function-Secrets gesetzt
 
 ```bash
 # Pflicht
-supabase secrets set ANTHROPIC_API_KEY=sk-ant-…           # KI
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-…           # KI primary
+supabase secrets set OPENAI_API_KEY=sk-proj-…             # KI hybrid (optional, ~50% Cost-Reduction)
 supabase secrets set RESEND_API_KEY=re_…                   # E-Mail-Plattform
 supabase secrets set STRIPE_SECRET_KEY=sk_live_…           # Zahlungs-Plattform
 supabase secrets set VAPI_API_KEY=vapi_…                   # Voice-Plattform
