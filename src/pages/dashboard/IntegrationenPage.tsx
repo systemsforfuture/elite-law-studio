@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Phone,
   MessageCircle,
@@ -30,6 +31,37 @@ import { toast } from "sonner";
 const IntegrationenPage = () => {
   const { tenant } = useTenant();
   const { data: cfg } = useProviderConfig(tenant.id);
+  const [params, setParams] = useSearchParams();
+  const stripe = useConnectStripe();
+
+  // Stripe-OAuth-Return: triggert automatischen Status-Refresh wenn Anwalt
+  // gerade aus dem KYC zurückkommt. Param wird danach aus der URL entfernt.
+  useEffect(() => {
+    const stripeFlag = params.get("stripe");
+    if (stripeFlag === "return" || stripeFlag === "refresh") {
+      params.delete("stripe");
+      setParams(params, { replace: true });
+      // Status-Refresh anstoßen — Toast zeigt's
+      void (async () => {
+        try {
+          const t = (await import("sonner")).toast;
+          const ld = t.loading("Zahlungs-Status wird aktualisiert…");
+          const res = await stripe.mutateAsync();
+          if (res.charges_enabled && res.payouts_enabled) {
+            t.success("Zahlungen sind live", { id: ld });
+          } else {
+            t.info("KYC noch nicht abgeschlossen", {
+              id: ld,
+              description: "Stripe verifiziert noch — kann ein paar Minuten dauern.",
+            });
+          }
+        } catch {
+          /* still ok */
+        }
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.get("stripe")]);
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -158,7 +190,7 @@ const VoiceCard = ({ config }: { config: VoiceIntegration }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-medium text-foreground block mb-1.5">
                 Vorwahl
@@ -444,13 +476,15 @@ const EmailCard = ({ config }: { config: EmailIntegration }) => {
             </div>
             <div className="divide-y divide-border/50">
               {config.dns_records.map((r, i) => (
-                <div key={i} className="px-4 py-3 grid grid-cols-[60px_1fr_auto] gap-3 items-start text-xs font-mono">
-                  <span className="font-bold text-accent uppercase">{r.type}</span>
-                  <div className="space-y-0.5 break-all">
+                <div key={i} className="px-3 sm:px-4 py-3 flex items-start gap-2 sm:gap-3 text-xs font-mono">
+                  <span className="font-bold text-accent uppercase shrink-0 w-12">{r.type}</span>
+                  <div className="space-y-0.5 break-all flex-1 min-w-0">
                     <div className="text-foreground">{r.name}</div>
                     <div className="text-muted-foreground">{r.value}</div>
                   </div>
-                  <CopyButton value={r.value} />
+                  <div className="shrink-0">
+                    <CopyButton value={r.value} />
+                  </div>
                 </div>
               ))}
             </div>
