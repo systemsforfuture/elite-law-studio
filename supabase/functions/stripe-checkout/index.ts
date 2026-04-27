@@ -8,6 +8,7 @@
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { supabaseAdmin } from "../_shared/supabase-admin.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 interface RequestBody {
   rechnung_id: string;
@@ -31,6 +32,30 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    // AUTH-Check: Caller MUSS authentifiziert sein (Anwalt, Mitarbeiter ODER Mandant).
+    // Sonst: Anonymer kann Checkout-Sessions für fremde Rechnungen erzeugen +
+    // PII der Mandanten lesen.
+    const auth = req.headers.get("Authorization") ?? "";
+    if (!auth.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
+    // Versuche Auth-User zu laden — kann Anwalt (public.users) oder Mandant sein.
+    const sUrl = Deno.env.get("SUPABASE_URL")!;
+    const sAnon = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const userClient = createClient(sUrl, sAnon, {
+      global: { headers: { Authorization: auth } },
+    });
+    const { data: u } = await userClient.auth.getUser();
+    if (!u.user) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
+
     const admin = supabaseAdmin();
     const { data: r } = await admin
       .from("rechnungen")
@@ -40,6 +65,26 @@ Deno.serve(async (req: Request) => {
     if (!r) {
       return new Response(JSON.stringify({ error: "Rechnung nicht gefunden" }), {
         status: 404,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
+
+    // Tenant-Scope-Check:
+    // (a) Caller ist eingeloggter Mandant der Rechnung selbst, ODER
+    // (b) Caller ist Kanzlei-User des Tenants der Rechnung
+    const isOwnMandant = (r.mandant as { auth_user_id?: string } | null)?.auth_user_id === u.user.id;
+    let isKanzlei = false;
+    if (!isOwnMandant) {
+      const { data: kanzleiUser } = await admin
+        .from("users")
+        .select("tenant_id")
+        .eq("id", u.user.id)
+        .maybeSingle();
+      isKanzlei = kanzleiUser?.tenant_id === r.tenant_id;
+    }
+    if (!isOwnMandant && !isKanzlei) {
+      return new Response(JSON.stringify({ error: "forbidden" }), {
+        status: 403,
         headers: { ...corsHeaders, "content-type": "application/json" },
       });
     }

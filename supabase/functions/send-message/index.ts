@@ -162,13 +162,18 @@ Deno.serve(async (req: Request) => {
 
     if (konvErr) throw konvErr;
 
-    // Activity
+    // Activity — actor_name aus public.users laden (statt UUID)
+    const { data: callerUser } = await admin
+      .from("users")
+      .select("name")
+      .eq("id", ctx.id)
+      .maybeSingle();
     await admin.from("activities").insert({
       tenant_id: ctx.tenant_id,
       mandant_id: body.mandant_id,
       type: body.channel === "email" ? "email_out" : "whatsapp",
       actor: "anwalt",
-      actor_name: ctx.id,
+      actor_name: callerUser?.name ?? "Anwalt",
       title: providerOk
         ? `Antwort an Mandant gesendet (${body.channel})`
         : `Antwort konnte nicht gesendet werden (${providerErr ?? "Provider-Fehler"})`,

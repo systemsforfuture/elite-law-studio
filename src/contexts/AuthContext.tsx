@@ -33,15 +33,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     let active = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (active) {
-        setSession(data.session);
-        setLoading(false);
-      }
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (active) {
+          setSession(data.session);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        // Selbst bei Netzwerk-Fehler nicht ewig im Loading hängen
+        console.warn("[auth] getSession failed:", e);
+        if (active) setLoading(false);
+      });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, s) => {
+      if (!active) return;
       setSession(s);
+      // setLoading(false) auch hier — falls onAuthStateChange vor getSession feuert
+      setLoading(false);
     });
 
     return () => {

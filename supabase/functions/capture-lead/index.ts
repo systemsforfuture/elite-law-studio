@@ -59,19 +59,33 @@ Deno.serve(async (req: Request) => {
 
     const admin = supabaseAdmin();
 
-    // Tenant auflösen
-    let tenant_id: string | null = body.tenant_id ?? null;
-    if (!tenant_id && body.domain) {
-      const { data } = await admin
+    // Tenant auflösen — nur über verifizierte Domain, nicht über body.tenant_id
+    // (sonst kann jeder anonyme Caller in fremde Tenants schreiben).
+    // Domain-Lookup escaped via .eq() statt .or()-String-Interpolation.
+    let tenant_id: string | null = null;
+    const domain = sanitize(body.domain, 253);
+    if (domain) {
+      const { data: byDomain } = await admin
         .from("tenants")
         .select("id")
-        .or(`domain.eq.${body.domain},subdomain.eq.${body.domain}`)
+        .eq("domain", domain)
         .maybeSingle();
-      tenant_id = data?.id ?? null;
+      tenant_id = byDomain?.id ?? null;
+      if (!tenant_id) {
+        const { data: bySub } = await admin
+          .from("tenants")
+          .select("id")
+          .eq("subdomain", domain)
+          .maybeSingle();
+        tenant_id = bySub?.id ?? null;
+      }
     }
-    // Fallback auf Bergmann-Demo
     if (!tenant_id) {
-      tenant_id = "11111111-1111-1111-1111-111111111111";
+      console.warn("[capture-lead] tenant nicht resolvable für domain=", domain);
+      return new Response(
+        JSON.stringify({ error: "tenant_not_resolvable", hint: "domain im Body muss zu einem Tenant gehören" }),
+        { status: 422, headers: { ...corsHeaders, "content-type": "application/json" } },
+      );
     }
 
     const typ = body.firmenname ? "unternehmen" : "privat";

@@ -28,7 +28,14 @@ const PortalLogin = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim()) {
+      toast.error("Bitte E-Mail-Adresse eingeben");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast.error("Ungültige E-Mail-Adresse");
+      return;
+    }
 
     if (mandantAuth.isDemoMode) {
       navigate("/portal/dashboard");

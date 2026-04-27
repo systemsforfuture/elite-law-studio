@@ -26,9 +26,12 @@ export interface Tenant {
   inhaber_name: string;
   notfall_nummer?: string;
   onboarded_at: string;
-  mandanten_count: number;
-  akten_count: number;
-  mrr_eur: number;
+  /** Mock-only: in DB nicht persistiert; in Production aus useMandantenQuery().length zu lesen */
+  mandanten_count?: number;
+  /** Mock-only: in DB nicht persistiert; in Production aus useAktenQuery().length zu lesen */
+  akten_count?: number;
+  /** Mock-only: in DB nicht persistiert; in Production aus useRechnungenQuery() zu summieren */
+  mrr_eur?: number;
 }
 
 export interface User {

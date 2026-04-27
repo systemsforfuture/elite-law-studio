@@ -68,7 +68,13 @@ Deno.serve(async (req: Request) => {
         .maybeSingle();
       tenant_id = t?.id ?? null;
     }
-    if (!tenant_id) tenant_id = "11111111-1111-1111-1111-111111111111";
+    if (!tenant_id) {
+      console.warn("[webhook-email] Tenant nicht resolvable für to=", toEmail);
+      return new Response(
+        JSON.stringify({ error: "tenant_not_resolvable", to: toEmail }),
+        { status: 422, headers: { ...corsHeaders, "content-type": "application/json" } },
+      );
+    }
 
     // Mandant via Absender-Email
     let mandant_id: string | null = null;
@@ -82,7 +88,7 @@ Deno.serve(async (req: Request) => {
       mandant_id = m?.id ?? null;
     }
 
-    const { data: konv } = await admin
+    const { data: konv, error: konvErr } = await admin
       .from("konversationen")
       .insert({
         tenant_id,
@@ -100,12 +106,22 @@ Deno.serve(async (req: Request) => {
       .select()
       .single();
 
+    if (konvErr || !konv) {
+      console.error("[webhook-email] Konversation-Insert fehlgeschlagen:", konvErr);
+      return new Response(
+        JSON.stringify({ error: "konversation_insert_failed", details: konvErr?.message }),
+        { status: 500, headers: { ...corsHeaders, "content-type": "application/json" } },
+      );
+    }
+
+    // actor_name darf nicht leer sein (NOT NULL Constraint)
+    const actorName = payload.data?.from?.name ?? fromEmail ?? "Unbekannt";
     await admin.from("activities").insert({
       tenant_id,
       mandant_id,
       type: "email_in",
       actor: "mandant",
-      actor_name: payload.data?.from?.name ?? fromEmail ?? "Unbekannt",
+      actor_name: actorName.trim() || "Unbekannt",
       title: "E-Mail eingegangen",
       detail: subject.slice(0, 500),
       link_to: konv ? { module: "inbox", id: konv.id } : null,

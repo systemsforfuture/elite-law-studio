@@ -123,6 +123,16 @@ const Onboarding = () => {
       setStep(0);
       return;
     }
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
+    if (!emailOk) {
+      toast.error("Bitte gültige E-Mail-Adresse eingeben");
+      setStep(0);
+      return;
+    }
+    if (form.notfall_nummer && form.notfall_nummer.trim() && !/^[+\d\s/()-]{6,}$/.test(form.notfall_nummer.trim())) {
+      toast.error("Notfall-Nummer hat ein ungültiges Format");
+      return;
+    }
     const t = toast.loading("Tenant wird angelegt…", {
       description: "Schema, Voice-Endpoint, Branding werden konfiguriert.",
     });
@@ -269,7 +279,10 @@ const Onboarding = () => {
                 <Field
                   label="Team-Größe (inkl. Sie)"
                   value={String(form.team_size)}
-                  onChange={(v) => update("team_size", Number(v) || 1)}
+                  onChange={(v) => {
+                    const n = parseInt(v, 10);
+                    update("team_size", Number.isFinite(n) && n >= 1 && n <= 999 ? n : 1);
+                  }}
                   type="number"
                 />
               </div>

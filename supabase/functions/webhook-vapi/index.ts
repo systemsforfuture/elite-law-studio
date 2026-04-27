@@ -73,8 +73,14 @@ Deno.serve(async (req: Request) => {
         .maybeSingle();
       tenant_id = t?.id ?? null;
     }
-    // Fallback: Demo-Tenant
-    if (!tenant_id) tenant_id = "11111111-1111-1111-1111-111111111111";
+    // Kein Fallback auf Demo-Tenant — sonst landen unbekannte Anrufe in fremdem Tenant.
+    if (!tenant_id) {
+      console.warn("[webhook-vapi] Tenant nicht resolvable für called=", calledNumber);
+      return new Response(
+        JSON.stringify({ error: "tenant_not_resolvable", called: calledNumber }),
+        { status: 422, headers: { ...corsHeaders, "content-type": "application/json" } },
+      );
+    }
 
     // Mandant via Anrufer-Nummer
     const fromNumber = normalizePhone(payload.call?.customer?.number);

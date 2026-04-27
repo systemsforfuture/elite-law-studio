@@ -5,6 +5,16 @@ import type { Akte, AnwaltsStrategie } from "@/data/types";
 
 const shouldMock = () => !isSupabaseConfigured || !supabase;
 
+// jsonb-Spalten können null sein wenn nie initialisiert. Normalisieren bevor ans
+// Frontend, damit a.fristen.map() & co nicht crashen.
+const normalizeAkte = (a: unknown): Akte => {
+  const row = a as Akte & { fristen: Akte["fristen"] | null };
+  return {
+    ...row,
+    fristen: Array.isArray(row.fristen) ? row.fristen : [],
+  } as Akte;
+};
+
 export const useAktenQuery = () =>
   useQuery({
     queryKey: ["akten"],
@@ -18,7 +28,7 @@ export const useAktenQuery = () =>
         console.warn("[akten] fallback:", error.message);
         return mockAkten;
       }
-      return (data ?? []) as unknown as Akte[];
+      return (data ?? []).map(normalizeAkte);
     },
     staleTime: 30_000,
   });
@@ -36,7 +46,7 @@ export const useAkteQuery = (id: string | undefined | null) =>
         .eq("id", id)
         .maybeSingle();
       if (error) return mockAkten.find((a) => a.id === id) ?? null;
-      return data as unknown as Akte | null;
+      return data ? normalizeAkte(data) : null;
     },
   });
 
