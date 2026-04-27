@@ -1,7 +1,7 @@
-import { CreditCard, Phone, Sparkles, ArrowUpRight, Download, Cpu, AlertCircle } from "lucide-react";
+import { CreditCard, Phone, Sparkles, ArrowUpRight, Download, Cpu, AlertCircle, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
-import { useLlmUsage } from "@/lib/queries/use-llm-usage";
+import { useLlmUsage, useLlmUsageDaily, LlmUsageDayRow } from "@/lib/queries/use-llm-usage";
 
 const tierMeta = {
   foundation: { label: "Foundation", monthly: 490, setup: 3900, kiTokens: 300_000 },
@@ -24,6 +24,7 @@ const AbrechnungPage = () => {
   const { tenant } = useTenant();
   const tier = tierMeta[tenant.subscription_tier];
   const { data: llmUsage = [] } = useLlmUsage();
+  const { data: llmDaily = [] } = useLlmUsageDaily();
 
   const totalTokens = llmUsage.reduce((s, r) => s + r.input_tokens_sum + r.output_tokens_sum, 0);
   const totalCost = llmUsage.reduce((s, r) => s + Number(r.cost_eur_sum), 0);
@@ -151,6 +152,9 @@ const AbrechnungPage = () => {
             </div>
           )}
 
+          {/* 30-Tage-Trend */}
+          <DailyTrend rows={llmDaily} />
+
           {/* Per-Task-Breakdown */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -258,6 +262,59 @@ const AbrechnungPage = () => {
             </table>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const DailyTrend = ({ rows }: { rows: LlmUsageDayRow[] }) => {
+  if (rows.length === 0) return null;
+  const max = Math.max(1, ...rows.map((r) => r.tokens_sum));
+  const W = 720;
+  const H = 60;
+  const stepX = W / Math.max(1, rows.length - 1);
+  const points = rows
+    .map((r, i) => `${(i * stepX).toFixed(1)},${(H - (r.tokens_sum / max) * H).toFixed(1)}`)
+    .join(" ");
+  const areaPath = `M 0,${H} L ${points.split(" ").join(" L ")} L ${W},${H} Z`;
+
+  // 7-Tage-Vergleich: Δ
+  const last7 = rows.slice(-7).reduce((s, r) => s + r.tokens_sum, 0);
+  const prev7 = rows.slice(-14, -7).reduce((s, r) => s + r.tokens_sum, 0);
+  const delta = prev7 === 0 ? 0 : ((last7 - prev7) / prev7) * 100;
+  const trendColor = delta > 30 ? "text-amber-600" : delta < -10 ? "text-emerald-600" : "text-muted-foreground";
+
+  return (
+    <div className="mb-5 rounded-xl border border-border/40 bg-background/40 p-4">
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground/80">
+          <TrendingUp className="h-3.5 w-3.5" />
+          30-Tage-Trend
+        </div>
+        <div className={`text-xs font-semibold tabular-nums ${trendColor}`}>
+          {delta > 0 ? "+" : ""}{delta.toFixed(0)}% ggü. Vorwoche
+        </div>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-14" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="ki-trend-fill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.32" />
+            <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        <path d={areaPath} fill="url(#ki-trend-fill)" />
+        <polyline
+          points={points}
+          fill="none"
+          stroke="hsl(var(--accent))"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="flex justify-between text-[10px] text-muted-foreground/70 mt-1 tabular-nums">
+        <span>{new Date(rows[0].day).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}</span>
+        <span>heute</span>
       </div>
     </div>
   );

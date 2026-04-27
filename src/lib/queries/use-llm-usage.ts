@@ -36,3 +36,48 @@ export const useLlmUsage = () =>
     },
     staleTime: 60_000,
   });
+
+export interface LlmUsageDayRow {
+  day: string;
+  call_count: number;
+  tokens_sum: number;
+  cost_eur_sum: number;
+}
+
+const buildMockDaily = (): LlmUsageDayRow[] => {
+  const rows: LlmUsageDayRow[] = [];
+  const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const weekday = d.getDay();
+    // Wochenende deutlich weniger; Werk-Tage variieren um eine Trend-Linie
+    const baseTokens = weekday === 0 || weekday === 6 ? 60_000 : 240_000;
+    const noise = Math.round((Math.sin(i * 0.6) + 1) * 90_000);
+    const tokens = baseTokens + noise;
+    rows.push({
+      day: d.toISOString().slice(0, 10),
+      call_count: Math.round(tokens / 2400),
+      tokens_sum: tokens,
+      cost_eur_sum: Number((tokens / 1_000_000 * 2.6).toFixed(4)),
+    });
+  }
+  return rows;
+};
+
+const mockDailyRows = buildMockDaily();
+
+export const useLlmUsageDaily = () =>
+  useQuery({
+    queryKey: ["llm-usage-daily"],
+    queryFn: async (): Promise<LlmUsageDayRow[]> => {
+      if (shouldMock()) return mockDailyRows;
+      const { data, error } = await supabase!.rpc("llm_usage_last_30_days");
+      if (error) {
+        warnMockFallback("llm-usage-daily", error.message);
+        return mockDailyRows;
+      }
+      return (data ?? []) as unknown as LlmUsageDayRow[];
+    },
+    staleTime: 60_000,
+  });
