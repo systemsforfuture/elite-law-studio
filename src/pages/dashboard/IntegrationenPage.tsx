@@ -470,6 +470,32 @@ const WhatsappCard = ({ config }: { config: WhatsappIntegration }) => {
 
 const EmailCard = ({ config }: { config: EmailIntegration }) => {
   const verify = useVerifyEmailDomain();
+
+  // Auto-Polling während Domain pending: alle 60s DNS-Verify-Status checken.
+  // Stoppt sobald verified. Bricht nach 30 Versuchen ab (= 30 Min) damit
+  // niemals ewig läuft.
+  useEffect(() => {
+    if (!config.custom_domain) return;
+    if (config.verification_status === "verified") return;
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (attempts > 30) {
+        clearInterval(interval);
+        return;
+      }
+      void verify
+        .mutateAsync({
+          custom_domain: config.custom_domain!,
+          action: "poll",
+        })
+        .catch(() => {
+          /* still ok */
+        });
+    }, 60_000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.custom_domain, config.verification_status]);
   const [domain, setDomain] = useState(config.custom_domain ?? "");
   const [fromEmail, setFromEmail] = useState(config.from_email ?? "");
   const [open, setOpen] = useState(!config.custom_domain);
