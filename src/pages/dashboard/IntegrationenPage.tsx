@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import {
   useProviderConfig,
   useProvisionVoice,
@@ -102,10 +103,18 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
   const provision = useProvisionVoice();
   const patch = usePatchProviderConfig();
   const testCall = useVoiceTestCall();
+  const { data: konversationen = [] } = useKonversationenQuery();
   const [areaCode, setAreaCode] = useState("030");
   const [greeting, setGreeting] = useState(config.greeting ?? "");
   const [testNumber, setTestNumber] = useState("");
   const [open, setOpen] = useState(!config.phone_number);
+
+  // Live-Anrufstatistik letzte 24h
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const calls24h = konversationen.filter(
+    (k) => k.kanal === "voice" && k.zeitpunkt >= cutoff,
+  );
+  const escalated24h = calls24h.filter((k) => k.status === "escalated").length;
 
   const handleTestCall = async () => {
     if (!/^\+\d{10,15}$/.test(testNumber.trim())) {
@@ -210,6 +219,34 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
               Drucken Sie diese Nummer auf Ihre Visitenkarten, Website, E-Mail-Signatur.
               Sie erreichen Sie 24/7 über die KI.
             </p>
+          </div>
+
+          {/* Live-Anrufstatistik */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Anrufe 24h
+              </div>
+              <div className="text-xl font-display font-bold text-foreground tabular-nums mt-1">
+                {calls24h.length}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                KI gelöst
+              </div>
+              <div className="text-xl font-display font-bold text-emerald-600 tabular-nums mt-1">
+                {calls24h.length - escalated24h}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Eskaliert
+              </div>
+              <div className={`text-xl font-display font-bold tabular-nums mt-1 ${escalated24h > 0 ? "text-amber-600" : "text-foreground"}`}>
+                {escalated24h}
+              </div>
+            </div>
           </div>
 
           <div>
@@ -433,15 +470,50 @@ const WhatsappCard = ({ config }: { config: WhatsappIntegration }) => {
 
 const EmailCard = ({ config }: { config: EmailIntegration }) => {
   const verify = useVerifyEmailDomain();
+
+  // Auto-Polling während Domain pending: alle 60s DNS-Verify-Status checken.
+  // Stoppt sobald verified. Bricht nach 30 Versuchen ab (= 30 Min) damit
+  // niemals ewig läuft.
+  useEffect(() => {
+    if (!config.custom_domain) return;
+    if (config.verification_status === "verified") return;
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (attempts > 30) {
+        clearInterval(interval);
+        return;
+      }
+      void verify
+        .mutateAsync({
+          custom_domain: config.custom_domain!,
+          action: "poll",
+        })
+        .catch(() => {
+          /* still ok */
+        });
+    }, 60_000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.custom_domain, config.verification_status]);
   const [domain, setDomain] = useState(config.custom_domain ?? "");
   const [fromEmail, setFromEmail] = useState(config.from_email ?? "");
   const [open, setOpen] = useState(!config.custom_domain);
 
   const handleSetup = async () => {
-    const trimmedDomain = domain.trim().toLowerCase();
+    const trimmedDomain = domain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
     if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(trimmedDomain)) {
-      toast.error("Ungültige Domain", { description: "z.B. deine-kanzlei.de" });
+      toast.error("Ungültige Domain", { description: "z.B. deine-kanzlei.de — ohne https:// und ohne Pfade" });
       return;
+    }
+    if (fromEmail.trim()) {
+      const fromDomain = fromEmail.trim().split("@")[1] ?? "";
+      if (fromDomain && fromDomain.toLowerCase() !== trimmedDomain) {
+        toast.error("Absender-Domain stimmt nicht", {
+          description: `Absender muss auf @${trimmedDomain} enden, ist aber @${fromDomain}.`,
+        });
+        return;
+      }
     }
     const t = toast.loading("Domain wird angelegt…");
     try {
@@ -596,6 +668,20 @@ const EmailCard = ({ config }: { config: EmailIntegration }) => {
 const StripeCard = ({ config }: { config: StripeIntegration }) => {
   const connect = useConnectStripe();
   const [open, setOpen] = useState(!config.connect_account_id);
+
+  // Auto-Polling während KYC läuft: alle 30s charges_enabled refreshen.
+  // Stoppt sobald charges_enabled+payouts_enabled true sind.
+  useEffect(() => {
+    if (!config.connect_account_id) return;
+    if (config.charges_enabled && config.payouts_enabled) return;
+    const interval = setInterval(() => {
+      void connect.mutateAsync().catch(() => {
+        /* still ok */
+      });
+    }, 30_000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.connect_account_id, config.charges_enabled, config.payouts_enabled]);
 
   const handleConnect = async () => {
     const t = toast.loading("Verbinde mit Zahlungsanbieter…");

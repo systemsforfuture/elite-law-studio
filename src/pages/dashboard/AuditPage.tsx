@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ShieldCheck,
   Activity,
@@ -39,6 +40,30 @@ const actionMeta: Record<
 
 const AuditPage = () => {
   const { data: auditLog = [] } = useAuditLog();
+  const [actionFilter, setActionFilter] = useState<AuditEvent["action"] | "all">("all");
+  const [entityFilter, setEntityFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
+
+  const entityTypes = Array.from(
+    new Set(auditLog.map((e) => e.entity_type)),
+  ).sort();
+
+  const filtered = auditLog.filter((e) => {
+    if (actionFilter !== "all" && e.action !== actionFilter) return false;
+    if (entityFilter !== "all" && e.entity_type !== entityFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (
+        !e.user_name.toLowerCase().includes(q) &&
+        !(e.details ?? "").toLowerCase().includes(q) &&
+        !e.entity_type.toLowerCase().includes(q)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
+
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-3 gap-4">
@@ -83,15 +108,50 @@ const AuditPage = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h3 className="font-display font-bold text-foreground flex items-center gap-2">
           <Activity className="h-4 w-4 text-accent" />
-          Live Audit-Log
+          Live Audit-Log{" "}
+          {filtered.length !== auditLog.length && (
+            <span className="text-xs font-normal text-muted-foreground">
+              ({filtered.length}/{auditLog.length})
+            </span>
+          )}
         </h3>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Suchen…"
+            className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-accent/30 w-40"
+          />
+          <select
+            value={actionFilter}
+            onChange={(e) => setActionFilter(e.target.value as typeof actionFilter)}
+            className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs"
+          >
+            <option value="all">Alle Aktionen</option>
+            <option value="create">Create</option>
+            <option value="update">Update</option>
+            <option value="delete">Delete</option>
+            <option value="export">Export</option>
+            <option value="login">Login</option>
+            <option value="ai_action">KI-Aktion</option>
+            <option value="read">Read</option>
+          </select>
+          <select
+            value={entityFilter}
+            onChange={(e) => setEntityFilter(e.target.value)}
+            className="px-3 py-1.5 rounded-xl border border-border bg-background text-xs"
+          >
+            <option value="all">Alle Entities</option>
+            {entityTypes.map((et) => (
+              <option key={et} value={et}>
+                {et}
+              </option>
+            ))}
+          </select>
           <Button variant="outline" size="sm" className="rounded-xl">
             <Download className="mr-2 h-3.5 w-3.5" />
             DSGVO-Export
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-xl">
-            Filter
           </Button>
         </div>
       </div>
@@ -110,7 +170,7 @@ const AuditPage = () => {
               </tr>
             </thead>
             <tbody>
-              {auditLog.length === 0 && (
+              {filtered.length === 0 && (
                 <tr>
                   <td colSpan={6} className="p-12 text-center text-sm text-muted-foreground">
                     Noch keine Audit-Events. Sobald jemand Daten anlegt oder
@@ -118,7 +178,7 @@ const AuditPage = () => {
                   </td>
                 </tr>
               )}
-              {auditLog.map((e) => {
+              {filtered.map((e) => {
                 const meta = actionMeta[e.action];
                 const Icon = meta.icon;
                 const isAI = e.action === "ai_action";
