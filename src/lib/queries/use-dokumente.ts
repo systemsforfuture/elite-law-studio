@@ -88,13 +88,17 @@ export const useUploadDokument = () => {
         .single();
       if (dbErr) throw dbErr;
 
-      // Trigger KI-Analyse asynchron (UI muss nicht warten)
+      // Trigger KI-Analyse asynchron (UI muss nicht warten). Errors loggen
+      // statt unhandled-promise-rejection.
       void supabase!.functions
         .invoke("analyze-document", { body: { dokument_id: data.id } })
         .then((res) => {
           if (res.error) {
             console.warn("[dokumente] analyze fehlgeschlagen:", res.error);
           }
+        })
+        .catch((e) => {
+          console.warn("[dokumente] analyze threw:", e);
         });
 
       return data as unknown as Dokument;
