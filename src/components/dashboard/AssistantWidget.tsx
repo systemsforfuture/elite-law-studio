@@ -22,20 +22,19 @@ const SUGGESTIONS = [
 const AssistantWidget = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState<AssistantMessage[]>([]);
+  // Synchron aus localStorage initialisieren — sonst überschreibt der save-Effect
+  // beim ersten Render mit leerem Array bevor der load-Effect feuern kann.
+  const [history, setHistory] = useState<AssistantMessage[]>(() => {
+    try {
+      const raw = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
+      return raw ? (JSON.parse(raw) as AssistantMessage[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const ask = useAskAssistant();
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  // Persist history in localStorage
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setHistory(JSON.parse(raw));
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   useEffect(() => {
     try {
