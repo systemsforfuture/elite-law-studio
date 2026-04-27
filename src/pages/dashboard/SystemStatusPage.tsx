@@ -12,14 +12,29 @@ import {
   Database,
   ShieldCheck,
   Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { useProviderHealth } from "@/lib/queries/use-provider-config";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { useTenant } from "@/contexts/TenantContext";
 
 const SystemStatusPage = () => {
   const { tenant } = useTenant();
-  const { data: health, isLoading } = useProviderHealth();
+  const { data: health, isLoading, dataUpdatedAt } = useProviderHealth();
+  const qc = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      await qc.invalidateQueries({ queryKey: ["provider-health"] });
+      await qc.invalidateQueries({ queryKey: ["provider-config"] });
+    } finally {
+      setTimeout(() => setRefreshing(false), 500);
+    }
+  };
 
   const items = [
     {
@@ -84,12 +99,33 @@ const SystemStatusPage = () => {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div>
-        <h2 className="text-2xl font-display font-bold text-foreground">System-Status</h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          Diese Seite zeigt was {tenant.kanzlei_name} aktuell live KI-betreiben kann.
-          Vor dem ersten Mandanten-Onboarding sollten alle Module grün sein.
-        </p>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-2xl font-display font-bold text-foreground">System-Status</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Diese Seite zeigt was {tenant.kanzlei_name} aktuell live KI-betreiben kann.
+            Vor dem ersten Mandanten-Onboarding sollten alle Module grün sein.
+          </p>
+          {dataUpdatedAt > 0 && (
+            <p className="text-[11px] text-muted-foreground/60 mt-1">
+              Aktualisiert{" "}
+              {new Date(dataUpdatedAt).toLocaleTimeString("de-DE", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </p>
+          )}
+        </div>
+        <button
+          onClick={refresh}
+          disabled={refreshing}
+          className="px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted/60 transition-all border border-border/50 inline-flex items-center gap-2 disabled:opacity-50"
+          aria-label="Status aktualisieren"
+        >
+          <RefreshCw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
+          Aktualisieren
+        </button>
       </div>
 
       <div
