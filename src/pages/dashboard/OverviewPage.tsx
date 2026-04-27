@@ -14,7 +14,6 @@ import {
   CalendarClock,
 } from "lucide-react";
 import {
-  kiAgents,
   findMandant,
   findUser,
   mandantName,
@@ -96,6 +95,22 @@ const OverviewPage = () => {
 
   // Mandanten-Wachstum letzte 30 Tage.
   const mandantenLast30 = mandanten.filter((m) => isWithinLastDays(m.created_at, 30)).length;
+
+  // KI-Performance heute pro Kanal aus echten konversationen statt
+  // mock-kiAgents.letzte_24h. Channels mit 0 Aufkommen werden trotzdem
+  // angezeigt damit die Liste konsistent bleibt.
+  const kiPerf = (
+    [
+      { label: "Voice-Receptionist", kanal: "voice" as const },
+      { label: "Email-Triagist", kanal: "email" as const },
+      { label: "WhatsApp-Konversationalist", kanal: "whatsapp" as const },
+    ]
+  ).map(({ label, kanal }) => {
+    const ch = today.filter((k) => k.kanal === kanal);
+    const ai = ch.filter((k) => k.ai_handled).length;
+    const pct = ch.length === 0 ? 0 : Math.round((ai / ch.length) * 100);
+    return { label, total: ch.length, ai, pct };
+  });
 
   const offene_rechnungen = rechnungen
     .filter((r) => r.status !== "bezahlt")
@@ -497,28 +512,30 @@ const OverviewPage = () => {
               KI-Performance heute
             </h3>
             <div className="space-y-3">
-              {kiAgents.slice(0, 4).map((a) => {
-                const total = a.letzte_24h.resolved + a.letzte_24h.escalated;
-                const pct = total > 0 ? (a.letzte_24h.resolved / total) * 100 : 100;
-                return (
-                  <div key={a.slug}>
+              {kiPerf.length === 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  Noch keine Konversationen heute.
+                </p>
+              ) : (
+                kiPerf.map((p) => (
+                  <div key={p.label}>
                     <div className="flex justify-between text-xs mb-1.5">
                       <span className="text-foreground font-medium truncate">
-                        {a.name}
+                        {p.label}
                       </span>
                       <span className="text-muted-foreground tabular-nums">
-                        {pct.toFixed(0)}% auto
+                        {p.total === 0 ? "—" : `${p.pct}% auto`}
                       </span>
                     </div>
                     <div className="h-1 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-accent"
-                        style={{ width: `${pct}%` }}
+                        style={{ width: `${p.pct}%` }}
                       />
                     </div>
                   </div>
-                );
-              })}
+                ))
+              )}
             </div>
             <Link
               to="/dashboard/agenten"
