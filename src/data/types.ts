@@ -274,3 +274,52 @@ export interface TeamMemberStats {
   erfolgsquote_pct: number;
   umsatz_ytd_eur: number;
 }
+
+// HR / Personal-Modul
+export type ZeiterfassungArt = "billable" | "intern" | "training";
+
+export interface Zeiterfassung {
+  id: string;
+  tenant_id: string;
+  mitarbeiter_id: string;
+  datum: string; // ISO date YYYY-MM-DD
+  start: string; // HH:mm
+  ende: string;
+  dauer_min: number;
+  akte_id?: string;
+  mandant_id?: string;
+  beschreibung?: string;
+  art: ZeiterfassungArt;
+  tarif_eur?: number;
+  created_at: string;
+}
+
+export type UrlaubArt = "urlaub" | "krankheit" | "home_office" | "sonstiges";
+export type UrlaubStatus = "pending" | "approved" | "rejected";
+
+export interface UrlaubAntrag {
+  id: string;
+  tenant_id: string;
+  mitarbeiter_id: string;
+  von: string;
+  bis: string;
+  tage: number;
+  art: UrlaubArt;
+  status: UrlaubStatus;
+  kommentar?: string;
+  approver_id?: string;
+  approved_at?: string;
+  created_at: string;
+}
+
+export interface MitarbeiterKontingent {
+  mitarbeiter_id: string;
+  jahr: number;
+  urlaubstage_total: number;
+  urlaubstage_genommen: number;
+  urlaubstage_offen: number;
+  kranktage_genommen: number;
+  ueberstunden_min: number;
+  ist_stunden_woche: number;
+  soll_stunden_woche: number;
+}

@@ -17,6 +17,7 @@ import BrandingPage from "@/pages/dashboard/BrandingPage";
 import TeamPage from "@/pages/dashboard/TeamPage";
 import AbrechnungPage from "@/pages/dashboard/AbrechnungPage";
 import AuditPage from "@/pages/dashboard/AuditPage";
+import PersonalPage from "@/pages/dashboard/PersonalPage";
 
 const pages: [string, () => JSX.Element][] = [
   ["Login", Login],
@@ -34,6 +35,7 @@ const pages: [string, () => JSX.Element][] = [
   ["TeamPage", TeamPage],
   ["AbrechnungPage", AbrechnungPage],
   ["AuditPage", AuditPage],
+  ["PersonalPage", PersonalPage],
 ];
 
 describe("Anwalt-Sicht: Dashboard pages render without crashing", () => {
