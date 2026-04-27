@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   FileText,
   ArrowLeft,
@@ -14,6 +14,7 @@ import { findMandant, mandantName } from "@/data/mockData";
 import type { Dokument, DokumentStatus } from "@/data/types";
 import { useDokumenteQuery, useUploadDokument, useSignedUrl } from "@/lib/queries/use-dokumente";
 import { useTenant } from "@/contexts/TenantContext";
+import { isSameDay } from "@/lib/date-utils";
 import { toast } from "sonner";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -284,26 +285,62 @@ const DokumentePage = () => {
     !query || d.dateiname.toLowerCase().includes(query.toLowerCase()),
   );
 
+  const stats = useMemo(() => {
+    const total = dokumente.length;
+    const totalBytes = dokumente.reduce((s, d) => s + (d.groesse_bytes ?? 0), 0);
+    const analysiert = dokumente.filter(
+      (d) => d.status !== "neu" || d.ai_extracted,
+    ).length;
+    const aiPct = total === 0 ? 0 : Math.round((analysiert / total) * 100);
+    const today = dokumente.filter((d) => isSameDay(d.uploaded_at));
+    const todayMandant = today.filter((d) => d.uploaded_by === "mandant").length;
+    const risikoKlauseln = dokumente.reduce(
+      (s, d) => s + (d.ai_extracted?.kritische_klauseln?.length ?? 0),
+      0,
+    );
+    const risikoHigh = dokumente.reduce(
+      (s, d) =>
+        s +
+        (d.ai_extracted?.kritische_klauseln?.filter((k) => k.risiko === "high")
+          .length ?? 0),
+      0,
+    );
+    return {
+      total,
+      totalBytes,
+      analysiert,
+      aiPct,
+      todayCount: today.length,
+      todayMandant,
+      risikoKlauseln,
+      risikoHigh,
+    };
+  }, [dokumente]);
+
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-4 gap-4">
-        <Stat label="Dokumente gesamt" value="1.847" sub="3.2 GB Storage" />
+        <Stat
+          label="Dokumente gesamt"
+          value={stats.total.toLocaleString("de-DE")}
+          sub={stats.totalBytes === 0 ? "—" : `${formatBytes(stats.totalBytes)} Storage`}
+        />
         <Stat
           label="KI-analysiert"
-          value="1.621"
-          sub="88% Auto-Quote"
+          value={stats.analysiert.toLocaleString("de-DE")}
+          sub={stats.total === 0 ? "—" : `${stats.aiPct}% Auto-Quote`}
           accent="emerald"
         />
         <Stat
           label="Heute hochgeladen"
-          value="18"
-          sub="14 von Mandanten"
+          value={stats.todayCount.toString()}
+          sub={stats.todayCount === 0 ? "—" : `${stats.todayMandant} von Mandanten`}
           accent="purple"
         />
         <Stat
           label="Risiko-Klauseln"
-          value="42"
-          sub="In offenen Akten"
+          value={stats.risikoKlauseln.toString()}
+          sub={stats.risikoHigh === 0 ? "Keine kritisch" : `${stats.risikoHigh} kritisch`}
           accent="amber"
         />
       </div>
