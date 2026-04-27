@@ -140,6 +140,15 @@ Deno.serve(async (req) => {
       .update({ notfall_nummer: result.number })
       .eq("id", ctx.tenant_id);
 
+    // Audit-Log: Provisioning-Erfolg
+    await admin.from("audit_log").insert({
+      tenant_id: ctx.tenant_id,
+      user_id: ctx.id,
+      action: "create",
+      entity_type: "voice_provisioning",
+      details: `KI-Telefonnummer ${result.number} provisioniert`,
+    });
+
     return respond({
       ok: true,
       phone_number: result.number,

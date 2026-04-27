@@ -25,6 +25,7 @@ export const useRealtimeSubscriptions = () => {
       audit_log: ["audit"],
       zeiterfassung: ["zeiterfassung"],
       urlaub_antraege: ["urlaub"],
+      tenants: ["tenant", "provider-config", "provider-health"],
     };
 
     const channel = supabase

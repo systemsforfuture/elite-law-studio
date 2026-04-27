@@ -93,6 +93,81 @@ export const useProviderHealth = () =>
   });
 
 // =============================================================
+// Generic Patch — für non-API-Key Felder (greeting, voice_id)
+// =============================================================
+
+interface PatchInput {
+  tenant_id: string;
+  patch: Partial<ProviderConfig>;
+}
+
+export const usePatchProviderConfig = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ tenant_id, patch }: PatchInput) => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 300));
+        return null;
+      }
+      const { data: existing, error: fetchErr } = await supabase!
+        .from("tenants")
+        .select("provider_config")
+        .eq("id", tenant_id)
+        .single();
+      if (fetchErr) throw fetchErr;
+      const merged = {
+        ...((existing.provider_config ?? {}) as Record<string, unknown>),
+        ...patch,
+      };
+      const { error } = await supabase!
+        .from("tenants")
+        .update({ provider_config: merged })
+        .eq("id", tenant_id);
+      if (error) throw error;
+      return merged;
+    },
+    onSuccess: (_, { tenant_id }) => {
+      qc.invalidateQueries({ queryKey: ["provider-config", tenant_id] });
+      qc.invalidateQueries({ queryKey: ["provider-health"] });
+    },
+  });
+};
+
+// =============================================================
+// Voice — Test-Anruf auslösen
+// =============================================================
+
+interface TestCallInput {
+  call_to: string;
+}
+
+interface TestCallResult {
+  ok: boolean;
+  message?: string;
+}
+
+export const useVoiceTestCall = () => {
+  return useMutation<TestCallResult, Error, TestCallInput>({
+    mutationFn: async (input) => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 1200));
+        return {
+          ok: true,
+          message: `Demo-Modus: Ihre KI würde jetzt ${input.call_to} anrufen.`,
+        };
+      }
+      const { data, error } = await supabase!.functions.invoke<TestCallResult>(
+        "voice-test-call",
+        { body: input },
+      );
+      if (error) throw error;
+      if (!data) throw new Error("Keine Antwort");
+      return data;
+    },
+  });
+};
+
+// =============================================================
 // Voice — KI-Telefonnummer provisionieren
 // =============================================================
 

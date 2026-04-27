@@ -148,6 +148,14 @@ Deno.serve(async (req) => {
       })
       .eq("id", ctx.tenant_id);
 
+    await admin.from("audit_log").insert({
+      tenant_id: ctx.tenant_id,
+      user_id: ctx.id,
+      action: "create",
+      entity_type: "stripe_connect",
+      details: `Stripe-Connect-Account ${acc.id} angelegt — KYC ausstehend`,
+    });
+
     return respond({
       ok: true,
       oauth_url: link.url,
