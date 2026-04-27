@@ -96,7 +96,7 @@ const titleByPath: Record<string, string> = {
   "/dashboard/team": "Team",
   "/dashboard/personal": "Personal · Zeit & Urlaub",
   "/dashboard/system-status": "System-Status · Live-Readiness",
-  "/dashboard/integrationen": "Integrationen · Vapi · WhatsApp · Email · Stripe",
+  "/dashboard/integrationen": "Integrationen · Telefon · WhatsApp · E-Mail · Zahlungen",
   "/dashboard/abrechnung": "Abrechnung",
   "/dashboard/audit": "Audit-Log",
 };

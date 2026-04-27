@@ -30,6 +30,9 @@ import {
   PhoneIncoming,
   Building2,
   User,
+  Plug,
+  HeartPulse,
+  Clock4,
 } from "lucide-react";
 import { useMandantenQuery } from "@/lib/queries/use-mandanten";
 import { useAktenQuery } from "@/lib/queries/use-akten";
@@ -48,6 +51,9 @@ const navItems = [
   { to: "/dashboard/import", icon: DatabaseZap, label: "Daten-Import" },
   { to: "/dashboard/branding", icon: Palette, label: "Branding & White-Label" },
   { to: "/dashboard/team", icon: UsersRound, label: "Team" },
+  { to: "/dashboard/personal", icon: Clock4, label: "Personal · Zeit & Urlaub" },
+  { to: "/dashboard/integrationen", icon: Plug, label: "Integrationen" },
+  { to: "/dashboard/system-status", icon: HeartPulse, label: "System-Status" },
   { to: "/dashboard/abrechnung", icon: CreditCard, label: "Abrechnung" },
   { to: "/dashboard/audit", icon: ShieldCheck, label: "Audit-Log" },
 ];

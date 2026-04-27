@@ -27,7 +27,7 @@ import { useAktenQuery } from "@/lib/queries/use-akten";
 import { useMandantenQuery } from "@/lib/queries/use-mandanten";
 import { useSeedDemoData } from "@/lib/queries/use-seed-demo";
 import { Button } from "@/components/ui/button";
-import { Database, Loader2 } from "lucide-react";
+import { Database, Loader2, Plug } from "lucide-react";
 import { toast } from "sonner";
 
 const OverviewPage = () => {
@@ -106,24 +106,34 @@ const OverviewPage = () => {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-base font-display font-bold text-foreground mb-1">
-                Willkommen — leerer Schreibtisch
+                Willkommen — Plattform startklar machen
               </h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                Lege mit einem Klick 3 Beispiel-Mandanten + Akten + Termine + Rechnungen an, um die Plattform live zu erleben. Alles voll bearbeitbar und DSGVO-konform mit Demo-Daten gekennzeichnet.
+              <p className="text-sm text-muted-foreground mb-4">
+                Zwei Schritte bis Sie produktiv sind:
+                <strong className="text-foreground"> 1.</strong> Integrationen einrichten (KI-Telefon, E-Mail, Zahlungen) — ca. 10 Min.
+                <strong className="text-foreground"> 2.</strong> Demo-Daten anlegen oder eigene Mandanten importieren.
               </p>
-              <Button variant="gold" size="sm" onClick={handleSeed} disabled={seed.isPending}>
-                {seed.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                    Anlegen …
-                  </>
-                ) : (
-                  <>
-                    <Database className="mr-2 h-3.5 w-3.5" />
-                    Demo-Daten anlegen
-                  </>
-                )}
-              </Button>
+              <div className="flex gap-2 flex-wrap">
+                <Link to="/dashboard/integrationen">
+                  <Button variant="gold" size="sm">
+                    <Plug className="mr-2 h-3.5 w-3.5" />
+                    Integrationen einrichten
+                  </Button>
+                </Link>
+                <Button variant="outline" size="sm" onClick={handleSeed} disabled={seed.isPending}>
+                  {seed.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                      Anlegen …
+                    </>
+                  ) : (
+                    <>
+                      <Database className="mr-2 h-3.5 w-3.5" />
+                      Demo-Daten anlegen
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

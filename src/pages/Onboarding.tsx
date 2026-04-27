@@ -645,10 +645,21 @@ const Onboarding = () => {
                         </div>
                         <div className="flex gap-2 items-start">
                           <span className="text-accent">2.</span>
-                          <span>Im Dashboard auf »Demo-Daten anlegen« klicken — sehen Sie 3 Beispiel-Mandanten + Akten + KI in Action</span>
+                          <span>
+                            Setup → <strong className="text-primary-foreground">Integrationen</strong>:
+                            KI-Telefon einrichten (30 Sek), Domain eintragen,
+                            Zahlungs-Konto verbinden
+                          </span>
                         </div>
                         <div className="flex gap-2 items-start">
                           <span className="text-accent">3.</span>
+                          <span>
+                            Setup → <strong className="text-primary-foreground">System-Status</strong>:
+                            alle Module grün? Dann live für Mandanten
+                          </span>
+                        </div>
+                        <div className="flex gap-2 items-start">
+                          <span className="text-accent">4.</span>
                           <span>Welcome-Call in T+2h. Customer-Success-Lead meldet sich</span>
                         </div>
                       </div>

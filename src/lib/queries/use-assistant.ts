@@ -31,7 +31,7 @@ const MOCK_REPLIES = [
   "Im aktuellen Demo-Datensatz haben Sie 12 aktive Mandanten und 8 offene Akten. Drei Rechnungen sind in Mahnstufe 1.",
   "Die Frist nach §233 ZPO läuft 2 Wochen nach Zustellung des Urteils. Konkret heißt das: Eingang +14 Tage, danach beginnt die Berufungsfrist.",
   "Nach RVG: Streitwert 5.000€ ergibt 1,3-Verfahrensgebühr 393,90€, 1,2-Terminsgebühr 363,60€, plus 20€ Auslagenpauschale, MwSt. Gesamt netto ≈ 777,50€.",
-  "Demo-Mode aktiv: Setze ANTHROPIC_API_KEY als Supabase-Function-Secret, damit die KI live antwortet.",
+  "Demo-Modus aktiv: SYSTEMS-KI antwortet sobald die Plattform vom Betreiber live geschaltet wurde.",
   "Ein Mahnbescheid setzt eine bezifferte Geldforderung voraus. Bei nicht bezifferten Ansprüchen kommt nur Klage in Betracht.",
 ];
 
