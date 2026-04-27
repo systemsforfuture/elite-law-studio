@@ -70,8 +70,17 @@ export const CommandPalette = ({
   const { data: akten = [] } = useAktenQuery();
   const [query, setQuery] = useState("");
 
-  const topMandanten = useMemo(() => mandanten.slice(0, 5), [mandanten]);
-  const topAkten = useMemo(() => akten.slice(0, 5), [akten]);
+  // Wenn keine Suche aktiv: nur Top-5 zeigen (UI-rein).
+  // Wenn Suche aktiv: alle Mandanten/Akten verfügbar machen, damit
+  // cmdk client-seitig matchen kann (z. B. »Müller« findet Müller GmbH).
+  const visibleMandanten = useMemo(
+    () => (query.trim() ? mandanten : mandanten.slice(0, 5)),
+    [mandanten, query],
+  );
+  const visibleAkten = useMemo(
+    () => (query.trim() ? akten : akten.slice(0, 5)),
+    [akten, query],
+  );
 
   const go = (path: string) => {
     onOpenChange(false);
@@ -129,15 +138,16 @@ export const CommandPalette = ({
           })}
         </CommandGroup>
 
-        {topMandanten.length > 0 && (
+        {visibleMandanten.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Mandanten">
-              {topMandanten.map((m) => {
+            <CommandGroup heading={`Mandanten${query.trim() ? ` (${visibleMandanten.length})` : ""}`}>
+              {visibleMandanten.map((m) => {
                 const MIcon = m.typ === "unternehmen" ? Building2 : User;
                 return (
                   <CommandItem
                     key={m.id}
+                    value={`mandant ${mandantName(m)} ${m.email ?? ""} ${m.rechtsgebiet ?? ""}`}
                     onSelect={() => go(`/dashboard/mandanten?id=${m.id}`)}
                   >
                     <MIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -152,13 +162,14 @@ export const CommandPalette = ({
           </>
         )}
 
-        {topAkten.length > 0 && (
+        {visibleAkten.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Akten">
-              {topAkten.map((a) => (
+            <CommandGroup heading={`Akten${query.trim() ? ` (${visibleAkten.length})` : ""}`}>
+              {visibleAkten.map((a) => (
                 <CommandItem
                   key={a.id}
+                  value={`akte ${a.titel} ${a.aktenzeichen}`}
                   onSelect={() => go(`/dashboard/akten?id=${a.id}`)}
                 >
                   <FolderOpen className="mr-2 h-4 w-4 text-muted-foreground" />
