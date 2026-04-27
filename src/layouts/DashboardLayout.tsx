@@ -29,6 +29,7 @@ import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { useUrlaubQuery } from "@/lib/queries/use-personal";
+import { useLlmUsage } from "@/lib/queries/use-llm-usage";
 import { isSameDay } from "@/lib/date-utils";
 import { CommandPalette, useCommandPalette } from "@/components/dashboard/CommandPalette";
 import ThemeToggle from "@/components/dashboard/ThemeToggle";
@@ -143,6 +144,7 @@ const DashboardLayout = () => {
   const { data: konversationen = [] } = useKonversationenQuery();
   const { data: rechnungen = [] } = useRechnungenQuery();
   const { data: urlaube = [] } = useUrlaubQuery("pending");
+  const { data: llmUsage = [] } = useLlmUsage();
   const integrationsReady = [
     providerHealth?.voice?.enabled && providerHealth?.voice?.status === "active",
     providerHealth?.email?.enabled && providerHealth?.email?.verification_status === "verified",
@@ -167,6 +169,33 @@ const DashboardLayout = () => {
     mahnwesen: mahnwesenAktiv,
     personal: personalPending,
   });
+
+  // Header KI-Cost-Live-Indicator: Token-Verbrauch im aktuellen Monat vs. Tier-Limit.
+  const tierLimits: Record<typeof tenant.subscription_tier, number> = {
+    foundation: 300_000,
+    growth: 2_000_000,
+    premium: 999_999_999,
+  };
+  const tierLimit = tierLimits[tenant.subscription_tier];
+  const monthTokens = llmUsage.reduce(
+    (s, r) => s + (r.input_tokens_sum ?? 0) + (r.output_tokens_sum ?? 0),
+    0,
+  );
+  const tierPct = tierLimit > 0 ? (monthTokens / tierLimit) * 100 : 0;
+  const tokensLabel =
+    monthTokens >= 1_000_000
+      ? `${(monthTokens / 1_000_000).toFixed(1)}M`
+      : monthTokens >= 1_000
+      ? `${Math.round(monthTokens / 1_000)}k`
+      : monthTokens.toString();
+  const kiToneClass =
+    tenant.subscription_tier === "premium"
+      ? "text-muted-foreground bg-muted/30 border border-border/50"
+      : tierPct > 100
+      ? "text-rose-700 bg-rose-500/10 border border-rose-500/20"
+      : tierPct > 80
+      ? "text-amber-700 bg-amber-500/10 border border-amber-500/20"
+      : "text-muted-foreground bg-muted/30 border border-border/50";
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -346,6 +375,23 @@ const DashboardLayout = () => {
                 </Link>
               </>
             )}
+            <Link
+              to="/dashboard/abrechnung"
+              className={`hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${kiToneClass}`}
+              title={
+                tenant.subscription_tier === "premium"
+                  ? `KI-Verbrauch diesen Monat: ${tokensLabel} Tokens (Premium · unbegrenzt)`
+                  : `KI-Verbrauch diesen Monat: ${tokensLabel} / ${(tierLimit / 1_000_000).toFixed(tierLimit < 1_000_000 ? 1 : 0)}${tierLimit < 1_000_000 ? "M" : "M"} Tokens (${tierPct.toFixed(0)}%)`
+              }
+              aria-label="KI-Verbrauch"
+            >
+              <Cpu className="h-3 w-3" />
+              <span className="tabular-nums">
+                {tenant.subscription_tier === "premium"
+                  ? tokensLabel
+                  : `${tokensLabel} · ${tierPct.toFixed(0)}%`}
+              </span>
+            </Link>
             <ThemeToggle />
             <NotificationsDropdown />
             <ProfileMenu />
