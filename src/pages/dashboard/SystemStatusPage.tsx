@@ -23,36 +23,62 @@ const SystemStatusPage = () => {
 
   const items = [
     {
-      key: "vapi",
-      name: "Voice-Agent (Vapi)",
+      key: "voice",
+      name: "KI-Telefon",
       icon: Phone,
-      whatItProvides: "Eingehende Anrufe 24/7 KI-beantwortet",
-      health: health?.vapi,
+      what: "Eingehende Anrufe 24/7 von der KI",
+      ok: Boolean(health?.voice?.enabled && health?.voice?.status === "active"),
+      detail: health?.voice?.phone_number ?? null,
+      pendingReason:
+        health?.voice?.status === "provisioning" ? "Wird eingerichtet" : null,
     },
     {
       key: "whatsapp",
       name: "WhatsApp",
       icon: MessageCircle,
-      whatItProvides: "Mandanten-Chat empathisch + KI-eskaliert",
-      health: health?.whatsapp,
+      what: "Mandanten chatten direkt mit der KI",
+      ok: Boolean(
+        health?.whatsapp?.enabled && health?.whatsapp?.verification_status === "verified",
+      ),
+      detail: health?.whatsapp?.phone_number ?? null,
+      pendingReason:
+        health?.whatsapp?.verification_status === "pending" && health?.whatsapp?.phone_number
+          ? "Verifizierung läuft (Meta-Approval)"
+          : null,
     },
     {
-      key: "resend",
-      name: "Email (Resend)",
+      key: "email",
+      name: "E-Mail",
       icon: Mail,
-      whatItProvides: "Magic-Links, Mahnungen, Antworten",
-      health: health?.resend,
+      what: "Magic-Links, Mahnungen, Inbound-Triage",
+      ok: Boolean(
+        health?.email?.enabled && health?.email?.verification_status === "verified",
+      ),
+      detail: health?.email?.from_email ?? health?.email?.custom_domain ?? null,
+      pendingReason:
+        health?.email?.verification_status === "pending" && health?.email?.custom_domain
+          ? "DNS-Records ausstehend"
+          : null,
     },
     {
       key: "stripe",
-      name: "Zahlungen (Stripe)",
+      name: "Zahlungen",
       icon: CreditCard,
-      whatItProvides: "Mandanten zahlen direkt im Portal",
-      health: health?.stripe,
+      what: "Mandanten zahlen direkt im Portal",
+      ok: Boolean(
+        health?.stripe?.enabled &&
+          health?.stripe?.charges_enabled &&
+          health?.stripe?.payouts_enabled,
+      ),
+      detail: null,
+      pendingReason:
+        health?.stripe?.configured && !health?.stripe?.charges_enabled
+          ? "KYC-Verifizierung läuft"
+          : null,
     },
   ];
 
-  const ready = items.filter((i) => i.health?.enabled && i.health?.last_test_ok === true).length;
+  const ready = items.filter((i) => i.ok).length;
   const total = items.length;
   const overallReady = ready === total;
 
@@ -62,11 +88,10 @@ const SystemStatusPage = () => {
         <h2 className="text-2xl font-display font-bold text-foreground">System-Status</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Diese Seite zeigt was {tenant.kanzlei_name} aktuell live KI-betreiben kann.
-          Vor dem Onboarding eines Mandanten sollten alle relevanten Provider grün sein.
+          Vor dem ersten Mandanten-Onboarding sollten alle Module grün sein.
         </p>
       </div>
 
-      {/* Overall Bar */}
       <div
         className={`glass-card p-5 ${
           overallReady
@@ -88,18 +113,18 @@ const SystemStatusPage = () => {
             <h3 className="text-base font-display font-bold text-foreground">
               {overallReady
                 ? "Alles bereit für Mandanten-Onboarding"
-                : `${ready} von ${total} Integrationen produktiv`}
+                : `${ready} von ${total} Modulen produktiv`}
             </h3>
             <p className="text-sm text-muted-foreground mt-0.5">
               {overallReady
-                ? "Anrufe, WhatsApp, Email und Zahlungen funktionieren live mit KI."
-                : "Erst alle Provider verbinden, dann produktiv onboarden. Demo bleibt verfügbar."}
+                ? "Anrufe, WhatsApp, E-Mail und Zahlungen funktionieren live mit KI."
+                : "Erst alle Module einrichten, dann produktiv onboarden. Demo bleibt verfügbar."}
             </p>
           </div>
           {!overallReady && (
             <Link to="/dashboard/integrationen">
               <button className="px-4 py-2 rounded-xl bg-accent text-navy-dark font-semibold text-sm hover:bg-gold-dark transition-colors flex items-center gap-2">
-                Integrationen einrichten
+                Jetzt einrichten
                 <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </Link>
@@ -107,7 +132,6 @@ const SystemStatusPage = () => {
         </div>
       </div>
 
-      {/* Foundation-Layer */}
       <section>
         <h3 className="text-sm uppercase tracking-wider font-semibold text-muted-foreground mb-3">
           Foundation
@@ -117,30 +141,29 @@ const SystemStatusPage = () => {
             icon={Database}
             label="Datenbank + RLS"
             ok={isSupabaseConfigured}
-            okText="Supabase verbunden"
+            okText="Verbunden · Hosting Frankfurt"
             warnText="Demo-Modus (Mock-Daten)"
           />
           <FoundationTile
             icon={Cpu}
             label="SYSTEMS-KI"
             ok={isSupabaseConfigured}
-            okText="Edge Functions live"
+            okText="6 Agenten live"
             warnText="KI-Aufrufe simuliert"
           />
           <FoundationTile
             icon={ShieldCheck}
             label="DSGVO + Audit"
             ok={true}
-            okText="Konform · Hosting Frankfurt"
+            okText="Konform · §43e BRAO"
             warnText=""
           />
         </div>
       </section>
 
-      {/* Integration-Layer */}
       <section>
         <h3 className="text-sm uppercase tracking-wider font-semibold text-muted-foreground mb-3">
-          Externe Provider
+          Kanzlei-Module
         </h3>
         {isLoading ? (
           <div className="glass-card p-8 border-border/50 text-center">
@@ -150,18 +173,14 @@ const SystemStatusPage = () => {
           <div className="grid md:grid-cols-2 gap-3">
             {items.map((it) => {
               const Icon = it.icon;
-              const status = !it.health
-                ? { label: "—", cls: "text-muted-foreground", IconComp: AlertCircle }
-                : !it.health.configured
-                  ? { label: "Nicht konfiguriert", cls: "text-muted-foreground", IconComp: XCircle }
-                  : !it.health.enabled
-                    ? { label: "Aus", cls: "text-amber-700", IconComp: AlertCircle }
-                    : it.health.last_test_ok === true
-                      ? { label: "Live", cls: "text-emerald-700", IconComp: CheckCircle2 }
-                      : it.health.last_test_ok === false
-                        ? { label: "Verbindung fehlerhaft", cls: "text-rose-700", IconComp: XCircle }
-                        : { label: "Konfiguriert · ungetestet", cls: "text-amber-700", IconComp: AlertCircle };
-              const StatusIcon = status.IconComp;
+              const StatusIcon = it.ok ? CheckCircle2 : it.pendingReason ? Loader2 : XCircle;
+              const statusCls = it.ok
+                ? "text-emerald-700"
+                : it.pendingReason
+                  ? "text-amber-700"
+                  : "text-muted-foreground";
+              const statusLabel = it.ok ? "Live" : it.pendingReason ?? "Nicht eingerichtet";
+
               return (
                 <Link
                   key={it.key}
@@ -177,22 +196,15 @@ const SystemStatusPage = () => {
                         <h4 className="text-sm font-display font-bold text-foreground">
                           {it.name}
                         </h4>
-                        <span className={`text-xs font-semibold inline-flex items-center gap-1 ${status.cls}`}>
+                        <span className={`text-xs font-semibold inline-flex items-center gap-1 ${statusCls}`}>
                           <StatusIcon className="h-3 w-3" />
-                          {status.label}
+                          {statusLabel}
                         </span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {it.whatItProvides}
-                      </p>
-                      {it.health?.last_test_at && (
-                        <p className="text-[10px] text-muted-foreground/60 mt-1.5">
-                          Test: {new Date(it.health.last_test_at).toLocaleString("de-DE")}
-                        </p>
-                      )}
-                      {it.key === "resend" && it.health && "verified_domain" in it.health && it.health.verified_domain && (
-                        <p className="text-[10px] text-muted-foreground/60 mt-0.5">
-                          Domain: {it.health.verified_domain}
+                      <p className="text-xs text-muted-foreground mt-0.5">{it.what}</p>
+                      {it.detail && (
+                        <p className="text-[11px] text-foreground/70 mt-1.5 font-mono">
+                          {it.detail}
                         </p>
                       )}
                     </div>
@@ -202,40 +214,6 @@ const SystemStatusPage = () => {
             })}
           </div>
         )}
-      </section>
-
-      {/* Onboarding-Readiness */}
-      <section className="glass-card p-5 border-border/50">
-        <h3 className="text-sm font-display font-bold text-foreground mb-3">
-          Was funktioniert ohne welcher Provider?
-        </h3>
-        <div className="space-y-2 text-sm">
-          <Row
-            ok={isSupabaseConfigured}
-            label="Login + Mandanten-CRM + Akten + Termine + Audit-Log"
-            req="Supabase"
-          />
-          <Row
-            ok={Boolean(health?.resend?.last_test_ok)}
-            label="Mandant kriegt Magic-Link per Email · Anwalt sendet Antworten"
-            req="Resend"
-          />
-          <Row
-            ok={Boolean(health?.vapi?.last_test_ok)}
-            label="Mandant ruft an, KI nimmt Anruf entgegen + qualifiziert"
-            req="Vapi"
-          />
-          <Row
-            ok={Boolean(health?.whatsapp?.last_test_ok)}
-            label="Mandant schreibt WhatsApp, KI antwortet empathisch"
-            req="360dialog (WhatsApp Business API)"
-          />
-          <Row
-            ok={Boolean(health?.stripe?.last_test_ok)}
-            label="Mandant zahlt Rechnung im Portal"
-            req="Stripe"
-          />
-        </div>
       </section>
     </div>
   );
@@ -263,20 +241,6 @@ const FoundationTile = ({
         <div className="text-sm font-display font-bold text-foreground">{label}</div>
         <div className="text-[10px] text-muted-foreground">{ok ? okText : warnText}</div>
       </div>
-    </div>
-  </div>
-);
-
-const Row = ({ ok, label, req }: { ok: boolean; label: string; req: string }) => (
-  <div className="flex items-start gap-2 text-foreground">
-    {ok ? (
-      <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-    ) : (
-      <XCircle className="h-4 w-4 text-rose-500/60 shrink-0 mt-0.5" />
-    )}
-    <div className="flex-1">
-      <div className={ok ? "text-foreground" : "text-muted-foreground"}>{label}</div>
-      <div className="text-[10px] text-muted-foreground/60">benötigt: {req}</div>
     </div>
   </div>
 );

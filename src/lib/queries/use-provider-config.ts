@@ -2,60 +2,58 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import type {
+  EmailDnsRecord,
+  IntegrationHealth,
   ProviderConfig,
-  ProviderHealth,
-  ProviderName,
-  VapiConfig,
-  WhatsappConfig,
-  ResendConfig,
-  StripeConfig,
 } from "@/data/types";
 
 const shouldMock = () => !isSupabaseConfigured || !supabase;
 
 const mockConfig: ProviderConfig = {
-  vapi: {
+  voice: {
     enabled: false,
-    api_key: null,
-    assistant_id: null,
+    phone_number: null,
     phone_number_id: null,
-    webhook_secret: null,
-    last_test_at: null,
-    last_test_ok: null,
+    voice_id: "anna_de_friendly",
+    greeting: null,
+    provisioned_at: null,
+    status: "not_provisioned",
   },
   whatsapp: {
     enabled: false,
-    provider: "360dialog",
-    api_key: null,
-    phone_number_id: null,
-    webhook_secret: null,
-    last_test_at: null,
-    last_test_ok: null,
+    phone_number: null,
+    verification_status: "pending",
+    verified_at: null,
+    requested_at: null,
   },
-  resend: {
+  email: {
     enabled: false,
-    api_key: null,
+    custom_domain: null,
     from_email: null,
-    verified_domain: null,
-    inbound_webhook_secret: null,
-    last_test_at: null,
-    last_test_ok: null,
+    verification_status: "pending",
+    dns_records: [],
+    verified_at: null,
   },
   stripe: {
     enabled: false,
-    secret_key: null,
-    webhook_secret: null,
     connect_account_id: null,
-    last_test_at: null,
-    last_test_ok: null,
+    charges_enabled: false,
+    payouts_enabled: false,
+    connected_at: null,
   },
 };
 
-const mockHealth: ProviderHealth = {
-  vapi: { enabled: false, configured: false, last_test_at: null, last_test_ok: null },
-  whatsapp: { enabled: false, configured: false, last_test_at: null, last_test_ok: null },
-  resend: { enabled: false, configured: false, verified_domain: null, last_test_at: null, last_test_ok: null },
-  stripe: { enabled: false, configured: false, last_test_at: null, last_test_ok: null },
+const mockHealth: IntegrationHealth = {
+  voice: { enabled: false, configured: false, phone_number: null, status: "not_provisioned" },
+  whatsapp: { enabled: false, configured: false, phone_number: null, verification_status: "pending" },
+  email: {
+    enabled: false,
+    configured: false,
+    custom_domain: null,
+    from_email: null,
+    verification_status: "pending",
+  },
+  stripe: { enabled: false, configured: false, charges_enabled: false, payouts_enabled: false },
 };
 
 export const useProviderConfig = (tenantId: string | undefined) =>
@@ -74,106 +72,197 @@ export const useProviderConfig = (tenantId: string | undefined) =>
         return mockConfig;
       }
       const cfg = (data?.provider_config ?? {}) as Partial<ProviderConfig>;
-      // Felder mergen damit fehlende Slots Default-Werte haben
       return { ...mockConfig, ...cfg };
     },
     staleTime: 30_000,
   });
 
-interface UpdateInput {
-  tenant_id: string;
-  provider: ProviderName;
-  patch: Partial<VapiConfig | WhatsappConfig | ResendConfig | StripeConfig>;
-}
-
-export const useUpdateProviderConfig = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ tenant_id, provider, patch }: UpdateInput) => {
-      if (shouldMock()) {
-        await new Promise((r) => setTimeout(r, 300));
-        Object.assign(mockConfig[provider] as Record<string, unknown>, patch);
-        return mockConfig[provider];
-      }
-      // RPC oder direkter UPDATE — Trigger blockt non-owner.
-      const { data: existing, error: fetchErr } = await supabase!
-        .from("tenants")
-        .select("provider_config")
-        .eq("id", tenant_id)
-        .single();
-      if (fetchErr) throw fetchErr;
-      const merged = {
-        ...(existing.provider_config as Record<string, unknown>),
-        [provider]: {
-          ...(existing.provider_config as Record<string, Record<string, unknown>>)[provider],
-          ...patch,
-        },
-      };
-      const { error } = await supabase!
-        .from("tenants")
-        .update({ provider_config: merged })
-        .eq("id", tenant_id);
-      if (error) throw error;
-      return merged[provider];
-    },
-    onSuccess: (_, { tenant_id }) => {
-      qc.invalidateQueries({ queryKey: ["provider-config", tenant_id] });
-      qc.invalidateQueries({ queryKey: ["provider-health"] });
-    },
-  });
-};
-
 export const useProviderHealth = () =>
   useQuery({
     queryKey: ["provider-health"],
-    queryFn: async (): Promise<ProviderHealth> => {
+    queryFn: async (): Promise<IntegrationHealth> => {
       if (shouldMock()) return mockHealth;
       const { data, error } = await supabase!.rpc("provider_health");
       if (error) {
         warnMockFallback("provider-health", error.message);
         return mockHealth;
       }
-      return data as unknown as ProviderHealth;
+      return data as unknown as IntegrationHealth;
     },
-    staleTime: 60_000,
+    staleTime: 30_000,
   });
 
-interface TestResult {
-  ok: boolean;
-  message: string;
-  details?: unknown;
+// =============================================================
+// Voice — KI-Telefonnummer provisionieren
+// =============================================================
+
+interface ProvisionVoiceInput {
+  area_code?: string;
+  greeting?: string;
 }
 
-/**
- * Pingt den Provider mit den eingetragenen Credentials.
- * In Mock-Mode: simulierte Antwort. In Production: echter API-Call.
- */
-export const useTestProvider = () => {
+interface ProvisionVoiceResult {
+  ok: boolean;
+  phone_number?: string;
+  message?: string;
+}
+
+export const useProvisionVoice = () => {
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      provider,
-    }: {
-      provider: ProviderName;
-    }): Promise<TestResult> => {
+  return useMutation<ProvisionVoiceResult, Error, ProvisionVoiceInput>({
+    mutationFn: async (input) => {
       if (shouldMock()) {
-        await new Promise((r) => setTimeout(r, 800));
+        await new Promise((r) => setTimeout(r, 1500));
         return {
-          ok: false,
-          message: `Demo-Modus: bitte echte ${provider}-Credentials eintragen + deployen.`,
+          ok: true,
+          phone_number: `+49 30 ${input.area_code ?? "5556677"}-${Math.floor(Math.random() * 9000) + 1000}`,
+          message: "Demo-Modus: provisionierte Telefon-Nummer ist nicht real",
         };
       }
-      const { data, error } = await supabase!.functions.invoke<TestResult>(
-        "test-provider",
-        { body: { provider } },
+      const { data, error } = await supabase!.functions.invoke<ProvisionVoiceResult>(
+        "provision-voice-number",
+        { body: input },
       );
       if (error) throw error;
-      if (!data) throw new Error("Keine Antwort vom Test-Endpoint");
+      if (!data) throw new Error("Keine Antwort");
       return data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["provider-health"] });
       qc.invalidateQueries({ queryKey: ["provider-config"] });
+      qc.invalidateQueries({ queryKey: ["provider-health"] });
+    },
+  });
+};
+
+// =============================================================
+// WhatsApp — eigene Nummer einrichten lassen
+// =============================================================
+
+interface LinkWhatsappInput {
+  phone_number: string;
+}
+
+interface LinkWhatsappResult {
+  ok: boolean;
+  message?: string;
+}
+
+export const useLinkWhatsapp = () => {
+  const qc = useQueryClient();
+  return useMutation<LinkWhatsappResult, Error, LinkWhatsappInput>({
+    mutationFn: async (input) => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 800));
+        return {
+          ok: true,
+          message: "Demo-Modus: WhatsApp-Verlinkung simuliert. Production: SYSTEMS-Team meldet sich in 24h.",
+        };
+      }
+      const { data, error } = await supabase!.functions.invoke<LinkWhatsappResult>(
+        "link-whatsapp-number",
+        { body: input },
+      );
+      if (error) throw error;
+      if (!data) throw new Error("Keine Antwort");
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["provider-config"] });
+      qc.invalidateQueries({ queryKey: ["provider-health"] });
+    },
+  });
+};
+
+// =============================================================
+// Email-Domain — verifizieren
+// =============================================================
+
+interface VerifyEmailInput {
+  custom_domain: string;
+  from_email?: string;
+  /** Bei action="poll" nur Status checken, kein neues Setup */
+  action?: "setup" | "poll";
+}
+
+interface VerifyEmailResult {
+  ok: boolean;
+  verification_status: "pending" | "verified" | "failed";
+  dns_records?: EmailDnsRecord[];
+  message?: string;
+}
+
+export const useVerifyEmailDomain = () => {
+  const qc = useQueryClient();
+  return useMutation<VerifyEmailResult, Error, VerifyEmailInput>({
+    mutationFn: async (input) => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 1000));
+        return {
+          ok: true,
+          verification_status: "pending",
+          dns_records: [
+            { type: "TXT", name: `send.${input.custom_domain}`, value: "v=spf1 include:_spf.systems-tm.de ~all" },
+            { type: "TXT", name: `_systems._domainkey.${input.custom_domain}`, value: "k=rsa; p=DEMO_DKIM_KEY" },
+            { type: "MX", name: `inbound.${input.custom_domain}`, value: "feedback-smtp.systems-tm.de", ttl: 3600 },
+          ],
+          message: "Demo: trage diese 3 DNS-Records bei deinem Provider ein",
+        };
+      }
+      const { data, error } = await supabase!.functions.invoke<VerifyEmailResult>(
+        "verify-email-domain",
+        { body: input },
+      );
+      if (error) throw error;
+      if (!data) throw new Error("Keine Antwort");
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["provider-config"] });
+      qc.invalidateQueries({ queryKey: ["provider-health"] });
+    },
+  });
+};
+
+// =============================================================
+// Stripe — Connect-Account verbinden
+// =============================================================
+
+interface ConnectStripeResult {
+  ok: boolean;
+  /** OAuth-URL zu Stripe — Frontend leitet hierhin */
+  oauth_url?: string;
+  /** Status-Update wenn schon connected */
+  charges_enabled?: boolean;
+  payouts_enabled?: boolean;
+  message?: string;
+}
+
+export const useConnectStripe = () => {
+  const qc = useQueryClient();
+  return useMutation<ConnectStripeResult, Error, void>({
+    mutationFn: async () => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 600));
+        return {
+          ok: true,
+          message: "Demo-Modus: Stripe-Connect-Onboarding wird in Production zu Stripe weitergeleitet.",
+        };
+      }
+      const { data, error } = await supabase!.functions.invoke<ConnectStripeResult>(
+        "connect-stripe",
+        { body: {} },
+      );
+      if (error) throw error;
+      if (!data) throw new Error("Keine Antwort");
+      // Wenn OAuth-URL kommt, redirecten
+      if (data.oauth_url) {
+        window.location.href = data.oauth_url;
+      }
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["provider-config"] });
+      qc.invalidateQueries({ queryKey: ["provider-health"] });
     },
   });
 };

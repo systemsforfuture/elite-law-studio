@@ -328,66 +328,91 @@ export interface MitarbeiterKontingent {
   soll_stunden_woche: number;
 }
 
-// Provider-Configuration (BYO-Credentials per Tenant)
-export type ProviderName = "vapi" | "whatsapp" | "resend" | "stripe";
+// Plattform-Managed Integrations (NICHT BYO).
+// SYSTEMS betreibt die Provider zentral; Kanzlei sieht keinen Provider-Namen
+// und keine API-Keys.
+export type IntegrationName = "voice" | "whatsapp" | "email" | "stripe";
 
-export interface VapiConfig {
+export type ProvisionStatus = "not_provisioned" | "provisioning" | "active" | "suspended";
+export type VerificationStatus = "pending" | "verified" | "failed";
+
+export interface VoiceIntegration {
   enabled: boolean;
-  api_key: string | null;
-  assistant_id: string | null;
+  /** Die KI-Telefonnummer der Kanzlei (international) */
+  phone_number: string | null;
+  /** Internal ID — vor User versteckt */
   phone_number_id: string | null;
-  webhook_secret: string | null;
-  last_test_at: string | null;
-  last_test_ok: boolean | null;
+  voice_id: string;
+  greeting: string | null;
+  provisioned_at: string | null;
+  status: ProvisionStatus;
 }
 
-export interface WhatsappConfig {
+export interface WhatsappIntegration {
   enabled: boolean;
-  provider: "360dialog" | "meta_cloud";
-  api_key: string | null;
-  phone_number_id: string | null;
-  webhook_secret: string | null;
-  last_test_at: string | null;
-  last_test_ok: boolean | null;
+  /** Die WhatsApp-Business-Nummer der Kanzlei */
+  phone_number: string | null;
+  verification_status: VerificationStatus;
+  verified_at: string | null;
+  requested_at: string | null;
 }
 
-export interface ResendConfig {
+export interface EmailDnsRecord {
+  type: "TXT" | "MX" | "CNAME";
+  name: string;
+  value: string;
+  ttl?: number;
+}
+
+export interface EmailIntegration {
   enabled: boolean;
-  api_key: string | null;
+  custom_domain: string | null;
   from_email: string | null;
-  verified_domain: string | null;
-  inbound_webhook_secret: string | null;
-  last_test_at: string | null;
-  last_test_ok: boolean | null;
+  verification_status: VerificationStatus;
+  dns_records: EmailDnsRecord[];
+  verified_at: string | null;
 }
 
-export interface StripeConfig {
+export interface StripeIntegration {
   enabled: boolean;
-  secret_key: string | null;
-  webhook_secret: string | null;
+  /** Connect-Account-ID — vor User versteckt, intern */
   connect_account_id: string | null;
-  last_test_at: string | null;
-  last_test_ok: boolean | null;
+  charges_enabled: boolean;
+  payouts_enabled: boolean;
+  connected_at: string | null;
 }
 
 export interface ProviderConfig {
-  vapi: VapiConfig;
-  whatsapp: WhatsappConfig;
-  resend: ResendConfig;
-  stripe: StripeConfig;
+  voice: VoiceIntegration;
+  whatsapp: WhatsappIntegration;
+  email: EmailIntegration;
+  stripe: StripeIntegration;
 }
 
-export interface ProviderHealthEntry {
-  enabled: boolean;
-  configured: boolean;
-  verified_domain?: string | null;
-  last_test_at: string | null;
-  last_test_ok: boolean | null;
-}
-
-export interface ProviderHealth {
-  vapi: ProviderHealthEntry;
-  whatsapp: ProviderHealthEntry;
-  resend: ProviderHealthEntry;
-  stripe: ProviderHealthEntry;
+export interface IntegrationHealth {
+  voice: {
+    enabled: boolean;
+    configured: boolean;
+    phone_number: string | null;
+    status: ProvisionStatus;
+  };
+  whatsapp: {
+    enabled: boolean;
+    configured: boolean;
+    phone_number: string | null;
+    verification_status: VerificationStatus;
+  };
+  email: {
+    enabled: boolean;
+    configured: boolean;
+    custom_domain: string | null;
+    from_email: string | null;
+    verification_status: VerificationStatus;
+  };
+  stripe: {
+    enabled: boolean;
+    configured: boolean;
+    charges_enabled: boolean;
+    payouts_enabled: boolean;
+  };
 }

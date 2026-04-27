@@ -112,28 +112,31 @@ Deno.serve(async (req: Request) => {
       .eq("id", ctx.tenant_id)
       .single();
 
-    // Per-Tenant Provider-Credentials laden (BYO statt platform-weit)
+    // Plattform-managed: API-Keys aus Function-Env, kanzlei-spezifische
+    // Daten (from_email, verified-Domain) aus tenant.provider_config.
     const providerCfg = (tenant?.provider_config ?? {}) as {
-      resend?: { enabled?: boolean; api_key?: string; from_email?: string };
-      whatsapp?: { enabled?: boolean; api_key?: string };
+      email?: { enabled?: boolean; from_email?: string; custom_domain?: string; verification_status?: string };
+      whatsapp?: { enabled?: boolean; phone_number?: string; verification_status?: string };
     };
 
-    // Provider-Versand
     let providerOk = false;
     let providerErr: string | undefined;
     let providerId: string | undefined;
+
     if (body.channel === "email") {
-      const resendCfg = providerCfg.resend;
-      if (!resendCfg?.enabled || !resendCfg.api_key) {
-        providerErr = "Resend ist für diese Kanzlei nicht konfiguriert. Owner: bitte unter /dashboard/integrationen einrichten.";
+      const platformKey = Deno.env.get("RESEND_API_KEY");
+      const emailCfg = providerCfg.email;
+      if (!platformKey) {
+        providerErr = "Plattform-E-Mail noch nicht eingerichtet.";
+      } else if (!emailCfg?.enabled || emailCfg.verification_status !== "verified") {
+        providerErr =
+          "E-Mail-Domain noch nicht verifiziert. Owner: unter Integrationen Domain einrichten.";
       } else {
         const fromEmail =
-          resendCfg.from_email ??
-          `${(tenant?.kanzlei_name ?? "Kanzlei")
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, "-")}@${tenant?.domain ?? "systems-tm.de"}`;
+          emailCfg.from_email ??
+          `kontakt@${emailCfg.custom_domain ?? tenant?.domain ?? "systems-tm.de"}`;
         const r = await sendEmailViaResend(
-          resendCfg.api_key,
+          platformKey,
           body.to,
           body.subject ?? "Nachricht von Ihrer Kanzlei",
           body.text,
@@ -144,11 +147,15 @@ Deno.serve(async (req: Request) => {
         providerId = r.id;
       }
     } else if (body.channel === "whatsapp") {
+      const platformKey = Deno.env.get("WHATSAPP_API_KEY");
       const waCfg = providerCfg.whatsapp;
-      if (!waCfg?.enabled || !waCfg.api_key) {
-        providerErr = "WhatsApp ist für diese Kanzlei nicht konfiguriert. Owner: bitte unter /dashboard/integrationen einrichten.";
+      if (!platformKey) {
+        providerErr = "Plattform-WhatsApp noch nicht eingerichtet.";
+      } else if (!waCfg?.enabled || waCfg.verification_status !== "verified") {
+        providerErr =
+          "WhatsApp-Nummer noch nicht verifiziert. Owner: unter Integrationen Nummer einrichten.";
       } else {
-        const r = await sendWhatsAppVia360dialog(waCfg.api_key, body.to, body.text);
+        const r = await sendWhatsAppVia360dialog(platformKey, body.to, body.text);
         providerOk = r.ok;
         providerErr = r.error;
         providerId = r.id;
