@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
           mandant_id: md1.id,
           rechtsgebiet: "Familienrecht",
           stufe: "strategie",
-          status: "aktiv",
+          status: "in_bearbeitung",
           titel: "Scheidung Beispiel",
           fristen: [
             {
@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
           mandant_id: md2.id,
           rechtsgebiet: "Arbeitsrecht",
           stufe: "verfahren",
-          status: "aktiv",
+          status: "in_bearbeitung",
           titel: "Kündigungsschutzklage Musterfrau",
           fristen: [
             {
@@ -147,7 +147,7 @@ Deno.serve(async (req) => {
           mandant_id: md3.id,
           rechtsgebiet: "Vertragsrecht",
           stufe: "fallaufnahme",
-          status: "aktiv",
+          status: "neu",
           titel: "Vertragsentwurf Demo Logistik",
           fristen: [],
           zugewiesener_anwalt_id: ownerId,
@@ -207,7 +207,7 @@ Deno.serve(async (req) => {
         betrag_brutto: 1500,
         rechnungsdatum: todayPlus(-10),
         faelligkeit: todayPlus(4),
-        status: "offen",
+        status: "versendet",
         mahnstufe: 0,
       },
     ]);
