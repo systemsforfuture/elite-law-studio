@@ -261,7 +261,7 @@ const DashboardLayout = () => {
         <WelcomeTour />
         <AssistantWidget />
 
-        <main id="main-content" className="p-3 sm:p-6 lg:p-8 max-w-7xl">
+        <main id="main-content" className="p-3 pb-24 sm:p-6 sm:pb-24 lg:p-8 lg:pb-24 max-w-7xl">
           <Outlet />
         </main>
 

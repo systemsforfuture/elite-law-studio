@@ -150,7 +150,7 @@ const AssistantWidget = () => {
               {history.length > 0 && (
                 <button
                   onClick={clear}
-                  className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   title="Verlauf löschen"
                   aria-label="Verlauf löschen"
                 >
@@ -159,7 +159,7 @@ const AssistantWidget = () => {
               )}
               <button
                 onClick={() => setOpen(false)}
-                className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Schließen"
               >
                 <X className="h-4 w-4" />
