@@ -5,7 +5,7 @@
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { supabaseAdmin } from "../_shared/supabase-admin.ts";
-import { normalizePhone, verifyHmac } from "../_shared/webhook-utils.ts";
+import { normalizePhone, requireSignature, verifyHmac } from "../_shared/webhook-utils.ts";
 
 interface WhatsAppPayload {
   // 360dialog/Meta Cloud API Format
@@ -44,18 +44,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const rawBody = await req.text();
-
-    const secret = Deno.env.get("WHATSAPP_WEBHOOK_SECRET");
     const sig = req.headers.get("x-hub-signature-256")?.replace("sha256=", "");
-    if (secret && sig) {
-      const valid = await verifyHmac(rawBody, sig, secret);
-      if (!valid) {
-        return new Response(JSON.stringify({ error: "Invalid signature" }), {
-          status: 401,
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        });
-      }
-    }
 
     const payload: WhatsAppPayload = JSON.parse(rawBody);
     const admin = supabaseAdmin();
@@ -69,14 +58,27 @@ Deno.serve(async (req: Request) => {
           value.metadata?.display_phone_number,
         );
         let tenant_id: string | null = null;
+        let tenantWebhookSecret: string | null = null;
         if (tenantPhone) {
           const { data: t } = await admin
             .from("tenants")
-            .select("id")
+            .select("id, provider_config")
             .eq("notfall_nummer", tenantPhone)
             .maybeSingle();
           tenant_id = t?.id ?? null;
+          const cfg = (t?.provider_config ?? {}) as { whatsapp?: { webhook_secret?: string } };
+          tenantWebhookSecret = cfg.whatsapp?.webhook_secret ?? null;
         }
+        // Per-Tenant Signature-Check (Fallback Env). Strict-Mode blockt ohne Secret.
+        const effectiveSecret = tenantWebhookSecret ?? Deno.env.get("WHATSAPP_WEBHOOK_SECRET");
+        const sigValid = await requireSignature(rawBody, sig, effectiveSecret, "webhook-whatsapp");
+        if (!sigValid) {
+          return new Response(JSON.stringify({ error: "Invalid signature" }), {
+            status: 401,
+            headers: { ...corsHeaders, "content-type": "application/json" },
+          });
+        }
+        void verifyHmac;
         if (!tenant_id) {
           console.warn("[webhook-whatsapp] Tenant nicht resolvable für phone=", tenantPhone);
           continue;

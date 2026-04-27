@@ -25,13 +25,12 @@ interface RequestBody {
 }
 
 const sendEmailViaResend = async (
+  apiKey: string,
   to: string,
   subject: string,
   text: string,
   fromEmail: string,
 ): Promise<{ ok: boolean; id?: string; error?: string }> => {
-  const apiKey = Deno.env.get("RESEND_API_KEY");
-  if (!apiKey) return { ok: false, error: "RESEND_API_KEY nicht gesetzt" };
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -54,14 +53,10 @@ const sendEmailViaResend = async (
 };
 
 const sendWhatsAppVia360dialog = async (
+  apiKey: string,
   to: string,
   text: string,
 ): Promise<{ ok: boolean; id?: string; error?: string }> => {
-  const apiKey = Deno.env.get("WHATSAPP_API_TOKEN");
-  const phoneId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
-  if (!apiKey || !phoneId) {
-    return { ok: false, error: "WhatsApp-Credentials nicht gesetzt" };
-  }
   const res = await fetch(
     `https://waba-v2.360dialog.io/v2/messages`,
     {
@@ -113,32 +108,51 @@ Deno.serve(async (req: Request) => {
     const admin = supabaseAdmin();
     const { data: tenant } = await admin
       .from("tenants")
-      .select("kanzlei_name, domain")
+      .select("kanzlei_name, domain, provider_config")
       .eq("id", ctx.tenant_id)
       .single();
+
+    // Per-Tenant Provider-Credentials laden (BYO statt platform-weit)
+    const providerCfg = (tenant?.provider_config ?? {}) as {
+      resend?: { enabled?: boolean; api_key?: string; from_email?: string };
+      whatsapp?: { enabled?: boolean; api_key?: string };
+    };
 
     // Provider-Versand
     let providerOk = false;
     let providerErr: string | undefined;
     let providerId: string | undefined;
     if (body.channel === "email") {
-      const fromEmail = `${(tenant?.kanzlei_name ?? "Kanzlei")
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "-")}@${tenant?.domain ?? "systems-tm.de"}`;
-      const r = await sendEmailViaResend(
-        body.to,
-        body.subject ?? "Nachricht von Ihrer Kanzlei",
-        body.text,
-        fromEmail,
-      );
-      providerOk = r.ok;
-      providerErr = r.error;
-      providerId = r.id;
+      const resendCfg = providerCfg.resend;
+      if (!resendCfg?.enabled || !resendCfg.api_key) {
+        providerErr = "Resend ist für diese Kanzlei nicht konfiguriert. Owner: bitte unter /dashboard/integrationen einrichten.";
+      } else {
+        const fromEmail =
+          resendCfg.from_email ??
+          `${(tenant?.kanzlei_name ?? "Kanzlei")
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, "-")}@${tenant?.domain ?? "systems-tm.de"}`;
+        const r = await sendEmailViaResend(
+          resendCfg.api_key,
+          body.to,
+          body.subject ?? "Nachricht von Ihrer Kanzlei",
+          body.text,
+          fromEmail,
+        );
+        providerOk = r.ok;
+        providerErr = r.error;
+        providerId = r.id;
+      }
     } else if (body.channel === "whatsapp") {
-      const r = await sendWhatsAppVia360dialog(body.to, body.text);
-      providerOk = r.ok;
-      providerErr = r.error;
-      providerId = r.id;
+      const waCfg = providerCfg.whatsapp;
+      if (!waCfg?.enabled || !waCfg.api_key) {
+        providerErr = "WhatsApp ist für diese Kanzlei nicht konfiguriert. Owner: bitte unter /dashboard/integrationen einrichten.";
+      } else {
+        const r = await sendWhatsAppVia360dialog(waCfg.api_key, body.to, body.text);
+        providerOk = r.ok;
+        providerErr = r.error;
+        providerId = r.id;
+      }
     }
 
     // DB-Eintrag IMMER (auch bei Provider-Failure → Anwalt sieht es als unsent)

@@ -19,6 +19,8 @@ import {
   ShieldCheck,
   UsersRound,
   Clock4,
+  Plug,
+  HeartPulse,
   Search,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
@@ -69,6 +71,8 @@ const navGroups: NavGroup[] = [
   {
     label: "Setup",
     items: [
+      { to: "/dashboard/system-status", icon: HeartPulse, label: "System-Status" },
+      { to: "/dashboard/integrationen", icon: Plug, label: "Integrationen" },
       { to: "/dashboard/import", icon: DatabaseZap, label: "Daten-Import" },
       { to: "/dashboard/branding", icon: Palette, label: "White-Label" },
       { to: "/dashboard/abrechnung", icon: CreditCard, label: "Abrechnung" },
@@ -91,6 +95,8 @@ const titleByPath: Record<string, string> = {
   "/dashboard/branding": "White-Label",
   "/dashboard/team": "Team",
   "/dashboard/personal": "Personal · Zeit & Urlaub",
+  "/dashboard/system-status": "System-Status · Live-Readiness",
+  "/dashboard/integrationen": "Integrationen · Vapi · WhatsApp · Email · Stripe",
   "/dashboard/abrechnung": "Abrechnung",
   "/dashboard/audit": "Audit-Log",
 };

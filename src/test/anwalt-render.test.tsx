@@ -18,6 +18,8 @@ import TeamPage from "@/pages/dashboard/TeamPage";
 import AbrechnungPage from "@/pages/dashboard/AbrechnungPage";
 import AuditPage from "@/pages/dashboard/AuditPage";
 import PersonalPage from "@/pages/dashboard/PersonalPage";
+import IntegrationenPage from "@/pages/dashboard/IntegrationenPage";
+import SystemStatusPage from "@/pages/dashboard/SystemStatusPage";
 
 const pages: [string, () => JSX.Element][] = [
   ["Login", Login],
@@ -36,6 +38,8 @@ const pages: [string, () => JSX.Element][] = [
   ["AbrechnungPage", AbrechnungPage],
   ["AuditPage", AuditPage],
   ["PersonalPage", PersonalPage],
+  ["IntegrationenPage", IntegrationenPage],
+  ["SystemStatusPage", SystemStatusPage],
 ];
 
 describe("Anwalt-Sicht: Dashboard pages render without crashing", () => {

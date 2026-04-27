@@ -327,3 +327,67 @@ export interface MitarbeiterKontingent {
   ist_stunden_woche?: number;
   soll_stunden_woche: number;
 }
+
+// Provider-Configuration (BYO-Credentials per Tenant)
+export type ProviderName = "vapi" | "whatsapp" | "resend" | "stripe";
+
+export interface VapiConfig {
+  enabled: boolean;
+  api_key: string | null;
+  assistant_id: string | null;
+  phone_number_id: string | null;
+  webhook_secret: string | null;
+  last_test_at: string | null;
+  last_test_ok: boolean | null;
+}
+
+export interface WhatsappConfig {
+  enabled: boolean;
+  provider: "360dialog" | "meta_cloud";
+  api_key: string | null;
+  phone_number_id: string | null;
+  webhook_secret: string | null;
+  last_test_at: string | null;
+  last_test_ok: boolean | null;
+}
+
+export interface ResendConfig {
+  enabled: boolean;
+  api_key: string | null;
+  from_email: string | null;
+  verified_domain: string | null;
+  inbound_webhook_secret: string | null;
+  last_test_at: string | null;
+  last_test_ok: boolean | null;
+}
+
+export interface StripeConfig {
+  enabled: boolean;
+  secret_key: string | null;
+  webhook_secret: string | null;
+  connect_account_id: string | null;
+  last_test_at: string | null;
+  last_test_ok: boolean | null;
+}
+
+export interface ProviderConfig {
+  vapi: VapiConfig;
+  whatsapp: WhatsappConfig;
+  resend: ResendConfig;
+  stripe: StripeConfig;
+}
+
+export interface ProviderHealthEntry {
+  enabled: boolean;
+  configured: boolean;
+  verified_domain?: string | null;
+  last_test_at: string | null;
+  last_test_ok: boolean | null;
+}
+
+export interface ProviderHealth {
+  vapi: ProviderHealthEntry;
+  whatsapp: ProviderHealthEntry;
+  resend: ProviderHealthEntry;
+  stripe: ProviderHealthEntry;
+}

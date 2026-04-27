@@ -12,7 +12,7 @@
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { supabaseAdmin } from "../_shared/supabase-admin.ts";
-import { normalizePhone, verifyHmac } from "../_shared/webhook-utils.ts";
+import { normalizePhone, requireSignature, verifyHmac } from "../_shared/webhook-utils.ts";
 
 interface VapiWebhookPayload {
   type:
@@ -45,19 +45,7 @@ Deno.serve(async (req: Request) => {
   try {
     // Body als String lesen für HMAC-Check
     const rawBody = await req.text();
-
-    // Signature-Verifikation (skippen wenn kein Secret gesetzt)
-    const secret = Deno.env.get("VAPI_WEBHOOK_SECRET");
     const sig = req.headers.get("x-vapi-signature");
-    if (secret && sig) {
-      const valid = await verifyHmac(rawBody, sig, secret);
-      if (!valid) {
-        return new Response(JSON.stringify({ error: "Invalid signature" }), {
-          status: 401,
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        });
-      }
-    }
 
     const payload: VapiWebhookPayload = JSON.parse(rawBody);
     const admin = supabaseAdmin();
@@ -65,13 +53,16 @@ Deno.serve(async (req: Request) => {
     // Tenant via angerufene Nummer auflösen
     const calledNumber = normalizePhone(payload.call?.phoneNumber?.number);
     let tenant_id: string | null = null;
+    let tenantWebhookSecret: string | null = null;
     if (calledNumber) {
       const { data: t } = await admin
         .from("tenants")
-        .select("id")
+        .select("id, provider_config")
         .eq("notfall_nummer", calledNumber)
         .maybeSingle();
       tenant_id = t?.id ?? null;
+      const cfg = (t?.provider_config ?? {}) as { vapi?: { webhook_secret?: string } };
+      tenantWebhookSecret = cfg.vapi?.webhook_secret ?? null;
     }
     // Kein Fallback auf Demo-Tenant — sonst landen unbekannte Anrufe in fremdem Tenant.
     if (!tenant_id) {
@@ -81,6 +72,19 @@ Deno.serve(async (req: Request) => {
         { status: 422, headers: { ...corsHeaders, "content-type": "application/json" } },
       );
     }
+
+    // Signature-Verifikation: bevorzugt per-tenant Secret, Fallback Env.
+    // requireSignature() blockt in WEBHOOK_STRICT-Mode wenn Secret fehlt.
+    const effectiveSecret = tenantWebhookSecret ?? Deno.env.get("VAPI_WEBHOOK_SECRET");
+    const sigValid = await requireSignature(rawBody, sig, effectiveSecret, "webhook-vapi");
+    if (!sigValid) {
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
+    // unused-import suppress: verifyHmac wird via requireSignature genutzt
+    void verifyHmac;
 
     // Mandant via Anrufer-Nummer
     const fromNumber = normalizePhone(payload.call?.customer?.number);

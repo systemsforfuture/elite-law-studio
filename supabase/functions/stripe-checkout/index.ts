@@ -89,18 +89,28 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    // Per-Tenant Stripe-Key aus provider_config (BYO statt platform-weit).
+    // Fallback auf Env-Variable für Plattform-Multi-Use erlaubt.
+    const { data: stripeTenant } = await admin
+      .from("tenants")
+      .select("provider_config")
+      .eq("id", r.tenant_id)
+      .single();
+    const stripeCfg = (stripeTenant?.provider_config ?? {}) as {
+      stripe?: { enabled?: boolean; secret_key?: string };
+    };
+    const stripeKey =
+      (stripeCfg.stripe?.enabled && stripeCfg.stripe.secret_key) ||
+      Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
-      // Mock-Mode
       return new Response(
         JSON.stringify({
           url: "https://checkout.stripe.com/demo/" + rechnung_id,
           mock_mode: true,
-          message: "STRIPE_SECRET_KEY nicht gesetzt — Demo-Link",
+          message:
+            "Stripe ist für diese Kanzlei nicht konfiguriert. Owner: bitte unter /dashboard/integrationen einrichten.",
         }),
-        {
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        },
+        { headers: { ...corsHeaders, "content-type": "application/json" } },
       );
     }
 

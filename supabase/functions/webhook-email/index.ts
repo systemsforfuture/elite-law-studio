@@ -5,7 +5,7 @@
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { supabaseAdmin } from "../_shared/supabase-admin.ts";
-import { verifyHmac } from "../_shared/webhook-utils.ts";
+import { requireSignature, verifyHmac } from "../_shared/webhook-utils.ts";
 
 interface EmailPayload {
   type: "email.delivered" | "email.received" | "inbound.email";
@@ -33,18 +33,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const rawBody = await req.text();
-
-    const secret = Deno.env.get("EMAIL_WEBHOOK_SECRET");
     const sig = req.headers.get("svix-signature") ?? req.headers.get("resend-signature");
-    if (secret && sig) {
-      const valid = await verifyHmac(rawBody, sig, secret);
-      if (!valid) {
-        return new Response(JSON.stringify({ error: "Invalid signature" }), {
-          status: 401,
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        });
-      }
-    }
 
     const payload: EmailPayload = JSON.parse(rawBody);
     const admin = supabaseAdmin();
@@ -57,16 +46,39 @@ Deno.serve(async (req: Request) => {
     const subject = payload.data?.subject ?? payload.email?.subject ?? "";
     const text = payload.data?.text ?? payload.email?.text ?? "";
 
-    // Tenant via Empfänger-Domain
+    // Tenant via Empfänger-Domain (escapes via .eq() statt .or() string-injection)
     const toDomain = toEmail.split("@")[1] ?? "";
     let tenant_id: string | null = null;
+    let tenantWebhookSecret: string | null = null;
     if (toDomain) {
-      const { data: t } = await admin
+      let { data: t } = await admin
         .from("tenants")
-        .select("id")
-        .or(`domain.eq.${toDomain},subdomain.eq.${toDomain}`)
+        .select("id, provider_config")
+        .eq("domain", toDomain)
         .maybeSingle();
+      if (!t) {
+        const { data: bySub } = await admin
+          .from("tenants")
+          .select("id, provider_config")
+          .eq("subdomain", toDomain)
+          .maybeSingle();
+        t = bySub;
+      }
       tenant_id = t?.id ?? null;
+      const cfg = (t?.provider_config ?? {}) as { resend?: { inbound_webhook_secret?: string } };
+      tenantWebhookSecret = cfg.resend?.inbound_webhook_secret ?? null;
+    }
+
+    // Per-Tenant Signature-Check (Fallback Env). Strict-Mode blockt ohne Secret.
+    const effectiveSecret = tenantWebhookSecret ?? Deno.env.get("EMAIL_WEBHOOK_SECRET");
+    const sigValid = await requireSignature(rawBody, sig, effectiveSecret, "webhook-email");
+    if (!sigValid) {
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
+    void verifyHmac;
     }
     if (!tenant_id) {
       console.warn("[webhook-email] Tenant nicht resolvable für to=", toEmail);
