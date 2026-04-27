@@ -67,15 +67,20 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const initialTier = (params.get("tier") as SubscriptionTier) || "growth";
+  // Marketing-Funnel-Prefill aus URL-Params: kanzlei, email, domain, name
+  const initialKanzlei = params.get("kanzlei") ?? "";
+  const initialEmail = params.get("email") ?? "";
+  const initialDomain = params.get("domain") ?? "";
+  const initialInhaber = params.get("name") ?? "";
   const [step, setStep] = useState(0);
 
   const [form, setForm] = useState<FormState>({
     tier: initialTier,
-    kanzlei_name: "",
-    inhaber_name: "",
-    email: "",
+    kanzlei_name: initialKanzlei,
+    inhaber_name: initialInhaber,
+    email: initialEmail,
     telefon: "",
-    domain: "",
+    domain: initialDomain,
     rechtsgebiete: ["Familienrecht", "Arbeitsrecht"],
     team_size: 3,
     tonalitaet: "freundlich",
