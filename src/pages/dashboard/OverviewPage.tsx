@@ -455,24 +455,35 @@ const OverviewPage = () => {
               <Clock className="h-4 w-4 text-accent" />
               Telefon-Guthaben
             </h3>
-            <div className="text-3xl font-display font-black text-foreground tabular-nums mb-1">
-              184<span className="text-lg text-muted-foreground">€</span>
-            </div>
-            <div className="text-xs text-muted-foreground mb-4">
-              ~610 Restminuten · reicht für 12 Tage
-            </div>
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-4">
-              <div
-                className="h-full bg-gradient-to-r from-accent to-gold-dark"
-                style={{ width: "61%" }}
-              />
-            </div>
-            <Link
-              to="/dashboard/abrechnung"
-              className="block w-full text-center text-xs font-medium text-accent hover:text-gold-dark py-2 rounded-lg border border-accent/30 hover:border-accent/50 transition-colors"
-            >
-              Guthaben aufladen
-            </Link>
+            {health?.voice?.enabled && health?.voice?.status === "active" ? (
+              <>
+                <div className="text-2xl font-display font-bold text-muted-foreground tabular-nums mb-1">
+                  —
+                </div>
+                <div className="text-xs text-muted-foreground mb-4">
+                  Live-Saldo wird in einer kommenden Version via Voice-Provider-API angezeigt.
+                </div>
+                <Link
+                  to="/dashboard/abrechnung"
+                  className="block w-full text-center text-xs font-medium text-accent hover:text-gold-dark py-2 rounded-lg border border-accent/30 hover:border-accent/50 transition-colors"
+                >
+                  Zur Abrechnung
+                </Link>
+              </>
+            ) : (
+              <>
+                <div className="text-xs text-muted-foreground mb-4">
+                  Voice-Integration ist noch nicht aktiv. Sobald die KI-Hotline
+                  eingerichtet ist, sehen Sie hier Ihr Guthaben und Restminuten.
+                </div>
+                <Link
+                  to="/dashboard/integrationen"
+                  className="block w-full text-center text-xs font-medium text-accent hover:text-gold-dark py-2 rounded-lg border border-accent/30 hover:border-accent/50 transition-colors"
+                >
+                  Voice einrichten
+                </Link>
+              </>
+            )}
           </section>
 
           <section className="glass-card p-6 border-border/50">
