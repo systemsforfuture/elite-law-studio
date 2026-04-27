@@ -14,6 +14,12 @@ const ANTHROPIC_VERSION = "2023-06-01";
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 // =============================================================
+// Provider-Stack
+// =============================================================
+
+export type Provider = "anthropic" | "openai" | "self_hosted";
+
+// =============================================================
 // Task-Types: Workflow-spezifische Modell-Wahl
 // =============================================================
 
@@ -29,9 +35,9 @@ export type LlmTask =
 
 interface ModelChoice {
   /** Primary provider + model */
-  primary: { provider: "anthropic" | "openai"; model: string };
+  primary: { provider: Provider; model: string };
   /** Fallback wenn primary nicht verfügbar */
-  fallback: { provider: "anthropic" | "openai"; model: string };
+  fallback: { provider: Provider; model: string };
   /** Default temperature & max-tokens */
   temperature: number;
   max_tokens: number;
@@ -132,7 +138,7 @@ interface CompletionResult {
   text: string;
   input_tokens: number;
   output_tokens: number;
-  provider: "anthropic" | "openai";
+  provider: Provider;
   model: string;
   cost_eur: number;
 }
@@ -211,6 +217,64 @@ const callOpenAI = async (
     model,
     cost_eur: calcCostEur(model, input_tokens, output_tokens),
   };
+};
+
+/**
+ * Self-hosted (vLLM / Ollama / TGI) Provider mit OpenAI-kompatibler API.
+ * Endpoint via SELF_HOSTED_LLM_URL env. Phase-3-Skalierungs-Pfad ab 500+ Kanzleien.
+ */
+const callSelfHosted = async (
+  model: string,
+  system: string,
+  messages: Message[],
+  max_tokens: number,
+  temperature: number,
+): Promise<CompletionResult> => {
+  const baseUrl = Deno.env.get("SELF_HOSTED_LLM_URL");
+  if (!baseUrl) throw new Error("SELF_HOSTED_LLM_URL fehlt");
+  const apiKey = Deno.env.get("SELF_HOSTED_LLM_KEY") ?? "";
+
+  const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
+    method: "POST",
+    headers: {
+      ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens,
+      temperature,
+      messages: [{ role: "system", content: system }, ...messages],
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`Self-hosted ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  }
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content ?? "";
+  const input_tokens = data.usage?.prompt_tokens ?? 0;
+  const output_tokens = data.usage?.completion_tokens ?? 0;
+  return {
+    text,
+    input_tokens,
+    output_tokens,
+    provider: "self_hosted",
+    model,
+    // Self-hosted: keine Per-Call-Kosten, Pauschal-Server. Tracking
+    // dient nur Volumen-Monitoring.
+    cost_eur: 0,
+  };
+};
+
+const callForProvider = (provider: Provider) => {
+  switch (provider) {
+    case "anthropic":
+      return callAnthropic;
+    case "openai":
+      return callOpenAI;
+    case "self_hosted":
+      return callSelfHosted;
+  }
 };
 
 // =============================================================
@@ -333,7 +397,7 @@ export const complete = async (input: CompletionInput): Promise<CompletionResult
 
   // 1) Versuche primary
   try {
-    const fn = choice.primary.provider === "anthropic" ? callAnthropic : callOpenAI;
+    const fn = callForProvider(choice.primary.provider);
     result = await fn(choice.primary.model, input.system, input.messages, max_tokens, temperature);
   } catch (e) {
     console.warn(`[llm] ${choice.primary.provider} failed, trying fallback:`, e instanceof Error ? e.message : e);
@@ -342,7 +406,7 @@ export const complete = async (input: CompletionInput): Promise<CompletionResult
   // 2) Fallback
   if (!result) {
     try {
-      const fn = choice.fallback.provider === "anthropic" ? callAnthropic : callOpenAI;
+      const fn = callForProvider(choice.fallback.provider);
       result = await fn(choice.fallback.model, input.system, input.messages, max_tokens, temperature);
     } catch (e) {
       console.error("[llm] both providers failed:", e instanceof Error ? e.message : e);
