@@ -62,6 +62,8 @@ const TeamPage = lazy(() => import("./pages/dashboard/TeamPage.tsx"));
 const AbrechnungPage = lazy(() => import("./pages/dashboard/AbrechnungPage.tsx"));
 const AuditPage = lazy(() => import("./pages/dashboard/AuditPage.tsx"));
 const PersonalPage = lazy(() => import("./pages/dashboard/PersonalPage.tsx"));
+const IntegrationenPage = lazy(() => import("./pages/dashboard/IntegrationenPage.tsx"));
+const SystemStatusPage = lazy(() => import("./pages/dashboard/SystemStatusPage.tsx"));
 
 const queryClient = new QueryClient();
 
@@ -110,6 +112,8 @@ const App = () => (
                   <Route path="branding" element={<BrandingPage />} />
                   <Route path="team" element={<TeamPage />} />
                   <Route path="personal" element={<PersonalPage />} />
+                  <Route path="integrationen" element={<IntegrationenPage />} />
+                  <Route path="system-status" element={<SystemStatusPage />} />
                   <Route path="abrechnung" element={<AbrechnungPage />} />
                   <Route path="audit" element={<AuditPage />} />
                 </Route>

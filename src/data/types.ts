@@ -327,3 +327,92 @@ export interface MitarbeiterKontingent {
   ist_stunden_woche?: number;
   soll_stunden_woche: number;
 }
+
+// Plattform-Managed Integrations (NICHT BYO).
+// SYSTEMS betreibt die Provider zentral; Kanzlei sieht keinen Provider-Namen
+// und keine API-Keys.
+export type IntegrationName = "voice" | "whatsapp" | "email" | "stripe";
+
+export type ProvisionStatus = "not_provisioned" | "provisioning" | "active" | "suspended";
+export type VerificationStatus = "pending" | "verified" | "failed";
+
+export interface VoiceIntegration {
+  enabled: boolean;
+  /** Die KI-Telefonnummer der Kanzlei (international) */
+  phone_number: string | null;
+  /** Internal ID — vor User versteckt */
+  phone_number_id: string | null;
+  voice_id: string;
+  greeting: string | null;
+  provisioned_at: string | null;
+  status: ProvisionStatus;
+}
+
+export interface WhatsappIntegration {
+  enabled: boolean;
+  /** Die WhatsApp-Business-Nummer der Kanzlei */
+  phone_number: string | null;
+  verification_status: VerificationStatus;
+  verified_at: string | null;
+  requested_at: string | null;
+}
+
+export interface EmailDnsRecord {
+  type: "TXT" | "MX" | "CNAME";
+  name: string;
+  value: string;
+  ttl?: number;
+}
+
+export interface EmailIntegration {
+  enabled: boolean;
+  custom_domain: string | null;
+  from_email: string | null;
+  verification_status: VerificationStatus;
+  dns_records: EmailDnsRecord[];
+  verified_at: string | null;
+}
+
+export interface StripeIntegration {
+  enabled: boolean;
+  /** Connect-Account-ID — vor User versteckt, intern */
+  connect_account_id: string | null;
+  charges_enabled: boolean;
+  payouts_enabled: boolean;
+  connected_at: string | null;
+}
+
+export interface ProviderConfig {
+  voice: VoiceIntegration;
+  whatsapp: WhatsappIntegration;
+  email: EmailIntegration;
+  stripe: StripeIntegration;
+}
+
+export interface IntegrationHealth {
+  voice: {
+    enabled: boolean;
+    configured: boolean;
+    phone_number: string | null;
+    status: ProvisionStatus;
+  };
+  whatsapp: {
+    enabled: boolean;
+    configured: boolean;
+    phone_number: string | null;
+    verification_status: VerificationStatus;
+  };
+  email: {
+    enabled: boolean;
+    configured: boolean;
+    custom_domain: string | null;
+    from_email: string | null;
+    verification_status: VerificationStatus;
+  };
+  stripe: {
+    enabled: boolean;
+    configured: boolean;
+    charges_enabled: boolean;
+    payouts_enabled: boolean;
+  };
+}

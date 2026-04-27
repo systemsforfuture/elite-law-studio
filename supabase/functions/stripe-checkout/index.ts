@@ -89,19 +89,36 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeKey) {
-      // Mock-Mode
+    // Plattform-Modell: SYSTEMS hat den Stripe-Plattform-Account.
+    // Tenant hat einen Connect-Account (acct_…) der via OAuth angebunden wurde.
+    // Wir erzeugen Checkout im Plattform-Modus und transferieren auf den
+    // Connect-Account via `application_fee_amount` / `transfer_data`.
+    const platformKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const { data: stripeTenant } = await admin
+      .from("tenants")
+      .select("provider_config")
+      .eq("id", r.tenant_id)
+      .single();
+    const stripeCfg = (stripeTenant?.provider_config ?? {}) as {
+      stripe?: {
+        enabled?: boolean;
+        connect_account_id?: string;
+        charges_enabled?: boolean;
+      };
+    };
+    const connectAcct = stripeCfg.stripe?.connect_account_id;
+    if (!platformKey || !connectAcct || !stripeCfg.stripe?.charges_enabled) {
       return new Response(
         JSON.stringify({
           url: "https://checkout.stripe.com/demo/" + rechnung_id,
           mock_mode: true,
-          message: "STRIPE_SECRET_KEY nicht gesetzt — Demo-Link",
+          message:
+            "Zahlungen für diese Kanzlei nicht aktiv. Owner: unter Integrationen → »Zahlungs-Konto verbinden«.",
         }),
-        {
-          headers: { ...corsHeaders, "content-type": "application/json" },
-        },
+        { headers: { ...corsHeaders, "content-type": "application/json" } },
       );
+    }
+    const stripeKey = platformKey;
     }
 
     const md = r.mandant as
@@ -128,6 +145,10 @@ Deno.serve(async (req: Request) => {
     if (md?.email) params.append("customer_email", md.email);
     params.append("metadata[rechnung_id]", rechnung_id);
     params.append("metadata[tenant_id]", r.tenant_id);
+    // Connect: Geld geht an den Tenant-Stripe-Account (transfer_data),
+    // SYSTEMS-Plattform behält 0% (kein application_fee). Optional könnte
+    // hier eine Plattform-Gebühr eingehängt werden.
+    params.append("payment_intent_data[transfer_data][destination]", connectAcct);
     params.append(
       "success_url",
       success_url ??

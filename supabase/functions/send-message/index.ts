@@ -25,13 +25,12 @@ interface RequestBody {
 }
 
 const sendEmailViaResend = async (
+  apiKey: string,
   to: string,
   subject: string,
   text: string,
   fromEmail: string,
 ): Promise<{ ok: boolean; id?: string; error?: string }> => {
-  const apiKey = Deno.env.get("RESEND_API_KEY");
-  if (!apiKey) return { ok: false, error: "RESEND_API_KEY nicht gesetzt" };
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -54,14 +53,10 @@ const sendEmailViaResend = async (
 };
 
 const sendWhatsAppVia360dialog = async (
+  apiKey: string,
   to: string,
   text: string,
 ): Promise<{ ok: boolean; id?: string; error?: string }> => {
-  const apiKey = Deno.env.get("WHATSAPP_API_TOKEN");
-  const phoneId = Deno.env.get("WHATSAPP_PHONE_NUMBER_ID");
-  if (!apiKey || !phoneId) {
-    return { ok: false, error: "WhatsApp-Credentials nicht gesetzt" };
-  }
   const res = await fetch(
     `https://waba-v2.360dialog.io/v2/messages`,
     {
@@ -113,32 +108,58 @@ Deno.serve(async (req: Request) => {
     const admin = supabaseAdmin();
     const { data: tenant } = await admin
       .from("tenants")
-      .select("kanzlei_name, domain")
+      .select("kanzlei_name, domain, provider_config")
       .eq("id", ctx.tenant_id)
       .single();
 
-    // Provider-Versand
+    // Plattform-managed: API-Keys aus Function-Env, kanzlei-spezifische
+    // Daten (from_email, verified-Domain) aus tenant.provider_config.
+    const providerCfg = (tenant?.provider_config ?? {}) as {
+      email?: { enabled?: boolean; from_email?: string; custom_domain?: string; verification_status?: string };
+      whatsapp?: { enabled?: boolean; phone_number?: string; verification_status?: string };
+    };
+
     let providerOk = false;
     let providerErr: string | undefined;
     let providerId: string | undefined;
+
     if (body.channel === "email") {
-      const fromEmail = `${(tenant?.kanzlei_name ?? "Kanzlei")
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "-")}@${tenant?.domain ?? "systems-tm.de"}`;
-      const r = await sendEmailViaResend(
-        body.to,
-        body.subject ?? "Nachricht von Ihrer Kanzlei",
-        body.text,
-        fromEmail,
-      );
-      providerOk = r.ok;
-      providerErr = r.error;
-      providerId = r.id;
+      const platformKey = Deno.env.get("RESEND_API_KEY");
+      const emailCfg = providerCfg.email;
+      if (!platformKey) {
+        providerErr = "Plattform-E-Mail noch nicht eingerichtet.";
+      } else if (!emailCfg?.enabled || emailCfg.verification_status !== "verified") {
+        providerErr =
+          "E-Mail-Domain noch nicht verifiziert. Owner: unter Integrationen Domain einrichten.";
+      } else {
+        const fromEmail =
+          emailCfg.from_email ??
+          `kontakt@${emailCfg.custom_domain ?? tenant?.domain ?? "systems-tm.de"}`;
+        const r = await sendEmailViaResend(
+          platformKey,
+          body.to,
+          body.subject ?? "Nachricht von Ihrer Kanzlei",
+          body.text,
+          fromEmail,
+        );
+        providerOk = r.ok;
+        providerErr = r.error;
+        providerId = r.id;
+      }
     } else if (body.channel === "whatsapp") {
-      const r = await sendWhatsAppVia360dialog(body.to, body.text);
-      providerOk = r.ok;
-      providerErr = r.error;
-      providerId = r.id;
+      const platformKey = Deno.env.get("WHATSAPP_API_KEY");
+      const waCfg = providerCfg.whatsapp;
+      if (!platformKey) {
+        providerErr = "Plattform-WhatsApp noch nicht eingerichtet.";
+      } else if (!waCfg?.enabled || waCfg.verification_status !== "verified") {
+        providerErr =
+          "WhatsApp-Nummer noch nicht verifiziert. Owner: unter Integrationen Nummer einrichten.";
+      } else {
+        const r = await sendWhatsAppVia360dialog(platformKey, body.to, body.text);
+        providerOk = r.ok;
+        providerErr = r.error;
+        providerId = r.id;
+      }
     }
 
     // DB-Eintrag IMMER (auch bei Provider-Failure → Anwalt sieht es als unsent)
