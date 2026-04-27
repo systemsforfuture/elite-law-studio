@@ -341,6 +341,21 @@ const MahnwesenPage = () => {
 
   return (
     <div className="space-y-6">
+      {!emailReady && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.04] p-4 flex items-center gap-3 flex-wrap">
+          <AlertOctagon className="h-4 w-4 text-amber-600 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <span className="text-sm font-medium text-foreground">
+              E-Mail-Integration nicht aktiv.
+            </span>{" "}
+            <span className="text-sm text-muted-foreground">
+              Mahnungen können generiert, aber nicht direkt versendet werden.
+              Setup → Integrationen → E-Mail einrichten.
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="grid sm:grid-cols-4 gap-4">
         <Stat
           label="Offene Forderungen"
