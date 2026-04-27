@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import {
   useProviderConfig,
   useProvisionVoice,
@@ -102,10 +103,18 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
   const provision = useProvisionVoice();
   const patch = usePatchProviderConfig();
   const testCall = useVoiceTestCall();
+  const { data: konversationen = [] } = useKonversationenQuery();
   const [areaCode, setAreaCode] = useState("030");
   const [greeting, setGreeting] = useState(config.greeting ?? "");
   const [testNumber, setTestNumber] = useState("");
   const [open, setOpen] = useState(!config.phone_number);
+
+  // Live-Anrufstatistik letzte 24h
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const calls24h = konversationen.filter(
+    (k) => k.kanal === "voice" && k.zeitpunkt >= cutoff,
+  );
+  const escalated24h = calls24h.filter((k) => k.status === "escalated").length;
 
   const handleTestCall = async () => {
     if (!/^\+\d{10,15}$/.test(testNumber.trim())) {
@@ -210,6 +219,34 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
               Drucken Sie diese Nummer auf Ihre Visitenkarten, Website, E-Mail-Signatur.
               Sie erreichen Sie 24/7 über die KI.
             </p>
+          </div>
+
+          {/* Live-Anrufstatistik */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Anrufe 24h
+              </div>
+              <div className="text-xl font-display font-bold text-foreground tabular-nums mt-1">
+                {calls24h.length}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                KI gelöst
+              </div>
+              <div className="text-xl font-display font-bold text-emerald-600 tabular-nums mt-1">
+                {calls24h.length - escalated24h}
+              </div>
+            </div>
+            <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Eskaliert
+              </div>
+              <div className={`text-xl font-display font-bold tabular-nums mt-1 ${escalated24h > 0 ? "text-amber-600" : "text-foreground"}`}>
+                {escalated24h}
+              </div>
+            </div>
           </div>
 
           <div>
@@ -596,6 +633,20 @@ const EmailCard = ({ config }: { config: EmailIntegration }) => {
 const StripeCard = ({ config }: { config: StripeIntegration }) => {
   const connect = useConnectStripe();
   const [open, setOpen] = useState(!config.connect_account_id);
+
+  // Auto-Polling während KYC läuft: alle 30s charges_enabled refreshen.
+  // Stoppt sobald charges_enabled+payouts_enabled true sind.
+  useEffect(() => {
+    if (!config.connect_account_id) return;
+    if (config.charges_enabled && config.payouts_enabled) return;
+    const interval = setInterval(() => {
+      void connect.mutateAsync().catch(() => {
+        /* still ok */
+      });
+    }, 30_000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.connect_account_id, config.charges_enabled, config.payouts_enabled]);
 
   const handleConnect = async () => {
     const t = toast.loading("Verbinde mit Zahlungsanbieter…");
