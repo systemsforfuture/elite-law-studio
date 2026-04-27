@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { auditLog as mockAuditLog } from "@/data/mockData";
 import type { AuditEvent } from "@/data/types";
 
@@ -16,7 +17,7 @@ export const useAuditLog = (limit = 100) =>
         .order("ts", { ascending: false })
         .limit(limit);
       if (error) {
-        console.warn("[audit_log] fallback:", error.message);
+        warnMockFallback("audit_log", error.message);
         return mockAuditLog;
       }
       // user_name kommt aus public.users — separat joinen

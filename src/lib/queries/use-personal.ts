@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import {
   zeiterfassungen as mockZeit,
   urlaubsantraege as mockUrlaub,
@@ -39,7 +40,7 @@ export const useZeiterfassungQuery = (mitarbeiterId?: string) =>
       if (mitarbeiterId) q = q.eq("mitarbeiter_id", mitarbeiterId);
       const { data, error } = await q;
       if (error) {
-        console.warn("[zeiterfassung] fallback:", error.message);
+        warnMockFallback("zeiterfassung", error.message);
         return mockZeit;
       }
       return (data ?? []) as unknown as Zeiterfassung[];
@@ -131,7 +132,7 @@ export const useUrlaubQuery = (status?: UrlaubStatus) =>
       if (status) q = q.eq("status", status);
       const { data, error } = await q;
       if (error) {
-        console.warn("[urlaub] fallback:", error.message);
+        warnMockFallback("urlaub", error.message);
         return mockUrlaub;
       }
       return (data ?? []) as unknown as UrlaubAntrag[];
@@ -224,7 +225,7 @@ export const useKontingenteQuery = () =>
       if (shouldMock()) return mockKont;
       const { data, error } = await supabase!.from("urlaub_uebersicht").select("*");
       if (error) {
-        console.warn("[kontingente] fallback:", error.message);
+        warnMockFallback("kontingente", error.message);
         return mockKont;
       }
       return (data ?? []) as unknown as MitarbeiterKontingent[];

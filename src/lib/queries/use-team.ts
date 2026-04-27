@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { users as mockUsers, teamStats as mockStats } from "@/data/mockData";
 import type { User, TeamMemberStats } from "@/data/types";
 
@@ -15,7 +16,7 @@ export const useTeamQuery = () =>
         .select("*")
         .order("created_at", { ascending: true });
       if (error) {
-        console.warn("[team] fallback:", error.message);
+        warnMockFallback("team", error.message);
         return mockUsers;
       }
       return (data ?? []) as unknown as User[];

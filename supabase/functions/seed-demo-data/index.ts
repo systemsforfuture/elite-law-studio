@@ -101,6 +101,9 @@ Deno.serve(async (req) => {
       .select();
 
     if (mErr) throw mErr;
+    if (!mandanten || mandanten.length < 3) {
+      throw new Error(`Mandanten-Insert unvollständig (got ${mandanten?.length ?? 0}, expected 3)`);
+    }
     const [md1, md2, md3] = mandanten as Array<{ id: string }>;
 
     // 2. Akten
@@ -156,10 +159,13 @@ Deno.serve(async (req) => {
       .select();
 
     if (aErr) throw aErr;
+    if (!akten || akten.length < 2) {
+      throw new Error(`Akten-Insert unvollständig (got ${akten?.length ?? 0}, expected 3)`);
+    }
     const [akt1, akt2] = akten as Array<{ id: string }>;
 
     // 3. Termine
-    await admin.from("termine").insert([
+    const { error: tErr } = await admin.from("termine").insert([
       {
         tenant_id: tenantId,
         mandant_id: md1.id,
@@ -183,9 +189,10 @@ Deno.serve(async (req) => {
         ort: "Arbeitsgericht",
       },
     ]);
+    if (tErr) throw tErr;
 
     // 4. Rechnungen
-    await admin.from("rechnungen").insert([
+    const { error: rErr } = await admin.from("rechnungen").insert([
       {
         tenant_id: tenantId,
         mandant_id: md1.id,
@@ -211,6 +218,7 @@ Deno.serve(async (req) => {
         mahnstufe: 0,
       },
     ]);
+    if (rErr) throw rErr;
 
     return new Response(
       JSON.stringify({

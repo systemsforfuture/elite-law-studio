@@ -123,10 +123,13 @@ Deno.serve(async (req: Request) => {
       .select("agent_config")
       .eq("id", ctx.tenant_id)
       .single();
+    // Eigener Slot für die Strategie-KI — vorher fälschlich an dokumenten_analyst
+    // gekoppelt, was bedeutete dass Pause der Dokumenten-Analyse auch die
+    // Strategie-Generation blockiert. Fallback auf undefined wenn kein Eintrag.
     const stratCfg = ((tenantData?.agent_config ?? {}) as Record<string, {
       status?: string;
       custom_prompt_addition?: string | null;
-    }>)["dokumenten_analyst"];
+    }>)["strategie_assistant"];
     if (stratCfg?.status === "pausiert") {
       return new Response(
         JSON.stringify({ error: "Strategie-KI ist für diese Kanzlei pausiert" }),

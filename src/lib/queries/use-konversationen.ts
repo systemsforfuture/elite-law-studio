@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { konversationen as mockKonversationen } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
 
@@ -15,7 +16,7 @@ export const useKonversationenQuery = () =>
         .select("*")
         .order("zeitpunkt", { ascending: false });
       if (error) {
-        console.warn("[konversationen] fallback:", error.message);
+        warnMockFallback("konversationen", error.message);
         return mockKonversationen;
       }
       return (data ?? []) as unknown as Konversation[];

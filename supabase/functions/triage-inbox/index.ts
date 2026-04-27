@@ -91,7 +91,13 @@ Deno.serve(async (req: Request) => {
       konfidenz_threshold?: number;
       tonalitaet?: string;
       custom_prompt_addition?: string | null;
-    }>)[konv.kanal === "whatsapp" ? "whatsapp_conversationalist" : "email_triagist"];
+    }>)[
+      konv.kanal === "whatsapp"
+        ? "whatsapp_conversationalist"
+        : konv.kanal === "voice"
+          ? "voice_receptionist"
+          : "email_triagist" // email + sms fallen auf email_triagist
+    ];
 
     // Wenn Agent pausiert → kein Vorschlag
     if (agentCfg?.status === "pausiert") {
