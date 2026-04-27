@@ -61,13 +61,71 @@ const TerminePage = () => {
     a.fristen.map((f) => ({ ...f, akte: a })),
   );
 
+  // Live-Stats: aktuelle Woche (Mo–So), heute, kritische Fristen.
+  const stats = useMemo(() => {
+    const now = new Date();
+    const dow = (now.getDay() + 6) % 7; // 0=Mo
+    const weekStart = new Date(now);
+    weekStart.setHours(0, 0, 0, 0);
+    weekStart.setDate(now.getDate() - dow);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
+    const todayKey = now.toISOString().slice(0, 10);
+
+    const weekTermine = termine.filter((t) => {
+      const d = new Date(t.start_at);
+      return d >= weekStart && d < weekEnd;
+    });
+    const weekBestaetigt = weekTermine.filter((t) => t.bestaetigt).length;
+
+    const wiedervorlagen = termine.filter((t) => t.typ === "wiedervorlage");
+    const wiedervorlagenHeute = wiedervorlagen.filter(
+      (t) => t.start_at.slice(0, 10) === todayKey,
+    ).length;
+
+    const fristenWeek = akten.flatMap((a) =>
+      a.fristen.filter((f) => {
+        const d = new Date(f.datum);
+        return d >= weekStart && d < weekEnd;
+      }),
+    );
+    const fristenKritisch = fristenWeek.filter((f) => f.kritisch).length;
+
+    return {
+      weekTermineCount: weekTermine.length,
+      weekBestaetigt,
+      wiedervorlagenCount: wiedervorlagen.length,
+      wiedervorlagenHeute,
+      fristenWeekCount: fristenWeek.length,
+      fristenKritisch,
+    };
+  }, [termine, akten]);
+
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-4 gap-4">
-        <Stat label="Termine diese Woche" value="8" sub="3 KI-gebucht" />
-        <Stat label="No-Show-Rate" value="4%" sub="−80% durch Reminder" accent="emerald" />
-        <Stat label="Offene Wiedervorlagen" value="11" sub="3 fällig heute" accent="amber" />
-        <Stat label="Frist-Eskalationen" value="2" sub="Diese Woche" accent="rose" />
+        <Stat
+          label="Termine diese Woche"
+          value={stats.weekTermineCount.toString()}
+          sub={stats.weekTermineCount === 0 ? "—" : `${stats.weekBestaetigt} bestätigt`}
+        />
+        <Stat
+          label="Offene Wiedervorlagen"
+          value={stats.wiedervorlagenCount.toString()}
+          sub={stats.wiedervorlagenHeute === 0 ? "Keine fällig heute" : `${stats.wiedervorlagenHeute} fällig heute`}
+          accent="amber"
+        />
+        <Stat
+          label="Fristen diese Woche"
+          value={stats.fristenWeekCount.toString()}
+          sub={stats.fristenKritisch === 0 ? "Keine kritisch" : `${stats.fristenKritisch} kritisch`}
+          accent="rose"
+        />
+        <Stat
+          label="Termine gesamt"
+          value={termine.length.toString()}
+          sub="im System"
+        />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
