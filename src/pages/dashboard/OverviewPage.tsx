@@ -51,8 +51,9 @@ const OverviewPage = () => {
     .sort((a, b) => b.zeitpunkt.localeCompare(a.zeitpunkt))
     .slice(0, 5);
 
+  const todayIso = new Date().toISOString().slice(0, 10);
   const upcomingTermine = termine
-    .filter((t) => t.start_at >= "2026-04-26")
+    .filter((t) => t.start_at >= todayIso)
     .slice()
     .sort((a, b) => a.start_at.localeCompare(b.start_at))
     .slice(0, 4);
@@ -145,6 +146,14 @@ const OverviewPage = () => {
             </div>
 
             <div className="space-y-2">
+              {recent.length === 0 && (
+                <div className="p-6 rounded-xl border border-dashed border-border/50 bg-muted/10 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    Noch keine Konversationen. Sobald die KI Anrufe oder
+                    Nachrichten beantwortet, erscheinen sie hier.
+                  </p>
+                </div>
+              )}
               {recent.map((k) => {
                 const md = findMandant(k.mandant_id);
                 const escalated = k.status === "escalated";
@@ -234,6 +243,13 @@ const OverviewPage = () => {
             </div>
 
             <div className="space-y-2">
+              {upcomingTermine.length === 0 && (
+                <div className="p-6 rounded-xl border border-dashed border-border/50 bg-muted/10 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    Keine anstehenden Termine.
+                  </p>
+                </div>
+              )}
               {upcomingTermine.map((t) => {
                 const u = findUser(t.anwalt_id);
                 const d = new Date(t.start_at);

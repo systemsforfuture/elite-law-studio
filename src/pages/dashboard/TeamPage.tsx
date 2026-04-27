@@ -258,6 +258,29 @@ const TeamPage = () => {
 
       <InviteUserDialog open={inviteOpen} onOpenChange={setInviteOpen} />
 
+      {users.length === 0 && (
+        <div className="glass-card p-12 border-border/50 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-muted/50 mx-auto mb-3 flex items-center justify-center">
+            <Plus className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <h3 className="text-base font-semibold text-foreground mb-1">
+            Noch keine Team-Mitglieder
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Lade deine Mitarbeiter per Magic-Link ein.
+          </p>
+          <Button
+            variant="gold"
+            size="sm"
+            className="rounded-xl"
+            onClick={() => setInviteOpen(true)}
+          >
+            <Plus className="mr-2 h-3.5 w-3.5" />
+            Mitglied einladen
+          </Button>
+        </div>
+      )}
+
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {users.map((u) => {
           const stats = findTeamStats(u.id);

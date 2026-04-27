@@ -110,6 +110,14 @@ const AuditPage = () => {
               </tr>
             </thead>
             <tbody>
+              {auditLog.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="p-12 text-center text-sm text-muted-foreground">
+                    Noch keine Audit-Events. Sobald jemand Daten anlegt oder
+                    ändert, erscheinen hier alle Aktionen.
+                  </td>
+                </tr>
+              )}
               {auditLog.map((e) => {
                 const meta = actionMeta[e.action];
                 const Icon = meta.icon;

@@ -34,7 +34,10 @@ const typColor: Record<TerminTyp, string> = {
 };
 
 const TerminePage = () => {
-  const [refMonth, setRefMonth] = useState(new Date(2026, 4, 1));
+  const [refMonth, setRefMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
   const { data: termine = [] } = useTermineQuery();
   const { data: akten = [] } = useAktenQuery();
   const { tenant } = useTenant();
@@ -88,7 +91,10 @@ const TerminePage = () => {
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <button
-                onClick={() => setRefMonth(new Date(2026, 4, 1))}
+                onClick={() => {
+                  const now = new Date();
+                  setRefMonth(new Date(now.getFullYear(), now.getMonth(), 1));
+                }}
                 className="text-xs px-3 py-1.5 rounded-lg hover:bg-muted transition-colors"
               >
                 Heute
@@ -129,7 +135,7 @@ const TerminePage = () => {
               const dayTermine = termine.filter((t) =>
                 t.start_at.startsWith(dateStr),
               );
-              const isToday = dateStr === "2026-04-26";
+              const isToday = dateStr === new Date().toISOString().slice(0, 10);
               return (
                 <div
                   key={i}
@@ -174,6 +180,11 @@ const TerminePage = () => {
               Anstehend
             </h3>
             <div className="space-y-3">
+              {termine.length === 0 && (
+                <div className="text-xs text-muted-foreground/70 italic px-1 py-3">
+                  Keine anstehenden Termine.
+                </div>
+              )}
               {termine
                 .slice()
                 .sort((a, b) => a.start_at.localeCompare(b.start_at))
