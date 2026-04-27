@@ -22,18 +22,9 @@ import { useSendMessage } from "@/lib/queries/use-send-message";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
+import { isSameDay } from "@/lib/date-utils";
 
 type Filter = "all" | "email" | "whatsapp" | "escalated" | "ai";
-
-const isSameDay = (iso: string) => {
-  const d = new Date(iso);
-  const now = new Date();
-  return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
-  );
-};
 
 const InboxPage = () => {
   const [filter, setFilter] = useState<Filter>("all");
