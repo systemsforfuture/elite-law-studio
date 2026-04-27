@@ -19,6 +19,7 @@ import {
   Sparkles,
   Cpu,
   Check,
+  Plug,
   type LucideIcon,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
@@ -37,6 +38,12 @@ const buildSteps = (kanzlei: string): Step[] => [
     icon: Cpu,
     title: `Willkommen bei SYSTEMS™, ${kanzlei}.`,
     body: "Ihre Plattform ist live. Ein kurzer Rundgang durch die wichtigsten Module — danach können Sie direkt loslegen.",
+  },
+  {
+    icon: Plug,
+    title: "Erst die 4 Integrationen einrichten",
+    body: "KI-Telefon, WhatsApp, E-Mail-Domain und Zahlungen — pro Modul ein Klick. Erst wenn alles grün ist, geht die Plattform live für Ihre Mandanten. Setup dauert ~10 Min.",
+    cta: { label: "Integrationen einrichten", to: "/dashboard/integrationen" },
   },
   {
     icon: Phone,

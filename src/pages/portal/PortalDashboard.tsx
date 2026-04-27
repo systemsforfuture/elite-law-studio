@@ -69,14 +69,14 @@ const PortalDashboard = () => {
   }
 
   const handlePay = async (rechnung_id: string) => {
-    const t = toast.loading("Stripe-Checkout wird erstellt…");
+    const t = toast.loading("Sicherer Zahlungs-Dialog wird erstellt…");
     try {
       const result = await checkout.mutateAsync(rechnung_id);
       if (result.mock_mode) {
-        toast.success("Demo-Mode", {
+        toast.success("Demo-Modus", {
           id: t,
           description:
-            "STRIPE_SECRET_KEY nicht gesetzt. In Production öffnet sich Stripe-Checkout.",
+            "Live öffnet sich ein sicherer Zahlungs-Dialog. Kanzlei muss Zahlungs-Konto unter Integrationen verbinden.",
         });
       } else {
         toast.success("Weiterleitung zu Stripe…", { id: t });

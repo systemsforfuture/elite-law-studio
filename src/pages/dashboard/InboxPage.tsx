@@ -60,7 +60,7 @@ const InboxPage = () => {
         toast.success("Antwort als gesendet markiert (Provider-Demo-Modus)", {
           id: t,
           description:
-            "Echtes Versenden braucht RESEND_API_KEY oder WhatsApp-Token.",
+            "Echtes Versenden braucht eingerichtete E-Mail- und WhatsApp-Integration unter Setup → Integrationen.",
         });
       } else if (result.ok) {
         toast.success(`Antwort gesendet (${k.kanal})`, { id: t });
