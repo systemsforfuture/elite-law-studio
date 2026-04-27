@@ -219,7 +219,7 @@ const AssistantWidget = () => {
             {history.map((m, i) => (
               <div
                 key={i}
-                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex flex-col gap-1 ${m.role === "user" ? "items-end" : "items-start"}`}
               >
                 <div
                   className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap ${
@@ -230,6 +230,19 @@ const AssistantWidget = () => {
                 >
                   {m.content}
                 </div>
+                {m.role === "assistant" && (
+                  <button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(m.content);
+                      const sonner = await import("sonner");
+                      sonner.toast.success("Kopiert");
+                    }}
+                    className="text-[10px] text-muted-foreground/60 hover:text-foreground transition-colors px-1"
+                    title="Antwort kopieren"
+                  >
+                    Kopieren
+                  </button>
+                )}
               </div>
             ))}
 
