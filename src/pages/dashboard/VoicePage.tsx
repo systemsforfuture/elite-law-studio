@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Phone,
   PhoneIncoming,
@@ -22,16 +22,73 @@ import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
 import VoiceTestDialog from "@/components/dashboard/VoiceTestDialog";
+import { isSameDay, isWithinLastDays } from "@/lib/date-utils";
+
+type CallFilter = "all" | "ai" | "escalated" | "spam";
+
+const formatDuration = (sec: number) => {
+  if (!sec || sec < 0) return "—";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+};
 
 const VoicePage = () => {
   const { tenant } = useTenant();
   const [tab, setTab] = useState<"calls" | "config">("calls");
   const [selected, setSelected] = useState<Konversation | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [callFilter, setCallFilter] = useState<CallFilter>("all");
   const voiceAgent = kiAgents.find((a) => a.slug === "voice_receptionist")!;
   const { data: konversationen = [], isLoading } = useKonversationenQuery();
-  const voiceCalls = konversationen.filter((k) => k.kanal === "voice");
+  const voiceCalls = useMemo(
+    () => konversationen.filter((k) => k.kanal === "voice"),
+    [konversationen],
+  );
   const [testOpen, setTestOpen] = useState(false);
+
+  const stats = useMemo(() => {
+    const today = voiceCalls.filter((k) => isSameDay(k.zeitpunkt));
+    const yesterdayRef = new Date();
+    yesterdayRef.setDate(yesterdayRef.getDate() - 1);
+    const yesterday = voiceCalls.filter((k) => isSameDay(k.zeitpunkt, yesterdayRef));
+    const todayAi = today.filter((k) => k.ai_handled).length;
+    const todayEsc = today.filter((k) => k.status === "escalated").length;
+    const aiPct = today.length === 0 ? 0 : Math.round((todayAi / today.length) * 100);
+    // Δ vs Vortag, in 7-Tage-Fenster gemittelt für Stabilität bei kleinen Volumen.
+    const last7 = voiceCalls.filter((k) => isWithinLastDays(k.zeitpunkt, 7)).length / 7;
+    const delta = last7 === 0 ? 0 : Math.round(((today.length - last7) / last7) * 100);
+    const deltaLabel =
+      yesterday.length === 0 && today.length === 0
+        ? "—"
+        : delta > 0
+        ? `+${delta}% vs. Ø Woche`
+        : `${delta}% vs. Ø Woche`;
+    const durations = today
+      .map((k) => k.dauer_sek ?? 0)
+      .filter((s) => s > 0);
+    const avgDuration =
+      durations.length === 0
+        ? 0
+        : durations.reduce((a, b) => a + b, 0) / durations.length;
+    return {
+      todayCount: today.length,
+      todayAi,
+      todayEsc,
+      aiPct,
+      deltaLabel,
+      avgDuration,
+    };
+  }, [voiceCalls]);
+
+  const filteredCalls = useMemo(() => {
+    return voiceCalls.filter((c) => {
+      if (callFilter === "ai") return c.ai_handled && c.status !== "escalated";
+      if (callFilter === "escalated") return c.status === "escalated";
+      if (callFilter === "spam") return c.intent === "spam_robocall";
+      return true;
+    });
+  }, [voiceCalls, callFilter]);
 
   if (selected) {
     return (
@@ -249,20 +306,28 @@ const VoicePage = () => {
       {tab === "calls" && (
         <>
           <div className="grid sm:grid-cols-4 gap-4">
-            <Stat label="Anrufe heute" value="47" sub="+18% vs. Vortag" />
+            <Stat
+              label="Anrufe heute"
+              value={stats.todayCount.toString()}
+              sub={stats.deltaLabel}
+            />
             <Stat
               label="KI-gelöst"
-              value="38"
-              sub="81% Auto-Quote"
+              value={stats.todayAi.toString()}
+              sub={stats.todayCount === 0 ? "—" : `${stats.aiPct}% Auto-Quote`}
               accent="emerald"
             />
             <Stat
               label="Eskaliert"
-              value="9"
-              sub="An Anwalt weitergegeben"
+              value={stats.todayEsc.toString()}
+              sub={stats.todayEsc === 0 ? "Keine offen" : "An Anwalt weitergegeben"}
               accent="amber"
             />
-            <Stat label="Ø Dauer" value="3:24" sub="min:sek" />
+            <Stat
+              label="Ø Dauer"
+              value={formatDuration(stats.avgDuration)}
+              sub="min:sek"
+            />
           </div>
 
           <div className="flex justify-end">
@@ -285,12 +350,24 @@ const VoicePage = () => {
                 Anrufprotokoll
               </h3>
               <div className="flex gap-2">
-                {["Alle", "KI", "Eskaliert", "Spam"].map((f) => (
+                {(
+                  [
+                    { v: "all" as const, label: "Alle" },
+                    { v: "ai" as const, label: "KI" },
+                    { v: "escalated" as const, label: "Eskaliert" },
+                    { v: "spam" as const, label: "Spam" },
+                  ]
+                ).map((f) => (
                   <button
-                    key={f}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors first:bg-navy first:text-primary-foreground"
+                    key={f.v}
+                    onClick={() => setCallFilter(f.v)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                      callFilter === f.v
+                        ? "bg-navy text-primary-foreground"
+                        : "bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
+                    }`}
                   >
-                    {f}
+                    {f.label}
                   </button>
                 ))}
               </div>
@@ -315,7 +392,12 @@ const VoicePage = () => {
                   </p>
                 </div>
               )}
-              {voiceCalls.map((c) => {
+              {!isLoading && voiceCalls.length > 0 && filteredCalls.length === 0 && (
+                <div className="p-10 text-center text-xs text-muted-foreground">
+                  Keine Anrufe in diesem Filter.
+                </div>
+              )}
+              {filteredCalls.map((c) => {
                 const md = findMandant(c.mandant_id);
                 return (
                   <button
