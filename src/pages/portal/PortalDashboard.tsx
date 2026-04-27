@@ -8,7 +8,6 @@ import {
   Phone,
   Mail,
   CalendarClock,
-  Upload,
   ChevronRight,
   Cpu,
   LogOut,
@@ -33,6 +32,7 @@ import { useMandantAuth } from "@/contexts/MandantAuthContext";
 import type { AktenStufe } from "@/data/types";
 import { useStripeCheckout } from "@/lib/queries/use-stripe";
 import { useDocumentTitle } from "@/hooks/use-document-title";
+import PortalUploader from "@/components/portal/PortalUploader";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
@@ -304,22 +304,13 @@ const PortalDashboard = () => {
                 <h3 className="text-sm font-display font-bold text-foreground mb-4">
                   Dokument einreichen
                 </h3>
-                <div
-                  className="border-2 border-dashed border-accent/20 rounded-xl p-5 sm:p-6 text-center cursor-pointer hover:bg-accent/5 transition-colors"
-                  onClick={() => setTab("dokumente")}
-                >
-                  <Upload className="h-7 w-7 text-accent mx-auto mb-2" />
-                  <p className="text-xs text-muted-foreground">
-                    Klicken oder Datei hierher ziehen
-                  </p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-1">
-                    PDF · JPG · PNG · max 25 MB
-                  </p>
-                </div>
-                <div className="text-[10px] text-muted-foreground/70 mt-3 flex items-center gap-1.5">
-                  <ShieldCheck className="h-3 w-3" />
-                  Ende-zu-Ende-verschlüsselt
-                </div>
+                <PortalUploader
+                  tenantId={tenant.id}
+                  mandantId={mandant.id}
+                  akteId={aktiveAkte?.id}
+                  variant="compact"
+                  onUploaded={() => setTab("dokumente")}
+                />
               </section>
             </div>
 
@@ -495,16 +486,12 @@ const PortalDashboard = () => {
 
         {tab === "dokumente" && (
           <div>
-            <div
-              className="glass-card border-2 border-dashed border-accent/20 bg-accent/[0.02] p-10 text-center mb-6 cursor-pointer hover:bg-accent/[0.04] transition-colors"
-            >
-              <Upload className="h-10 w-10 text-accent mx-auto mb-3" />
-              <h3 className="text-sm font-display font-bold text-foreground mb-1">
-                Dokument hochladen
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Drag & Drop oder klicken · max 25 MB
-              </p>
+            <div className="mb-6">
+              <PortalUploader
+                tenantId={tenant.id}
+                mandantId={mandant.id}
+                akteId={aktiveAkte?.id}
+              />
             </div>
 
             <div className="space-y-2">
