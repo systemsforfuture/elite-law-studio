@@ -638,8 +638,19 @@ const Onboarding = () => {
                         gesendet. Öffnen Sie den Link auf demselben Gerät — Sie
                         werden direkt als Owner Ihrer Kanzlei eingeloggt.
                       </div>
-                      <div className="mt-3 text-xs text-primary-foreground/50">
-                        Welcome-Call in T+2h. Customer-Success-Lead meldet sich.
+                      <div className="mt-3 text-xs text-primary-foreground/60 space-y-1">
+                        <div className="flex gap-2 items-start">
+                          <span className="text-accent">1.</span>
+                          <span>Magic-Link aus Ihrer Inbox klicken</span>
+                        </div>
+                        <div className="flex gap-2 items-start">
+                          <span className="text-accent">2.</span>
+                          <span>Im Dashboard auf »Demo-Daten anlegen« klicken — sehen Sie 3 Beispiel-Mandanten + Akten + KI in Action</span>
+                        </div>
+                        <div className="flex gap-2 items-start">
+                          <span className="text-accent">3.</span>
+                          <span>Welcome-Call in T+2h. Customer-Success-Lead meldet sich</span>
+                        </div>
                       </div>
                     </div>
                   </div>
