@@ -26,6 +26,10 @@ import {
 import { useTenant } from "@/contexts/TenantContext";
 import { useRealtimeSubscriptions } from "@/lib/queries/use-realtime";
 import { useProviderHealth } from "@/lib/queries/use-provider-config";
+import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useUrlaubQuery } from "@/lib/queries/use-personal";
+import { isSameDay } from "@/lib/date-utils";
 import { CommandPalette, useCommandPalette } from "@/components/dashboard/CommandPalette";
 import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
@@ -39,7 +43,12 @@ interface NavGroup {
   items: { to: string; icon: typeof Phone; label: string; badge?: string | number }[];
 }
 
-const navGroups: NavGroup[] = [
+const buildNavGroups = (badges: {
+  voice: number;
+  inbox: number;
+  mahnwesen: number;
+  personal: number;
+}): NavGroup[] => [
   {
     label: "Übersicht",
     items: [{ to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" }],
@@ -47,8 +56,18 @@ const navGroups: NavGroup[] = [
   {
     label: "KI-Operations",
     items: [
-      { to: "/dashboard/voice", icon: Phone, label: "Voice-Agent", badge: "47" },
-      { to: "/dashboard/inbox", icon: Inbox, label: "Inbox", badge: "12" },
+      {
+        to: "/dashboard/voice",
+        icon: Phone,
+        label: "Voice-Agent",
+        badge: badges.voice > 0 ? badges.voice : undefined,
+      },
+      {
+        to: "/dashboard/inbox",
+        icon: Inbox,
+        label: "Inbox",
+        badge: badges.inbox > 0 ? badges.inbox : undefined,
+      },
       { to: "/dashboard/agenten", icon: BrainCircuit, label: "KI-Agenten" },
     ],
   },
@@ -59,14 +78,24 @@ const navGroups: NavGroup[] = [
       { to: "/dashboard/akten", icon: FolderOpen, label: "Akten" },
       { to: "/dashboard/termine", icon: CalendarDays, label: "Termine" },
       { to: "/dashboard/dokumente", icon: FileSearch, label: "Dokumente" },
-      { to: "/dashboard/mahnwesen", icon: Receipt, label: "Mahnwesen", badge: "3" },
+      {
+        to: "/dashboard/mahnwesen",
+        icon: Receipt,
+        label: "Mahnwesen",
+        badge: badges.mahnwesen > 0 ? badges.mahnwesen : undefined,
+      },
     ],
   },
   {
     label: "Team & Personal",
     items: [
       { to: "/dashboard/team", icon: UsersRound, label: "Team" },
-      { to: "/dashboard/personal", icon: Clock4, label: "Personal", badge: "2" },
+      {
+        to: "/dashboard/personal",
+        icon: Clock4,
+        label: "Personal",
+        badge: badges.personal > 0 ? badges.personal : undefined,
+      },
     ],
   },
   {
@@ -111,12 +140,33 @@ const DashboardLayout = () => {
   useRealtimeSubscriptions();
   const cmdk = useCommandPalette();
   const { data: providerHealth } = useProviderHealth();
+  const { data: konversationen = [] } = useKonversationenQuery();
+  const { data: rechnungen = [] } = useRechnungenQuery();
+  const { data: urlaube = [] } = useUrlaubQuery("pending");
   const integrationsReady = [
     providerHealth?.voice?.enabled && providerHealth?.voice?.status === "active",
     providerHealth?.email?.enabled && providerHealth?.email?.verification_status === "verified",
     providerHealth?.whatsapp?.enabled && providerHealth?.whatsapp?.verification_status === "verified",
     providerHealth?.stripe?.enabled && providerHealth?.stripe?.charges_enabled,
   ].filter(Boolean).length;
+
+  // Live-Sidebar-Badges aus echten Daten.
+  const voiceTodayCount = konversationen.filter(
+    (k) => k.kanal === "voice" && isSameDay(k.zeitpunkt),
+  ).length;
+  const inboxUnread = konversationen.filter(
+    (k) => k.ungelesen && (k.kanal === "email" || k.kanal === "whatsapp" || k.kanal === "sms"),
+  ).length;
+  const mahnwesenAktiv = rechnungen.filter(
+    (r) => r.mahnstufe > 0 && r.status !== "bezahlt",
+  ).length;
+  const personalPending = urlaube.length;
+  const navGroups = buildNavGroups({
+    voice: voiceTodayCount,
+    inbox: inboxUnread,
+    mahnwesen: mahnwesenAktiv,
+    personal: personalPending,
+  });
 
   return (
     <div className="min-h-screen bg-background flex">
