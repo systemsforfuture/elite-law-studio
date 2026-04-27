@@ -13,6 +13,7 @@ import {
 import { findMandant, mandantName, mandanten as allMandanten } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
 import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useSendMessage } from "@/lib/queries/use-send-message";
 import { useTenant } from "@/contexts/TenantContext";
 import { exportRechnungenDatev, downloadCsv } from "@/lib/datev-export";
 import MahnwesenAutopilot from "@/components/dashboard/MahnwesenAutopilot";
@@ -81,6 +82,7 @@ const MahnwesenPage = () => {
   const { tenant } = useTenant();
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
   const generateMahnung = useGenerateMahnung();
+  const sendMessage = useSendMessage();
   const [generatedText, setGeneratedText] = useState<string | null>(null);
 
   // Rechnungen die für die nächste Eskalations-Stufe fällig sind:
@@ -273,6 +275,39 @@ const MahnwesenPage = () => {
                                   }}
                                 >
                                   PDF Download
+                                </Button>
+                                <Button
+                                  variant="gold"
+                                  size="sm"
+                                  className="rounded-lg"
+                                  onClick={async () => {
+                                    const md = findMandant(selected.mandant_id);
+                                    if (!md?.email) {
+                                      toast.error("Mandant hat keine Email-Adresse");
+                                      return;
+                                    }
+                                    const t = toast.loading("Wird per E-Mail versendet…");
+                                    try {
+                                      await sendMessage.mutateAsync({
+                                        channel: "email",
+                                        to: md.email,
+                                        mandant_id: md.id,
+                                        subject: `Mahnung Stufe ${aktStufe + 1} · Rechnung ${selected.rechnungsnummer}`,
+                                        text: generatedText,
+                                      });
+                                      toast.success("Mahnung versendet", {
+                                        id: t,
+                                        description: `An ${md.email}`,
+                                      });
+                                    } catch (err) {
+                                      toast.error("Versand fehlgeschlagen", {
+                                        id: t,
+                                        description: err instanceof Error ? err.message : "Unbekannt",
+                                      });
+                                    }
+                                  }}
+                                >
+                                  Per E-Mail senden
                                 </Button>
                               </>
                             )}
