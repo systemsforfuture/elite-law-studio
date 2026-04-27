@@ -697,8 +697,22 @@ const Onboarding = () => {
             <span className="hidden sm:inline">Zurück</span>
           </Button>
 
-          <div className="text-xs text-primary-foreground/40 hidden sm:block">
-            Schritt {step + 1} von {steps.length}
+          <div className="hidden sm:flex items-center gap-2">
+            {steps.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i < step
+                    ? "w-6 bg-emerald-500/70"
+                    : i === step
+                    ? "w-10 bg-accent"
+                    : "w-6 bg-primary-foreground/15"
+                }`}
+              />
+            ))}
+            <span className="text-xs text-primary-foreground/40 ml-2 tabular-nums">
+              {step + 1} / {steps.length}
+            </span>
           </div>
 
           {step < steps.length - 1 ? (
