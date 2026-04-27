@@ -11,6 +11,8 @@ import {
   Phone,
   Loader2,
   RefreshCw,
+  Search,
+  X,
 } from "lucide-react";
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
@@ -23,8 +25,19 @@ import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
 
 type Filter = "all" | "email" | "whatsapp" | "escalated" | "ai";
 
+const isSameDay = (iso: string) => {
+  const d = new Date(iso);
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
+};
+
 const InboxPage = () => {
   const [filter, setFilter] = useState<Filter>("all");
+  const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Konversation | null>(null);
   const [reply, setReply] = useState("");
   const [triage, setTriage] = useState<TriageResult | null>(null);
@@ -110,8 +123,45 @@ const InboxPage = () => {
         if (filter === "ai") return k.ai_handled;
         return true;
       })
+      .filter((k) => {
+        if (!query.trim()) return true;
+        const q = query.trim().toLowerCase();
+        const md = findMandant(k.mandant_id);
+        const haystacks = [
+          md ? mandantName(md) : "",
+          md?.email ?? "",
+          k.betreff ?? "",
+          k.preview ?? "",
+        ];
+        return haystacks.some((h) => h.toLowerCase().includes(q));
+      })
       .sort((a, b) => b.zeitpunkt.localeCompare(a.zeitpunkt));
-  }, [filter, konversationen]);
+  }, [filter, konversationen, query]);
+
+  const stats = useMemo(() => {
+    const visible = konversationen.filter(
+      (k) => k.kanal === "email" || k.kanal === "whatsapp" || k.kanal === "sms",
+    );
+    const today = visible.filter((k) => isSameDay(k.zeitpunkt));
+    const todayAi = today.filter((k) => k.ai_handled).length;
+    const whatsapp = visible.filter((k) => k.kanal === "whatsapp");
+    const whatsappAi = whatsapp.filter((k) => k.ai_handled).length;
+    const whatsappEsc = whatsapp.filter((k) => k.status === "escalated").length;
+    const email = visible.filter((k) => k.kanal === "email");
+    const emailAi = email.filter((k) => k.ai_handled).length;
+    const emailAiPct = email.length === 0 ? 0 : Math.round((emailAi / email.length) * 100);
+    const escalated = visible.filter((k) => k.status === "escalated");
+    return {
+      todayCount: today.length,
+      todayAi,
+      whatsappCount: whatsapp.length,
+      whatsappAi,
+      whatsappEsc,
+      emailCount: email.length,
+      emailAiPct,
+      escalatedCount: escalated.length,
+    };
+  }, [konversationen]);
 
   if (selected) {
     const md = findMandant(selected.mandant_id);
@@ -356,21 +406,55 @@ const InboxPage = () => {
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-4 gap-4">
-        <Stat label="Heute eingegangen" value="142" sub="119 von KI gelöst" />
+        <Stat
+          label="Heute eingegangen"
+          value={stats.todayCount.toString()}
+          sub={`${stats.todayAi} von KI gelöst`}
+        />
         <Stat
           label="WhatsApp"
-          value="28"
-          sub="22 KI · 6 eskaliert"
+          value={stats.whatsappCount.toString()}
+          sub={`${stats.whatsappAi} KI · ${stats.whatsappEsc} eskaliert`}
           accent="green"
         />
-        <Stat label="Email" value="142" sub="84% Auto-Antwort" accent="sky" />
-        <Stat label="Eskaliert offen" value="12" sub="Sie · Sarah · Julia" accent="amber" />
+        <Stat
+          label="Email"
+          value={stats.emailCount.toString()}
+          sub={`${stats.emailAiPct}% Auto-Antwort`}
+          accent="sky"
+        />
+        <Stat
+          label="Eskaliert offen"
+          value={stats.escalatedCount.toString()}
+          sub={stats.escalatedCount === 0 ? "Alle bearbeitet" : "Anwalt-Antwort erforderlich"}
+          accent="amber"
+        />
       </div>
 
       <div className="glass-card border-border/50 overflow-hidden">
         <div className="p-5 border-b border-border/50 flex items-center justify-between flex-wrap gap-3">
           <h3 className="font-display font-bold text-foreground">Inbox</h3>
-          <div className="flex gap-2 items-center flex-wrap">
+          <div className="flex gap-2 items-center flex-wrap flex-1 justify-end">
+            <div className="relative flex-1 sm:max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Mandant, Betreff, Inhalt…"
+                className="w-full h-9 pl-9 pr-9 rounded-lg border border-border/50 bg-background/60 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-accent/40"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label="Suche löschen"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
             <Filter className="h-4 w-4 text-muted-foreground" />
             {(
               [
