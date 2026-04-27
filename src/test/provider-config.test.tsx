@@ -53,3 +53,22 @@ describe("useProviderHealth", () => {
     expect(h.stripe.charges_enabled).toBe(false);
   });
 });
+
+describe("Domain-Format-Normalize (Email-Wizard)", () => {
+  // Spiegel die Logik in EmailCard.handleSetup
+  const normalize = (s: string) =>
+    s.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+
+  it("entfernt https://-Prefix", () => {
+    expect(normalize("https://deine-kanzlei.de")).toBe("deine-kanzlei.de");
+    expect(normalize("HTTP://Foo.de/")).toBe("foo.de");
+  });
+
+  it("entfernt Trailing-Path", () => {
+    expect(normalize("kanzlei.de/path?q=1")).toBe("kanzlei.de");
+  });
+
+  it("akzeptiert sauberen Input", () => {
+    expect(normalize("deine-kanzlei.de")).toBe("deine-kanzlei.de");
+  });
+});

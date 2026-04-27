@@ -475,10 +475,19 @@ const EmailCard = ({ config }: { config: EmailIntegration }) => {
   const [open, setOpen] = useState(!config.custom_domain);
 
   const handleSetup = async () => {
-    const trimmedDomain = domain.trim().toLowerCase();
+    const trimmedDomain = domain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
     if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(trimmedDomain)) {
-      toast.error("Ungültige Domain", { description: "z.B. deine-kanzlei.de" });
+      toast.error("Ungültige Domain", { description: "z.B. deine-kanzlei.de — ohne https:// und ohne Pfade" });
       return;
+    }
+    if (fromEmail.trim()) {
+      const fromDomain = fromEmail.trim().split("@")[1] ?? "";
+      if (fromDomain && fromDomain.toLowerCase() !== trimmedDomain) {
+        toast.error("Absender-Domain stimmt nicht", {
+          description: `Absender muss auf @${trimmedDomain} enden, ist aber @${fromDomain}.`,
+        });
+        return;
+      }
     }
     const t = toast.loading("Domain wird angelegt…");
     try {
