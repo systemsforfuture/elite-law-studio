@@ -212,12 +212,20 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
   };
 
   const handleProvision = async () => {
+    // Vorwahl-Validation: 2-5 Ziffern, optional führende 0
+    const trimmedArea = areaCode.trim().replace(/^0+/, "");
+    if (!/^\d{2,5}$/.test(trimmedArea)) {
+      toast.error("Vorwahl ungültig", {
+        description: "z.B. 030 (Berlin), 040 (Hamburg), 089 (München)",
+      });
+      return;
+    }
     const t = toast.loading("KI-Telefonnummer wird angelegt…", {
       description: "Das dauert bis zu 30 Sekunden.",
     });
     try {
       const res = await provision.mutateAsync({
-        area_code: areaCode,
+        area_code: trimmedArea,
         greeting: greeting || undefined,
       });
       if (res.ok) {
