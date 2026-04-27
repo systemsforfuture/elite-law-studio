@@ -258,23 +258,43 @@ const DashboardLayout = () => {
               <Search className="h-4 w-4" />
             </button>
             {integrationsReady === 4 ? (
-              <div
-                className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground bg-emerald-500/10 border border-emerald-500/20"
-                role="status"
-                aria-label="Plattform-Status"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Alle KI-Agenten live
-              </div>
+              <>
+                <div
+                  className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground bg-emerald-500/10 border border-emerald-500/20"
+                  role="status"
+                  aria-label="Plattform-Status"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Alle KI-Agenten live
+                </div>
+                {/* Mobile: nur Punkt */}
+                <span
+                  className="xl:hidden w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
+                  aria-label="Plattform live"
+                  title="Alle KI-Agenten live"
+                />
+              </>
             ) : (
-              <Link
-                to="/dashboard/integrationen"
-                className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-amber-700 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/15 transition-colors"
-                aria-label="Setup unvollständig"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                Setup {integrationsReady}/4
-              </Link>
+              <>
+                <Link
+                  to="/dashboard/integrationen"
+                  className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-amber-700 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/15 transition-colors"
+                  aria-label="Setup unvollständig"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  Setup {integrationsReady}/4
+                </Link>
+                {/* Mobile: kompakte Pille */}
+                <Link
+                  to="/dashboard/integrationen"
+                  className="xl:hidden inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-semibold text-amber-700 bg-amber-500/10 border border-amber-500/20"
+                  aria-label="Setup unvollständig"
+                  title="Plattform-Setup unvollständig"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                  {integrationsReady}/4
+                </Link>
+              </>
             )}
             <ThemeToggle />
             <NotificationsDropdown />
