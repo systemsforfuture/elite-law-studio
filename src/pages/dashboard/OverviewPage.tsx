@@ -24,6 +24,11 @@ import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { useTermineQuery } from "@/lib/queries/use-termine";
 import { useAktenQuery } from "@/lib/queries/use-akten";
+import { useMandantenQuery } from "@/lib/queries/use-mandanten";
+import { useSeedDemoData } from "@/lib/queries/use-seed-demo";
+import { Button } from "@/components/ui/button";
+import { Database, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const OverviewPage = () => {
   const { tenant } = useTenant();
@@ -31,6 +36,39 @@ const OverviewPage = () => {
   const { data: rechnungen = [] } = useRechnungenQuery();
   const { data: termine = [] } = useTermineQuery();
   const { data: akten = [] } = useAktenQuery();
+  const { data: mandanten = [] } = useMandantenQuery();
+  const seed = useSeedDemoData();
+
+  const handleSeed = async () => {
+    const t = toast.loading("Demo-Daten werden angelegt …");
+    try {
+      const res = await seed.mutateAsync();
+      if (res.skipped) {
+        toast.info("Demo-Daten übersprungen", {
+          id: t,
+          description: res.reason ?? "Tenant hat bereits Daten.",
+        });
+      } else {
+        const s = res.seeded;
+        toast.success("Demo-Daten angelegt", {
+          id: t,
+          description: s
+            ? `${s.mandanten} Mandanten · ${s.akten} Akten · ${s.termine} Termine · ${s.rechnungen} Rechnungen`
+            : "Tenant ist startklar.",
+        });
+      }
+    } catch (e) {
+      toast.error("Anlegen fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : "Unbekannt",
+      });
+    }
+  };
+
+  const isEmptyTenant =
+    mandanten.length === 0 &&
+    akten.length === 0 &&
+    rechnungen.length === 0;
 
   const aiHandled24h = kiAgents.reduce(
     (sum, a) => sum + a.letzte_24h.resolved,
@@ -60,6 +98,37 @@ const OverviewPage = () => {
 
   return (
     <div className="space-y-8">
+      {isEmptyTenant && (
+        <div className="glass-card p-5 sm:p-6 border-accent/30 bg-accent/[0.04]">
+          <div className="flex items-start gap-4 flex-wrap">
+            <div className="w-12 h-12 rounded-2xl bg-accent/15 flex items-center justify-center shrink-0">
+              <Database className="h-5 w-5 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-base font-display font-bold text-foreground mb-1">
+                Willkommen — leerer Schreibtisch
+              </h3>
+              <p className="text-sm text-muted-foreground mb-3">
+                Lege mit einem Klick 3 Beispiel-Mandanten + Akten + Termine + Rechnungen an, um die Plattform live zu erleben. Alles voll bearbeitbar und DSGVO-konform mit Demo-Daten gekennzeichnet.
+              </p>
+              <Button variant="gold" size="sm" onClick={handleSeed} disabled={seed.isPending}>
+                {seed.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                    Anlegen …
+                  </>
+                ) : (
+                  <>
+                    <Database className="mr-2 h-3.5 w-3.5" />
+                    Demo-Daten anlegen
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">

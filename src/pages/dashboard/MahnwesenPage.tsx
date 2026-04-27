@@ -8,11 +8,14 @@ import {
   CheckCircle2,
   ArrowLeft,
   TrendingUp,
+  Download,
 } from "lucide-react";
-import { findMandant, mandantName } from "@/data/mockData";
+import { findMandant, mandantName, mandanten as allMandanten } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
 import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { useTenant } from "@/contexts/TenantContext";
+import { exportRechnungenDatev, downloadCsv } from "@/lib/datev-export";
+import MahnwesenAutopilot from "@/components/dashboard/MahnwesenAutopilot";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,11 +76,21 @@ const eskalationsStufen = [
 
 const MahnwesenPage = () => {
   const [selected, setSelected] = useState<Rechnung | null>(null);
+  const [autopilotOpen, setAutopilotOpen] = useState(false);
   const { data: rechnungen = [], isLoading } = useRechnungenQuery();
   const { tenant } = useTenant();
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
   const generateMahnung = useGenerateMahnung();
   const [generatedText, setGeneratedText] = useState<string | null>(null);
+
+  // Rechnungen die für die nächste Eskalations-Stufe fällig sind:
+  // - nicht bezahlt
+  // - Fälligkeit überschritten
+  // - aktuelle Stufe < 3 (Stufe 4 = gerichtlich, kein Auto-Pilot)
+  const heuteIso = new Date().toISOString().slice(0, 10);
+  const autopilotKandidaten = offen.filter(
+    (r) => r.faelligkeit < heuteIso && r.mahnstufe < 3,
+  );
 
   const handleGenerate = async (id: string) => {
     const t = toast.loading("SYSTEMS-Mahnwesen-KI formuliert…", {
@@ -307,20 +320,62 @@ const MahnwesenPage = () => {
       </div>
 
       <div className="glass-card p-5 border-accent/20 bg-accent/[0.04]">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="h-4 w-4 text-accent" />
-          <h3 className="text-sm font-display font-bold text-foreground">
-            Mahnungs-Eskalator schlägt vor
-          </h3>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Sparkles className="h-4 w-4 text-accent" />
+              <h3 className="text-sm font-display font-bold text-foreground">
+                Mahnungs-Eskalator schlägt vor
+              </h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">
+              {autopilotKandidaten.length === 0
+                ? "Keine Rechnungen zur Eskalation fällig — alles im grünen Bereich."
+                : `${autopilotKandidaten.length} Rechnung${autopilotKandidaten.length === 1 ? " ist" : "en sind"} überfällig für die nächste Eskalations-Stufe.`}
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                variant="gold"
+                size="sm"
+                className="rounded-xl"
+                onClick={() => setAutopilotOpen(true)}
+                disabled={autopilotKandidaten.length === 0}
+              >
+                <TrendingUp className="mr-2 h-3.5 w-3.5" />
+                {autopilotKandidaten.length === 0
+                  ? "Auto-Pilot bereit"
+                  : `Auto-Pilot starten (${autopilotKandidaten.length})`}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl"
+                onClick={() => {
+                  if (rechnungen.length === 0) {
+                    toast.info("Keine Rechnungen zum Exportieren");
+                    return;
+                  }
+                  const csv = exportRechnungenDatev(rechnungen, allMandanten);
+                  const today = new Date().toISOString().slice(0, 10);
+                  downloadCsv(csv, `DATEV-Rechnungen_${today}.csv`);
+                  toast.success(`${rechnungen.length} Rechnungen exportiert`, {
+                    description: "DATEV-Buchungsstapel · UTF-8 + BOM",
+                  });
+                }}
+              >
+                <Download className="mr-2 h-3.5 w-3.5" />
+                DATEV-Export
+              </Button>
+            </div>
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground mb-4">
-          3 Rechnungen sind heute fällig für die nächste Eskalations-Stufe.
-        </p>
-        <Button variant="gold" size="sm" className="rounded-xl">
-          <TrendingUp className="mr-2 h-3.5 w-3.5" />
-          Alle 3 Vorschläge prüfen
-        </Button>
       </div>
+
+      <MahnwesenAutopilot
+        open={autopilotOpen}
+        onOpenChange={setAutopilotOpen}
+        rechnungen={autopilotKandidaten}
+      />
 
       {!isLoading && rechnungen.length === 0 ? (
         <EmptyState

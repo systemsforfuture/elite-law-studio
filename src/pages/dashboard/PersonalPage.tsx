@@ -10,9 +10,9 @@ import {
   XCircle,
   TimerReset,
   TrendingUp,
-  Users,
   AlertTriangle,
   Sparkles,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTeamQuery } from "@/lib/queries/use-team";
@@ -25,8 +25,9 @@ import {
   useUpdateUrlaubStatus,
 } from "@/lib/queries/use-personal";
 import type { UrlaubArt, UrlaubStatus, ZeiterfassungArt } from "@/data/types";
-import { findUser } from "@/data/mockData";
+import { findUser, mandanten as allMandanten } from "@/data/mockData";
 import { countWerktage, diffMinutes, formatHours } from "@/lib/personal-utils";
+import { exportZeiterfassungCsv, downloadCsv } from "@/lib/datev-export";
 import { toast } from "sonner";
 
 const eur = (n: number) =>
@@ -117,7 +118,25 @@ const PersonalPage = () => {
             Zeiterfassung, Urlaub & Abwesenheit für {team.length} Mitarbeiter.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (zeiten.length === 0) {
+                toast.info("Keine Zeit-Einträge zum Exportieren");
+                return;
+              }
+              const csv = exportZeiterfassungCsv(zeiten, team, allMandanten);
+              const today = new Date().toISOString().slice(0, 10);
+              downloadCsv(csv, `Zeiterfassung_${today}.csv`);
+              toast.success(`${zeiten.length} Einträge exportiert`, {
+                description: "RVG-Stundenabrechnung · UTF-8 + BOM",
+              });
+            }}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            CSV-Export
+          </Button>
           <Button variant="outline" onClick={() => setUrlaubDialog(true)}>
             <Plane className="h-4 w-4 mr-2" />
             Urlaub beantragen

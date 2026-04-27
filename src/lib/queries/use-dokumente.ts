@@ -31,6 +31,7 @@ interface UploadInput {
   file: File;
   mandant_id?: string;
   akte_id?: string;
+  uploaded_by?: "anwalt" | "mandant";
 }
 
 export const useUploadDokument = () => {
@@ -41,10 +42,27 @@ export const useUploadDokument = () => {
       file,
       mandant_id,
       akte_id,
+      uploaded_by = "anwalt",
     }: UploadInput): Promise<Dokument | null> => {
       if (shouldMock()) {
         console.info("[dokumente] mock upload:", file.name);
-        return null;
+        // Im Mock-Mode: simulierte 800ms-Latenz, dann fake-Dokument anhängen
+        await new Promise((r) => setTimeout(r, 800));
+        const fake: Dokument = {
+          id: `dok_${Date.now()}`,
+          tenant_id,
+          mandant_id,
+          akte_id,
+          dateiname: file.name,
+          storage_path: `_mock/${file.name}`,
+          mime_type: file.type,
+          groesse_bytes: file.size,
+          status: "neu",
+          uploaded_by,
+          uploaded_at: new Date().toISOString(),
+        } as Dokument;
+        mockDokumente.unshift(fake);
+        return fake;
       }
       const path = `tenants/${tenant_id}/${akte_id ?? "_global"}/${Date.now()}_${file.name}`;
       const { error: upErr } = await supabase!.storage
@@ -63,7 +81,7 @@ export const useUploadDokument = () => {
           mime_type: file.type,
           groesse_bytes: file.size,
           status: "neu",
-          uploaded_by: "anwalt",
+          uploaded_by,
         })
         .select()
         .single();
