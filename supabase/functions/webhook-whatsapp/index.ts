@@ -77,7 +77,10 @@ Deno.serve(async (req: Request) => {
             .maybeSingle();
           tenant_id = t?.id ?? null;
         }
-        if (!tenant_id) tenant_id = "11111111-1111-1111-1111-111111111111";
+        if (!tenant_id) {
+          console.warn("[webhook-whatsapp] Tenant nicht resolvable für phone=", tenantPhone);
+          continue;
+        }
 
         for (const msg of value.messages) {
           const from = normalizePhone(msg.from);

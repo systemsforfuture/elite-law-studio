@@ -45,10 +45,17 @@ const NewMandantDialog = ({ open, onOpenChange }: Props) => {
     setTyp("privat");
   };
 
+  const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+  const isValidPhone = (s: string) => !s.trim() || /^[+\d\s/()-]{6,}$/.test(s.trim());
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email.trim()) {
-      toast.error("E-Mail ist erforderlich");
+    if (!form.email.trim() || !isValidEmail(form.email.trim())) {
+      toast.error("Bitte gültige E-Mail-Adresse eingeben");
+      return;
+    }
+    if (!isValidPhone(form.telefon)) {
+      toast.error("Telefonnummer hat ein ungültiges Format");
       return;
     }
     if (typ === "privat" && !form.nachname.trim()) {
@@ -65,16 +72,17 @@ const NewMandantDialog = ({ open, onOpenChange }: Props) => {
       await createMandant.mutateAsync({
         tenant_id: tenant.id,
         typ,
-        vorname: typ === "privat" ? form.vorname || undefined : undefined,
-        nachname: typ === "privat" ? form.nachname : undefined,
-        firmenname: typ === "unternehmen" ? form.firmenname : undefined,
-        email: form.email,
-        telefon: form.telefon,
-        rechtsgebiet: form.rechtsgebiet || undefined,
-        notes_preview: form.beschreibung || undefined,
+        vorname: typ === "privat" ? form.vorname.trim() || undefined : undefined,
+        nachname: typ === "privat" ? form.nachname.trim() : undefined,
+        firmenname: typ === "unternehmen" ? form.firmenname.trim() : undefined,
+        email: form.email.trim(),
+        telefon: form.telefon.trim(),
+        rechtsgebiet: form.rechtsgebiet.trim() || undefined,
+        notes_preview: form.beschreibung.trim() || undefined,
         status: "aktiv",
         herkunft: "web",
-        last_contact: new Date().toISOString(),
+        // last_contact NICHT setzen — DB-Default greift, sonst überschreiben wir
+        // potential RLS-relevante Audit-Daten.
       });
       toast.success("Mandant angelegt", { id: t });
       reset();

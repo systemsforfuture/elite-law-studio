@@ -122,8 +122,17 @@ Deno.serve(async (req: Request) => {
     });
 
     if (invErr) {
-      // Rollback wäre clean, aber für MVP: nur loggen
-      console.error("[create-tenant] Einladung fehlgeschlagen:", invErr);
+      // Rollback: ohne Owner-Invite ist der Tenant orphaned (niemand kann sich
+      // jemals als Owner einloggen). Lieber löschen + Fehler zurück.
+      console.error("[create-tenant] Invitation fehlgeschlagen — rolle Tenant zurück:", invErr);
+      await admin.from("tenants").delete().eq("id", tenant.id);
+      return new Response(
+        JSON.stringify({
+          error: "Invitation konnte nicht angelegt werden. Tenant wurde rückgängig gemacht.",
+          details: invErr.message,
+        }),
+        { status: 500, headers: { ...corsHeaders, "content-type": "application/json" } },
+      );
     }
 
     return new Response(

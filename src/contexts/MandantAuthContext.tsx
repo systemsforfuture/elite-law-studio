@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -24,6 +25,10 @@ export const MandantAuthProvider = ({ children }: { children: ReactNode }) => {
   const [mandant, setMandant] = useState<Mandant | null>(null);
   const [loading, setLoading] = useState(false);
   const [isDemoMode, setDemoMode] = useState(false);
+  // Track whether bootstrap was already attempted for this auth-user-id.
+  // Prevents the RPC-loop where every onAuthStateChange (incl. token-refresh + tab-focus)
+  // triggers another bootstrap call.
+  const bootstrappedFor = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
@@ -34,28 +39,52 @@ export const MandantAuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     let active = true;
-    setLoading(true);
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!active) return;
-      if (!data.session?.user) {
-        setLoading(false);
-        return;
-      }
-      // Bootstrap Mandant
-      const { data: m } = await supabase!.rpc("bootstrap_mandant_self");
-      if (active) {
-        setMandant((m as unknown as Mandant) ?? null);
-        setLoading(false);
-      }
-    });
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_evt, sess) => {
+    const tryBootstrap = async (userId: string) => {
+      if (bootstrappedFor.current === userId) return;
+      bootstrappedFor.current = userId;
+      // Wenn der User auch ein Kanzlei-Mitarbeiter ist, würde bootstrap_mandant_self
+      // einen Fehler werfen. Den fangen wir und ignorieren ihn — der User ist dann
+      // einfach kein Mandant.
+      const { data: m, error } = await supabase!.rpc("bootstrap_mandant_self");
+      if (!active) return;
+      if (error) {
+        // 1× pro Session loggen, dann ruhig sein
+        console.info("[mandant-auth] kein Mandant (User ist Kanzlei-Mitarbeiter):", error.message);
+        setMandant(null);
+      } else {
+        setMandant((m as unknown as Mandant) ?? null);
+      }
+      setLoading(false);
+    };
+
+    setLoading(true);
+    supabase.auth
+      .getSession()
+      .then(async ({ data }) => {
+        if (!active) return;
+        if (!data.session?.user) {
+          setLoading(false);
+          return;
+        }
+        await tryBootstrap(data.session.user.id);
+      })
+      .catch((e) => {
+        console.warn("[mandant-auth] getSession failed:", e);
+        if (active) setLoading(false);
+      });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, sess) => {
+      if (!active) return;
       if (!sess?.user) {
         setMandant(null);
+        bootstrappedFor.current = null;
         return;
       }
-      const { data: m } = await supabase!.rpc("bootstrap_mandant_self");
-      setMandant((m as unknown as Mandant) ?? null);
+      // Nur bei tatsächlich neuem User bootstrappen, nicht bei Token-Refresh
+      if (bootstrappedFor.current !== sess.user.id) {
+        void tryBootstrap(sess.user.id);
+      }
     });
 
     return () => {
@@ -85,6 +114,7 @@ export const MandantAuthProvider = ({ children }: { children: ReactNode }) => {
       signOut: async () => {
         if (supabase) await supabase.auth.signOut();
         setMandant(null);
+        bootstrappedFor.current = null;
       },
     }),
     [mandant, loading, isDemoMode],

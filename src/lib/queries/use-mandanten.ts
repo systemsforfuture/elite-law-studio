@@ -55,7 +55,10 @@ export const useCreateMandant = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (
-      input: Omit<Mandant, "id" | "created_at" | "tenant_id"> & { tenant_id?: string },
+      input: Omit<Mandant, "id" | "created_at" | "tenant_id" | "last_contact"> & {
+        tenant_id?: string;
+        last_contact?: string;
+      },
     ): Promise<Mandant> => {
       if (shouldMock()) {
         // No-op in mock mode
@@ -64,6 +67,7 @@ export const useCreateMandant = () => {
           id: `mock_${Date.now()}`,
           created_at: new Date().toISOString(),
           tenant_id: input.tenant_id ?? "tnt_mock",
+          last_contact: input.last_contact ?? new Date().toISOString(),
         };
         return fake;
       }

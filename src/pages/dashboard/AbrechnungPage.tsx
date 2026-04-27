@@ -40,7 +40,7 @@ const AbrechnungPage = () => {
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
             <Mini label="Monatlich" value={`${tier.monthly}€`} />
-            <Mini label="Mandanten" value={tenant.mandanten_count.toLocaleString("de-DE")} />
+            <Mini label="Mandanten" value={(tenant.mandanten_count ?? 0).toLocaleString("de-DE")} />
             <Mini label="MRR" value={`${tier.monthly}€`} accent="emerald" />
           </div>
         </div>

@@ -85,8 +85,10 @@ Deno.serve(async (req: Request) => {
         headers: { ...corsHeaders, "content-type": "application/json" },
       });
     }
-    if (!["owner", "anwalt", "mitarbeiter"].includes(ctx.role)) {
-      return new Response(JSON.stringify({ error: "Keine Berechtigung" }), {
+    // Massen-Import nur durch Owner oder Anwalt — eine Sekretärin sollte nicht
+    // ohne Approval beliebige Mandanten-Daten ins System bringen können.
+    if (!["owner", "anwalt"].includes(ctx.role)) {
+      return new Response(JSON.stringify({ error: "Nur Owner/Anwalt darf Daten importieren" }), {
         status: 403,
         headers: { ...corsHeaders, "content-type": "application/json" },
       });

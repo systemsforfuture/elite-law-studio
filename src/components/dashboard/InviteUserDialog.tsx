@@ -31,15 +31,21 @@ const InviteUserDialog = ({ open, onOpenChange }: Props) => {
   const [name, setName] = useState("");
   const [role, setRole] = useState<User["role"]>("anwalt");
 
+  const isValidEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !name.trim()) {
-      toast.error("Name und E-Mail erforderlich");
+    if (!name.trim()) {
+      toast.error("Name erforderlich");
+      return;
+    }
+    if (!email.trim() || !isValidEmail(email.trim())) {
+      toast.error("Bitte gültige E-Mail-Adresse eingeben");
       return;
     }
     const t = toast.loading("Einladung wird verschickt…");
     try {
-      await invite.mutateAsync({ email, name, role });
+      await invite.mutateAsync({ email: email.trim(), name: name.trim(), role });
       toast.success("Einladung verschickt", {
         id: t,
         description: `${name} wurde eingeladen. Magic-Link kommt per E-Mail.`,

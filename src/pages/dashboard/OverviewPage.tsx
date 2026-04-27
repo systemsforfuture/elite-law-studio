@@ -171,7 +171,7 @@ const OverviewPage = () => {
         <Kpi
           icon={Users}
           label="Aktive Mandanten"
-          value={tenant.mandanten_count.toLocaleString("de-DE")}
+          value={(tenant.mandanten_count ?? mandanten.length).toLocaleString("de-DE")}
           delta="+12 / Mo"
           trend="up"
           link="/dashboard/mandanten"
