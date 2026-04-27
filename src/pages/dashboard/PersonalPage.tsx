@@ -26,6 +26,7 @@ import {
 } from "@/lib/queries/use-personal";
 import type { UrlaubArt, UrlaubStatus, ZeiterfassungArt } from "@/data/types";
 import { findUser } from "@/data/mockData";
+import { countWerktage, diffMinutes, formatHours } from "@/lib/personal-utils";
 import { toast } from "sonner";
 
 const eur = (n: number) =>
@@ -34,12 +35,6 @@ const eur = (n: number) =>
     currency: "EUR",
     maximumFractionDigits: 0,
   });
-
-const formatHours = (min: number) => {
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return `${h}:${m.toString().padStart(2, "0")} h`;
-};
 
 const artLabel: Record<ZeiterfassungArt, { label: string; cls: string }> = {
   billable: { label: "Mandantenarbeit", cls: "bg-emerald-500/15 text-emerald-700" },
@@ -481,11 +476,7 @@ const ZeitDialog = ({
   const [beschreibung, setBeschreibung] = useState("");
   const [tarif, setTarif] = useState("280");
 
-  const dauerMin = useMemo(() => {
-    const [sh, sm] = start.split(":").map(Number);
-    const [eh, em] = ende.split(":").map(Number);
-    return Math.max(0, eh * 60 + em - (sh * 60 + sm));
-  }, [start, ende]);
+  const dauerMin = useMemo(() => diffMinutes(start, ende), [start, ende]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -614,19 +605,7 @@ const UrlaubDialog = ({
   const [art, setArt] = useState<UrlaubArt>("urlaub");
   const [kommentar, setKommentar] = useState("");
 
-  const tage = useMemo(() => {
-    const v = new Date(von);
-    const b = new Date(bis);
-    if (b < v) return 0;
-    let count = 0;
-    const cur = new Date(v);
-    while (cur <= b) {
-      const d = cur.getDay();
-      if (d !== 0 && d !== 6) count++;
-      cur.setDate(cur.getDate() + 1);
-    }
-    return count;
-  }, [von, bis]);
+  const tage = useMemo(() => countWerktage(von, bis), [von, bis]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
