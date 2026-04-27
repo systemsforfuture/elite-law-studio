@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useRealtimeSubscriptions } from "@/lib/queries/use-realtime";
+import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { CommandPalette, useCommandPalette } from "@/components/dashboard/CommandPalette";
 import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
@@ -109,6 +110,13 @@ const DashboardLayout = () => {
   useDocumentTitle(`${title} · ${tenant.kanzlei_name}`);
   useRealtimeSubscriptions();
   const cmdk = useCommandPalette();
+  const { data: providerHealth } = useProviderHealth();
+  const integrationsReady = [
+    providerHealth?.voice?.enabled && providerHealth?.voice?.status === "active",
+    providerHealth?.email?.enabled && providerHealth?.email?.verification_status === "verified",
+    providerHealth?.whatsapp?.enabled && providerHealth?.whatsapp?.verification_status === "verified",
+    providerHealth?.stripe?.enabled && providerHealth?.stripe?.charges_enabled,
+  ].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -249,14 +257,25 @@ const DashboardLayout = () => {
             >
               <Search className="h-4 w-4" />
             </button>
-            <div
-              className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground bg-muted/30 border border-border/50"
-              role="status"
-              aria-label="KI-Agenten Status"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Alle KI-Agenten aktiv
-            </div>
+            {integrationsReady === 4 ? (
+              <div
+                className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-muted-foreground bg-emerald-500/10 border border-emerald-500/20"
+                role="status"
+                aria-label="Plattform-Status"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Alle KI-Agenten live
+              </div>
+            ) : (
+              <Link
+                to="/dashboard/integrationen"
+                className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs text-amber-700 bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/15 transition-colors"
+                aria-label="Setup unvollständig"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                Setup {integrationsReady}/4
+              </Link>
+            )}
             <ThemeToggle />
             <NotificationsDropdown />
             <ProfileMenu />
