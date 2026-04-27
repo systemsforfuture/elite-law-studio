@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Clock,
   CalendarRange,
@@ -721,32 +721,42 @@ const Dialog = ({
   title: string;
   onClose: () => void;
   children: React.ReactNode;
-}) => (
-  <div
-    className="fixed inset-0 z-50 bg-navy-dark/60 backdrop-blur-sm flex items-center justify-center p-4"
-    onClick={onClose}
-  >
+}) => {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={title}
-      className="bg-background rounded-2xl shadow-2xl border border-border/50 max-w-md w-full p-6"
-      onClick={(e) => e.stopPropagation()}
+      className="fixed inset-0 z-50 bg-navy-dark/60 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
     >
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-lg font-display font-bold text-foreground">{title}</h3>
-        <button
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground"
-          aria-label="Schließen"
-        >
-          <XCircle className="h-5 w-5" />
-        </button>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="bg-background rounded-2xl shadow-2xl border border-border/50 max-w-md w-full p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-lg font-display font-bold text-foreground">{title}</h3>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Schließen"
+          >
+            <XCircle className="h-5 w-5" />
+          </button>
+        </div>
+        {children}
       </div>
-      {children}
     </div>
-  </div>
-);
+  );
+};
 
 const Field = ({
   label,
