@@ -59,7 +59,8 @@ const NotificationsDropdown = () => {
     .sort((a, b) => b.ts.localeCompare(a.ts))
     .slice(0, 8);
 
-  const totalCount = eskalierte.length + ungelesen;
+  // eskalierte ist Subset von ungelesen — nur ungelesen zählen damit nicht doppelt
+  const totalCount = ungelesen;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
