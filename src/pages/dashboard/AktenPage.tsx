@@ -48,6 +48,13 @@ const stufeLabel: Record<AktenStufe, string> = {
 
 type DetailTab = "ueberblick" | "strategie" | "fristen" | "aktivitaet";
 
+const formatStreitwert = (eur: number): string => {
+  if (eur === 0) return "0€";
+  if (eur >= 1_000_000) return `${(eur / 1_000_000).toFixed(1)}M€`;
+  if (eur >= 1_000) return `${Math.round(eur / 1_000)}k€`;
+  return `${eur}€`;
+};
+
 const AktenPage = () => {
   const [selected, setSelected] = useState<Akte | null>(null);
   const [tab, setTab] = useState<DetailTab>("ueberblick");
@@ -58,6 +65,23 @@ const AktenPage = () => {
   const { data: acts = [] } = useActivitiesForAkte(selected?.id);
   const generateStrategie = useGenerateStrategie();
   const iterating = generateStrategie.isPending;
+
+  const aktiveAkten = akten.filter(
+    (a) => a.status === "in_bearbeitung" || a.status === "neu" || a.status === "wartend",
+  );
+  const offeneFristen = aktiveAkten.reduce(
+    (acc, a) => {
+      acc.total += a.fristen.length;
+      acc.kritisch += a.fristen.filter((f) => f.kritisch).length;
+      return acc;
+    },
+    { total: 0, kritisch: 0 },
+  );
+  const streitwertSum = aktiveAkten.reduce(
+    (s, a) => s + (a.streitwert_eur ?? 0),
+    0,
+  );
+  const strategieReview = allStrategien.filter((s) => s.status === "review").length;
 
   const triggerGenerate = async (akteId: string, prompt?: string) => {
     const t = toast.loading(
@@ -536,12 +560,21 @@ const AktenPage = () => {
           value={String(akten.filter((a) => a.status === "in_bearbeitung").length)}
           sub="In Bearbeitung"
         />
-        <Stat label="Offene Fristen" value="6" sub="2 kritisch" accent="amber" />
-        <Stat label="Streitwert gesamt" value="266k€" sub="Aktive Akten" />
+        <Stat
+          label="Offene Fristen"
+          value={String(offeneFristen.total)}
+          sub={offeneFristen.kritisch === 0 ? "Keine kritisch" : `${offeneFristen.kritisch} kritisch`}
+          accent="amber"
+        />
+        <Stat
+          label="Streitwert gesamt"
+          value={formatStreitwert(streitwertSum)}
+          sub="Aktive Akten"
+        />
         <Stat
           label="KI-Strategien"
-          value="1"
-          sub="Im Review"
+          value={String(strategieReview)}
+          sub={strategieReview === 0 ? "Keine im Review" : "Im Review"}
           accent="purple"
         />
       </div>
