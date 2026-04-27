@@ -19,6 +19,7 @@ import {
   useLinkWhatsapp,
   useVerifyEmailDomain,
   useConnectStripe,
+  usePatchProviderConfig,
 } from "@/lib/queries/use-provider-config";
 import type {
   EmailIntegration,
@@ -82,7 +83,7 @@ const IntegrationenPage = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          <VoiceCard config={cfg.voice} />
+          <VoiceCard config={cfg.voice} tenantId={tenant.id} />
           <WhatsappCard config={cfg.whatsapp} />
           <EmailCard config={cfg.email} />
           <StripeCard config={cfg.stripe} />
@@ -96,11 +97,33 @@ const IntegrationenPage = () => {
 // Voice Card — Plattform provisioniert KI-Telefonnummer
 // =====================================================================
 
-const VoiceCard = ({ config }: { config: VoiceIntegration }) => {
+const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: string }) => {
   const provision = useProvisionVoice();
+  const patch = usePatchProviderConfig();
   const [areaCode, setAreaCode] = useState("030");
   const [greeting, setGreeting] = useState(config.greeting ?? "");
   const [open, setOpen] = useState(!config.phone_number);
+
+  const handleSaveGreeting = async () => {
+    const t = toast.loading("Begrüßung wird gespeichert…");
+    try {
+      await patch.mutateAsync({
+        tenant_id: tenantId,
+        patch: {
+          voice: { ...config, greeting: greeting.trim() || null },
+        },
+      });
+      toast.success("Gespeichert", {
+        id: t,
+        description: "Beim nächsten Anruf nutzt die KI den neuen Begrüßungstext.",
+      });
+    } catch (e) {
+      toast.error("Speichern fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : "Unbekannt",
+      });
+    }
+  };
 
   const handleProvision = async () => {
     const t = toast.loading("KI-Telefonnummer wird angelegt…", {
@@ -175,8 +198,19 @@ const VoiceCard = ({ config }: { config: VoiceIntegration }) => {
             />
           </div>
 
-          <Button variant="outline" disabled>
-            Begrüßung speichern
+          <Button
+            variant="outline"
+            onClick={handleSaveGreeting}
+            disabled={patch.isPending || greeting === (config.greeting ?? "")}
+          >
+            {patch.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                Speichere…
+              </>
+            ) : (
+              "Begrüßung speichern"
+            )}
           </Button>
         </div>
       ) : (

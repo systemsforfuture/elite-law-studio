@@ -93,6 +93,47 @@ export const useProviderHealth = () =>
   });
 
 // =============================================================
+// Generic Patch — für non-API-Key Felder (greeting, voice_id)
+// =============================================================
+
+interface PatchInput {
+  tenant_id: string;
+  patch: Partial<ProviderConfig>;
+}
+
+export const usePatchProviderConfig = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ tenant_id, patch }: PatchInput) => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 300));
+        return null;
+      }
+      const { data: existing, error: fetchErr } = await supabase!
+        .from("tenants")
+        .select("provider_config")
+        .eq("id", tenant_id)
+        .single();
+      if (fetchErr) throw fetchErr;
+      const merged = {
+        ...((existing.provider_config ?? {}) as Record<string, unknown>),
+        ...patch,
+      };
+      const { error } = await supabase!
+        .from("tenants")
+        .update({ provider_config: merged })
+        .eq("id", tenant_id);
+      if (error) throw error;
+      return merged;
+    },
+    onSuccess: (_, { tenant_id }) => {
+      qc.invalidateQueries({ queryKey: ["provider-config", tenant_id] });
+      qc.invalidateQueries({ queryKey: ["provider-health"] });
+    },
+  });
+};
+
+// =============================================================
 // Voice — KI-Telefonnummer provisionieren
 // =============================================================
 

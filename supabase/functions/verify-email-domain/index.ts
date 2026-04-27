@@ -167,6 +167,14 @@ Deno.serve(async (req) => {
       .update({ provider_config: updatedCfg, domain: body.custom_domain })
       .eq("id", ctx.tenant_id);
 
+    await admin.from("audit_log").insert({
+      tenant_id: ctx.tenant_id,
+      user_id: ctx.id,
+      action: "create",
+      entity_type: "email_domain",
+      details: `Domain ${body.custom_domain} angelegt — DNS-Verify ausstehend`,
+    });
+
     return respond({
       ok: true,
       verification_status: "pending",
