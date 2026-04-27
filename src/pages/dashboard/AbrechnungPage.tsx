@@ -1,16 +1,35 @@
-import { CreditCard, Phone, Sparkles, ArrowUpRight, Download } from "lucide-react";
+import { CreditCard, Phone, Sparkles, ArrowUpRight, Download, Cpu, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
+import { useLlmUsage } from "@/lib/queries/use-llm-usage";
 
 const tierMeta = {
-  foundation: { label: "Foundation", monthly: 490, setup: 3900 },
-  growth: { label: "Growth", monthly: 990, setup: 7900 },
-  premium: { label: "Premium", monthly: 1890, setup: 14900 },
+  foundation: { label: "Foundation", monthly: 490, setup: 3900, kiTokens: 300_000 },
+  growth: { label: "Growth", monthly: 990, setup: 7900, kiTokens: 2_000_000 },
+  premium: { label: "Premium", monthly: 1890, setup: 14900, kiTokens: 999_999_999 },
+};
+
+const TASK_LABEL: Record<string, string> = {
+  voice_triage: "Voice-Anruf-Triage",
+  email_triage: "E-Mail-Triage",
+  whatsapp_chat: "WhatsApp",
+  doc_analysis: "Dokumenten-Analyse",
+  strategy_gen: "Akten-Strategie",
+  mahnung_gen: "Mahnungs-Texte",
+  assistant_chat: "KI-Assistent",
+  lead_capture: "Lead-Erfassung",
 };
 
 const AbrechnungPage = () => {
   const { tenant } = useTenant();
   const tier = tierMeta[tenant.subscription_tier];
+  const { data: llmUsage = [] } = useLlmUsage();
+
+  const totalTokens = llmUsage.reduce((s, r) => s + r.input_tokens_sum + r.output_tokens_sum, 0);
+  const totalCost = llmUsage.reduce((s, r) => s + Number(r.cost_eur_sum), 0);
+  const totalCalls = llmUsage.reduce((s, r) => s + r.call_count, 0);
+  const limitPct = Math.min(100, (totalTokens / tier.kiTokens) * 100);
+  const overLimit = totalTokens > tier.kiTokens;
 
   return (
     <div className="space-y-6">
@@ -70,6 +89,86 @@ const AbrechnungPage = () => {
           </Button>
           <div className="text-[10px] text-muted-foreground mt-2 text-center">
             Auto-Top-up bei &lt; 50€ aktivierbar
+          </div>
+        </div>
+
+        {/* KI-Verbrauch im aktuellen Monat */}
+        <div className="glass-card p-6 border-border/50 lg:col-span-3">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+            <h3 className="font-display font-bold text-foreground flex items-center gap-2">
+              <Cpu className="h-4 w-4 text-accent" />
+              SYSTEMS-KI-Verbrauch · Aktueller Monat
+            </h3>
+            <div className="text-xs text-muted-foreground">
+              {totalCalls.toLocaleString("de-DE")} Aufrufe · {Math.round(totalTokens / 1000)}k Tokens · {totalCost.toFixed(2)} €
+            </div>
+          </div>
+
+          {/* Limit-Bar */}
+          {tenant.subscription_tier !== "premium" && (
+            <div className="mb-5">
+              <div className="flex items-center justify-between text-xs mb-1.5">
+                <span className="text-muted-foreground">
+                  {totalTokens.toLocaleString("de-DE")} / {tier.kiTokens.toLocaleString("de-DE")} Tokens
+                </span>
+                <span className={`font-semibold ${overLimit ? "text-rose-600" : limitPct > 80 ? "text-amber-600" : "text-emerald-600"}`}>
+                  {limitPct.toFixed(0)}%
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className={`h-full transition-all ${
+                    overLimit ? "bg-rose-500" : limitPct > 80 ? "bg-amber-500" : "bg-emerald-500"
+                  }`}
+                  style={{ width: `${limitPct}%` }}
+                />
+              </div>
+              {limitPct > 80 && (
+                <div className="mt-2 text-xs flex items-center gap-1.5 text-amber-700">
+                  <AlertCircle className="h-3 w-3" />
+                  {overLimit ? "Limit überschritten — KI antwortet nur noch eingeschränkt." : "Limit fast erreicht — Tier upgraden?"}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Per-Task-Breakdown */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="text-xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
+                <tr>
+                  <th className="text-left py-2 font-semibold">Modul</th>
+                  <th className="text-right py-2 font-semibold">Aufrufe</th>
+                  <th className="text-right py-2 font-semibold">Tokens</th>
+                  <th className="text-right py-2 font-semibold">Kosten</th>
+                </tr>
+              </thead>
+              <tbody>
+                {llmUsage.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="py-6 text-center text-xs text-muted-foreground">
+                      Noch kein Verbrauch in diesem Monat
+                    </td>
+                  </tr>
+                )}
+                {llmUsage.map((row, i) => (
+                  <tr key={`${row.task}-${row.provider}-${i}`} className="border-b border-border/30 last:border-0">
+                    <td className="py-2 text-foreground">
+                      {TASK_LABEL[row.task] ?? row.task}
+                    </td>
+                    <td className="py-2 text-right tabular-nums text-foreground">
+                      {row.call_count.toLocaleString("de-DE")}
+                    </td>
+                    <td className="py-2 text-right tabular-nums text-muted-foreground">
+                      {((row.input_tokens_sum + row.output_tokens_sum) / 1000).toFixed(1)}k
+                    </td>
+                    <td className="py-2 text-right tabular-nums font-semibold text-foreground">
+                      {Number(row.cost_eur_sum).toFixed(2)} €
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 

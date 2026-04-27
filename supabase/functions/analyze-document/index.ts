@@ -5,7 +5,7 @@
 // und schreibt sie in dokumente.ai_extracted.
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
-import { complete, tryParseJson } from "../_shared/anthropic.ts";
+import { complete, tryParseJson } from "../_shared/llm.ts";
 import { callerContext, supabaseAdmin } from "../_shared/supabase-admin.ts";
 
 interface RequestBody {
@@ -116,7 +116,7 @@ Deno.serve(async (req: Request) => {
     if (!apiKey) {
       // Mock-Mode: kein Key → nutze Standard-complete (gibt Mock-Text)
       const mock = await complete({
-        tier: "balanced",
+        task: "doc_analysis",
         system: SYSTEM_PROMPT,
         messages: [
           {
@@ -124,6 +124,7 @@ Deno.serve(async (req: Request) => {
             content: `Dateiname: ${dok.dateiname}. Bitte analysieren.`,
           },
         ],
+        tenant_id: ctx.tenant_id,
         max_tokens: 1024,
       });
       return new Response(
