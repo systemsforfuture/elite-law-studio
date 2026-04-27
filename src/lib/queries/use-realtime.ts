@@ -22,6 +22,9 @@ export const useRealtimeSubscriptions = () => {
       rechnungen: ["rechnungen"],
       activities: ["activities"],
       anwalts_strategien: ["strategien"],
+      audit_log: ["audit"],
+      zeiterfassung: ["zeiterfassung"],
+      urlaub_antraege: ["urlaub"],
     };
 
     const channel = supabase

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { dokumente as mockDokumente } from "@/data/mockData";
 import type { Dokument } from "@/data/types";
 
@@ -18,7 +19,7 @@ export const useDokumenteQuery = () =>
         .select("*")
         .order("uploaded_at", { ascending: false });
       if (error) {
-        console.warn("[dokumente] fallback:", error.message);
+        warnMockFallback("dokumente", error.message);
         return mockDokumente;
       }
       return (data ?? []) as unknown as Dokument[];

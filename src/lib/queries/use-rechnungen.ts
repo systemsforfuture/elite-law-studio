@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { rechnungen as mockRechnungen } from "@/data/mockData";
 import type { Rechnung } from "@/data/types";
 
@@ -15,7 +16,7 @@ export const useRechnungenQuery = () =>
         .select("*")
         .order("rechnungsdatum", { ascending: false });
       if (error) {
-        console.warn("[rechnungen] fallback:", error.message);
+        warnMockFallback("rechnungen", error.message);
         return mockRechnungen;
       }
       return (data ?? []) as unknown as Rechnung[];

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { termine as mockTermine } from "@/data/mockData";
 import type { Termin } from "@/data/types";
 
@@ -15,7 +16,7 @@ export const useTermineQuery = () =>
         .select("*")
         .order("start_at", { ascending: true });
       if (error) {
-        console.warn("[termine] fallback:", error.message);
+        warnMockFallback("termine", error.message);
         return mockTermine;
       }
       return (data ?? []) as unknown as Termin[];

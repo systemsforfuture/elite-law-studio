@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { akten as mockAkten, strategien as mockStrategien } from "@/data/mockData";
 import type { Akte, AnwaltsStrategie } from "@/data/types";
 
@@ -25,7 +26,7 @@ export const useAktenQuery = () =>
         .select("*")
         .order("created_at", { ascending: false });
       if (error) {
-        console.warn("[akten] fallback:", error.message);
+        warnMockFallback("akten", error.message);
         return mockAkten;
       }
       return (data ?? []).map(normalizeAkte);

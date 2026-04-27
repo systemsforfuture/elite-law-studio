@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { warnMockFallback } from "@/lib/queries/warn-fallback";
 import { mandanten as mockMandanten } from "@/data/mockData";
 import type { Mandant } from "@/data/types";
 
@@ -20,7 +21,7 @@ export const useMandantenQuery = () =>
         .select("*")
         .order("created_at", { ascending: false });
       if (error) {
-        console.warn("[mandanten] supabase failed, fallback:", error.message);
+        warnMockFallback("mandanten", error.message);
         return mockMandanten;
       }
       return (data ?? []) as unknown as Mandant[];
@@ -43,7 +44,7 @@ export const useMandantQuery = (id: string | undefined | null) =>
         .eq("id", id)
         .maybeSingle();
       if (error) {
-        console.warn("[mandant] supabase failed, fallback:", error.message);
+        warnMockFallback("mandant", error.message);
         return mockMandanten.find((m) => m.id === id) ?? null;
       }
       return data as unknown as Mandant | null;
