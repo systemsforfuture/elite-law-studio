@@ -96,12 +96,11 @@ Deno.serve(async (req: Request) => {
       const charges = Boolean(event.data.object.charges_enabled);
       const payouts = Boolean(event.data.object.payouts_enabled);
 
-      // Tenant via connect_account_id finden — kein direkter Index, deshalb scan.
-      // In Production: indexed-jsonb-Path-Query oder dedizierte stripe_connect_id-Spalte.
+      // Tenant via stripe_connect_account_id finden (generated column + index)
       const { data: tenants, error: searchErr } = await admin
         .from("tenants")
         .select("id, provider_config")
-        .filter("provider_config->stripe->>connect_account_id", "eq", acctId)
+        .eq("stripe_connect_account_id", acctId)
         .limit(1);
       if (searchErr || !tenants || tenants.length === 0) {
         console.warn("[webhook-stripe] account.updated: kein Tenant für", acctId);
