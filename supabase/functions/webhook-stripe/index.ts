@@ -21,6 +21,10 @@ interface StripeEvent {
       metadata?: { rechnung_id?: string; tenant_id?: string };
       customer_email?: string;
       amount_total?: number;
+      // account.updated payload
+      charges_enabled?: boolean;
+      payouts_enabled?: boolean;
+      details_submitted?: boolean;
     };
   };
 }
@@ -77,6 +81,54 @@ Deno.serve(async (req: Request) => {
 
     const event: StripeEvent = JSON.parse(body);
     const admin = supabaseAdmin();
+
+    // ──────────────────────────────────────────────────────────
+    // Connect-Status sync: Tenant.provider_config.stripe aktualisieren
+    // wenn der Connect-Account vom Anwalt beim KYC weiter ausgefüllt wird.
+    // ──────────────────────────────────────────────────────────
+    if (event.type === "account.updated") {
+      const acctId = event.data.object.id;
+      if (!acctId) {
+        return new Response(JSON.stringify({ ok: true, ignored: "no account id" }), {
+          headers: { ...corsHeaders, "content-type": "application/json" },
+        });
+      }
+      const charges = Boolean(event.data.object.charges_enabled);
+      const payouts = Boolean(event.data.object.payouts_enabled);
+
+      // Tenant via connect_account_id finden — kein direkter Index, deshalb scan.
+      // In Production: indexed-jsonb-Path-Query oder dedizierte stripe_connect_id-Spalte.
+      const { data: tenants, error: searchErr } = await admin
+        .from("tenants")
+        .select("id, provider_config")
+        .filter("provider_config->stripe->>connect_account_id", "eq", acctId)
+        .limit(1);
+      if (searchErr || !tenants || tenants.length === 0) {
+        console.warn("[webhook-stripe] account.updated: kein Tenant für", acctId);
+        return new Response(JSON.stringify({ ok: true, ignored: "no tenant" }), {
+          headers: { ...corsHeaders, "content-type": "application/json" },
+        });
+      }
+      const t = tenants[0];
+      const baseCfg = (t.provider_config ?? {}) as Record<string, Record<string, unknown>>;
+      await admin
+        .from("tenants")
+        .update({
+          provider_config: {
+            ...baseCfg,
+            stripe: {
+              ...(baseCfg.stripe ?? {}),
+              charges_enabled: charges,
+              payouts_enabled: payouts,
+              enabled: charges && payouts,
+            },
+          },
+        })
+        .eq("id", t.id);
+      return new Response(JSON.stringify({ ok: true, charges, payouts }), {
+        headers: { ...corsHeaders, "content-type": "application/json" },
+      });
+    }
 
     if (event.type === "checkout.session.completed") {
       const rechnung_id = event.data.object.metadata?.rechnung_id;

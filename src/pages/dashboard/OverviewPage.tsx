@@ -26,6 +26,7 @@ import { useTermineQuery } from "@/lib/queries/use-termine";
 import { useAktenQuery } from "@/lib/queries/use-akten";
 import { useMandantenQuery } from "@/lib/queries/use-mandanten";
 import { useSeedDemoData } from "@/lib/queries/use-seed-demo";
+import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, Plug } from "lucide-react";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ const OverviewPage = () => {
   const { data: termine = [] } = useTermineQuery();
   const { data: akten = [] } = useAktenQuery();
   const { data: mandanten = [] } = useMandantenQuery();
+  const { data: health } = useProviderHealth();
   const seed = useSeedDemoData();
 
   const handleSeed = async () => {
@@ -70,6 +72,15 @@ const OverviewPage = () => {
     akten.length === 0 &&
     rechnungen.length === 0;
 
+  const integrationsReady = [
+    health?.voice?.enabled && health?.voice?.status === "active",
+    health?.whatsapp?.enabled && health?.whatsapp?.verification_status === "verified",
+    health?.email?.enabled && health?.email?.verification_status === "verified",
+    health?.stripe?.enabled && health?.stripe?.charges_enabled,
+  ].filter(Boolean).length;
+  const integrationsTotal = 4;
+  const integrationsIncomplete = integrationsReady < integrationsTotal;
+
   const aiHandled24h = kiAgents.reduce(
     (sum, a) => sum + a.letzte_24h.resolved,
     0,
@@ -98,6 +109,26 @@ const OverviewPage = () => {
 
   return (
     <div className="space-y-8">
+      {!isEmptyTenant && integrationsIncomplete && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.04] p-4 flex items-center gap-3 flex-wrap">
+          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <span className="text-sm text-foreground font-medium">
+              {integrationsReady}/{integrationsTotal} Integrationen aktiv.
+            </span>{" "}
+            <span className="text-sm text-muted-foreground">
+              Bis alle 4 grün sind, kann die KI keine echten Mandanten bedienen.
+            </span>
+          </div>
+          <Link to="/dashboard/integrationen">
+            <Button variant="outline" size="sm">
+              <Plug className="mr-2 h-3.5 w-3.5" />
+              Jetzt einrichten
+            </Button>
+          </Link>
+        </div>
+      )}
+
       {isEmptyTenant && (
         <div className="glass-card p-5 sm:p-6 border-accent/30 bg-accent/[0.04]">
           <div className="flex items-start gap-4 flex-wrap">
