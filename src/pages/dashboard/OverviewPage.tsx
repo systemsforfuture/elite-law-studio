@@ -30,6 +30,7 @@ import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { Button } from "@/components/ui/button";
 import { Database, Loader2, Plug } from "lucide-react";
 import { toast } from "sonner";
+import { isSameDay, isWithinLastHours, isWithinLastDays } from "@/lib/date-utils";
 
 const OverviewPage = () => {
   const { tenant } = useTenant();
@@ -81,14 +82,21 @@ const OverviewPage = () => {
   const integrationsTotal = 4;
   const integrationsIncomplete = integrationsReady < integrationsTotal;
 
-  const aiHandled24h = kiAgents.reduce(
-    (sum, a) => sum + a.letzte_24h.resolved,
-    0,
-  );
-  const escalated24h = kiAgents.reduce(
-    (sum, a) => sum + a.letzte_24h.escalated,
-    0,
-  );
+  // Live aus konversationen berechnet (vorher: aus mock kiAgents).
+  const last24h = konversationen.filter((k) => isWithinLastHours(k.zeitpunkt, 24));
+  const aiHandled24h = last24h.filter((k) => k.ai_handled).length;
+  const escalated24h = last24h.filter((k) => k.status === "escalated").length;
+
+  // Heute-Zähler für KPI-Cards.
+  const today = konversationen.filter((k) => isSameDay(k.zeitpunkt));
+  const voiceToday = today.filter((k) => k.kanal === "voice");
+  const voiceTodayAi = voiceToday.filter((k) => k.ai_handled).length;
+  const emailToday = today.filter((k) => k.kanal === "email");
+  const emailTodayAi = emailToday.filter((k) => k.ai_handled).length;
+
+  // Mandanten-Wachstum letzte 30 Tage.
+  const mandantenLast30 = mandanten.filter((m) => isWithinLastDays(m.created_at, 30)).length;
+
   const offene_rechnungen = rechnungen
     .filter((r) => r.status !== "bezahlt")
     .reduce((sum, r) => sum + r.betrag_brutto, 0);
@@ -196,16 +204,16 @@ const OverviewPage = () => {
         <Kpi
           icon={Phone}
           label="KI-Anrufe heute"
-          value="47"
-          delta="+18%"
+          value={voiceToday.length.toString()}
+          delta={voiceToday.length === 0 ? "—" : `${voiceTodayAi} auto`}
           trend="up"
           link="/dashboard/voice"
         />
         <Kpi
           icon={Inbox}
           label="Mails heute"
-          value="142"
-          delta="119 auto"
+          value={emailToday.length.toString()}
+          delta={emailToday.length === 0 ? "—" : `${emailTodayAi} auto`}
           trend="up"
           link="/dashboard/inbox"
         />
@@ -213,7 +221,7 @@ const OverviewPage = () => {
           icon={Users}
           label="Aktive Mandanten"
           value={(tenant.mandanten_count ?? mandanten.length).toLocaleString("de-DE")}
-          delta="+12 / Mo"
+          delta={mandantenLast30 === 0 ? "—" : `+${mandantenLast30} / 30T`}
           trend="up"
           link="/dashboard/mandanten"
         />
