@@ -28,6 +28,7 @@ import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import WelcomeTour from "@/components/dashboard/WelcomeTour";
 import ProfileMenu from "@/components/dashboard/ProfileMenu";
+import AssistantWidget from "@/components/dashboard/AssistantWidget";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 
 interface NavGroup {
@@ -258,6 +259,7 @@ const DashboardLayout = () => {
 
         <CommandPalette open={cmdk.open} onOpenChange={cmdk.setOpen} />
         <WelcomeTour />
+        <AssistantWidget />
 
         <main id="main-content" className="p-3 sm:p-6 lg:p-8 max-w-7xl">
           <Outlet />
