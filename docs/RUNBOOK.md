@@ -84,6 +84,8 @@ Das deployed alle 16 Funktionen:
 ```bash
 # KI-Provider — PFLICHT
 supabase secrets set ANTHROPIC_API_KEY=sk-ant-xxxxx
+# Optional: OpenAI als 2. Provider — halbiert KI-Kosten via Hybrid-Routing
+supabase secrets set OPENAI_API_KEY=sk-proj-xxxxx
 
 # Email-Versand — PFLICHT für Magic-Links
 supabase secrets set RESEND_API_KEY=re_xxxxx

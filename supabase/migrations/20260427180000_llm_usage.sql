@@ -9,7 +9,7 @@ create table if not exists public.llm_usage (
   tenant_id     uuid not null references public.tenants(id) on delete cascade,
   ts            timestamptz not null default now(),
   task          text not null,
-  provider      text not null check (provider in ('anthropic', 'openai', 'mock')),
+  provider      text not null check (provider in ('anthropic', 'openai', 'self_hosted', 'mock')),
   model         text not null,
   input_tokens  int not null default 0,
   output_tokens int not null default 0,

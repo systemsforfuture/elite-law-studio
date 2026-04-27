@@ -124,9 +124,28 @@ const AbrechnungPage = () => {
                 />
               </div>
               {limitPct > 80 && (
-                <div className="mt-2 text-xs flex items-center gap-1.5 text-amber-700">
-                  <AlertCircle className="h-3 w-3" />
-                  {overLimit ? "Limit überschritten — KI antwortet nur noch eingeschränkt." : "Limit fast erreicht — Tier upgraden?"}
+                <div className={`mt-2 rounded-lg p-3 ${overLimit ? "border border-rose-500/30 bg-rose-500/[0.04]" : "border border-amber-500/30 bg-amber-500/[0.04]"}`}>
+                  <div className="flex items-start justify-between gap-3 flex-wrap">
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <AlertCircle className={`h-4 w-4 mt-0.5 shrink-0 ${overLimit ? "text-rose-600" : "text-amber-600"}`} />
+                      <div className="text-xs">
+                        <div className={`font-semibold ${overLimit ? "text-rose-700" : "text-amber-700"}`}>
+                          {overLimit
+                            ? "Limit überschritten — KI antwortet nur noch eingeschränkt."
+                            : "Limit fast erreicht."}
+                        </div>
+                        <div className="text-muted-foreground mt-0.5">
+                          {tenant.subscription_tier === "foundation"
+                            ? "Growth-Tier hat 6× mehr Tokens (2M/Monat) für 990€/Monat."
+                            : "Premium-Tier hat unbegrenzten KI-Zugang für 1890€/Monat."}
+                        </div>
+                      </div>
+                    </div>
+                    <Button variant="gold" size="sm" className="rounded-lg shrink-0">
+                      <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
+                      Auf {tenant.subscription_tier === "foundation" ? "Growth" : "Premium"} upgraden
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
