@@ -52,7 +52,7 @@ const MahnwesenAutopilot = ({ open, onOpenChange, rechnungen }: Props) => {
   }, [open]);
 
   useEffect(() => {
-    if (!current || generated || generate.isPending) return;
+    if (!open || !current || generated || generate.isPending) return;
     void (async () => {
       try {
         const res = await generate.mutateAsync(current.id);
@@ -64,7 +64,7 @@ const MahnwesenAutopilot = ({ open, onOpenChange, rechnungen }: Props) => {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current?.id]);
+  }, [current?.id, open]);
 
   const next = (outcome: Result["outcome"]) => {
     if (current) {

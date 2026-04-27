@@ -29,7 +29,13 @@ export const useZeiterfassungQuery = (mitarbeiterId?: string) =>
           ? mockZeit.filter((z) => z.mitarbeiter_id === mitarbeiterId)
           : mockZeit;
       }
-      let q = supabase!.from("zeiterfassung").select("*").order("datum", { ascending: false });
+      // DB-Spalten heißen start_zeit/ende_zeit (start ist SQL-Keyword) — Aliase in select
+      let q = supabase!
+        .from("zeiterfassung")
+        .select(
+          "id, tenant_id, mitarbeiter_id, datum, start:start_zeit, ende:ende_zeit, dauer_min, akte_id, mandant_id, beschreibung, art, tarif_eur, created_at",
+        )
+        .order("datum", { ascending: false });
       if (mitarbeiterId) q = q.eq("mitarbeiter_id", mitarbeiterId);
       const { data, error } = await q;
       if (error) {
@@ -82,7 +88,9 @@ export const useCreateZeit = () => {
           beschreibung: input.beschreibung,
           tarif_eur: input.tarif_eur,
         })
-        .select()
+        .select(
+          "id, tenant_id, mitarbeiter_id, datum, start:start_zeit, ende:ende_zeit, dauer_min, akte_id, mandant_id, beschreibung, art, tarif_eur, created_at",
+        )
         .single();
       if (error) throw error;
       return data;

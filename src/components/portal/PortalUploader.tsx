@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Upload, Loader2, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
 import { useUploadDokument } from "@/lib/queries/use-dokumente";
 import { toast } from "sonner";
@@ -30,9 +30,16 @@ const PortalUploader = ({
   onUploaded,
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const doneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [done, setDone] = useState(false);
   const upload = useUploadDokument();
+
+  useEffect(() => {
+    return () => {
+      if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
+    };
+  }, []);
 
   const handleFile = async (file: File) => {
     if (file.size > MAX_BYTES) {
@@ -62,7 +69,8 @@ const PortalUploader = ({
       });
       setDone(true);
       onUploaded?.();
-      setTimeout(() => setDone(false), 3000);
+      if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
+      doneTimerRef.current = setTimeout(() => setDone(false), 3000);
     } catch (e) {
       toast.error("Upload fehlgeschlagen", {
         id: t,
