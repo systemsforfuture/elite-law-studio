@@ -8,15 +8,23 @@ import {
   Cpu,
 } from "lucide-react";
 import { useAskAssistant, type AssistantMessage } from "@/lib/queries/use-assistant";
+import { useProviderHealth } from "@/lib/queries/use-provider-config";
 
 const STORAGE_KEY = "systems-assistant-history";
 const MAX_HISTORY = 30;
 
-const SUGGESTIONS = [
+const SUGGESTIONS_DEFAULT = [
   "Was muss ich heute priorisieren?",
   "Welche Fristen laufen diese Woche kritisch?",
   "RVG-Berechnung für Streitwert 8.500€",
   "Entwirf ein Erinnerungsschreiben (Stufe 1)",
+];
+
+const SUGGESTIONS_SETUP = [
+  "Wie richte ich die KI-Telefonnummer ein?",
+  "Welche DNS-Records brauche ich für meine Email-Domain?",
+  "Welche Integrationen muss ich für Mandanten-Onboarding aktivieren?",
+  "Was kann die KI heute für mich tun?",
 ];
 
 const AssistantWidget = () => {
@@ -33,6 +41,15 @@ const AssistantWidget = () => {
     }
   });
   const ask = useAskAssistant();
+  const { data: health } = useProviderHealth();
+  const integrationsReady = [
+    health?.voice?.enabled && health?.voice?.status === "active",
+    health?.email?.enabled && health?.email?.verification_status === "verified",
+    health?.whatsapp?.enabled && health?.whatsapp?.verification_status === "verified",
+    health?.stripe?.enabled && health?.stripe?.charges_enabled,
+  ].filter(Boolean).length;
+  // In Setup-Phase (< 2 Integrationen) → Setup-orientierte Suggestions
+  const SUGGESTIONS = integrationsReady < 2 ? SUGGESTIONS_SETUP : SUGGESTIONS_DEFAULT;
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -202,7 +219,7 @@ const AssistantWidget = () => {
             {history.map((m, i) => (
               <div
                 key={i}
-                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex flex-col gap-1 ${m.role === "user" ? "items-end" : "items-start"}`}
               >
                 <div
                   className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap ${
@@ -213,6 +230,19 @@ const AssistantWidget = () => {
                 >
                   {m.content}
                 </div>
+                {m.role === "assistant" && (
+                  <button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(m.content);
+                      const sonner = await import("sonner");
+                      sonner.toast.success("Kopiert");
+                    }}
+                    className="text-[10px] text-muted-foreground/60 hover:text-foreground transition-colors px-1"
+                    title="Antwort kopieren"
+                  >
+                    Kopieren
+                  </button>
+                )}
               </div>
             ))}
 
