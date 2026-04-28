@@ -24,7 +24,7 @@ import {
   Search,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
-import { useRealtimeSubscriptions } from "@/lib/queries/use-realtime";
+import { useRealtimeSubscriptions, useRealtimeToasts } from "@/lib/queries/use-realtime";
 import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
@@ -139,6 +139,7 @@ const DashboardLayout = () => {
   const title = titleByPath[location.pathname] ?? "Dashboard";
   useDocumentTitle(`${title} · ${tenant.kanzlei_name}`);
   useRealtimeSubscriptions();
+  useRealtimeToasts();
   const cmdk = useCommandPalette();
   const { data: providerHealth } = useProviderHealth();
   const { data: konversationen = [] } = useKonversationenQuery();
