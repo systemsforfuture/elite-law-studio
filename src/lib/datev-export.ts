@@ -31,7 +31,7 @@ const DATEV_HEADER = [
   "Status",
 ] as const;
 
-const csvEscape = (val: string | number | undefined): string => {
+export const csvEscape = (val: string | number | undefined): string => {
   if (val === undefined || val === null) return "";
   const s = String(val);
   if (s.includes('"') || s.includes(";") || s.includes("\n")) {
