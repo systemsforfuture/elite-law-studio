@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ShieldCheck,
   Activity,
@@ -16,6 +16,7 @@ import {
 import type { AuditEvent } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useAuditLog } from "@/lib/queries/use-audit";
+import { isWithinLastHours, isWithinLastDays } from "@/lib/date-utils";
 
 const actionMeta: Record<
   AuditEvent["action"],
@@ -47,6 +48,19 @@ const AuditPage = () => {
   const entityTypes = Array.from(
     new Set(auditLog.map((e) => e.entity_type)),
   ).sort();
+
+  const stats = useMemo(() => {
+    const last24 = auditLog.filter((e) => isWithinLastHours(e.ts, 24));
+    const aiCount = last24.filter((e) => e.action === "ai_action").length;
+    const userCount = last24.length - aiCount;
+    // Sicherheits-Vorfall-Heuristik: failed logins oder unbekannte
+    // ip_address-Patterns. Hier konservativ: delete-Actions in den
+    // letzten 90 Tagen (löschen ist signifikant, audit-relevant).
+    const securityRelevant = auditLog.filter(
+      (e) => e.action === "delete" && isWithinLastDays(e.ts, 90),
+    ).length;
+    return { last24Count: last24.length, aiCount, userCount, securityRelevant };
+  }, [auditLog]);
 
   const filtered = auditLog.filter((e) => {
     if (actionFilter !== "all" && e.action !== actionFilter) return false;
@@ -86,21 +100,27 @@ const AuditPage = () => {
             Events 24h
           </div>
           <div className="text-3xl font-display font-black text-foreground tabular-nums">
-            247
+            {stats.last24Count}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            142 KI · 105 Nutzer
+            {stats.last24Count === 0
+              ? "Keine Events"
+              : `${stats.aiCount} KI · ${stats.userCount} Nutzer`}
           </div>
         </div>
         <div className="glass-card p-5 border-border/50">
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-            Sicherheits-Vorfälle
+            Lösch-Aktionen
           </div>
-          <div className="text-3xl font-display font-black text-emerald-600 tabular-nums">
-            0
+          <div
+            className={`text-3xl font-display font-black tabular-nums ${
+              stats.securityRelevant === 0 ? "text-emerald-600" : "text-amber-600"
+            }`}
+          >
+            {stats.securityRelevant}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            Letzte 90 Tage
+            Letzte 90 Tage · Audit-Pflicht
           </div>
         </div>
       </div>
