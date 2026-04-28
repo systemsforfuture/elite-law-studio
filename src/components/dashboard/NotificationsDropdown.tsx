@@ -20,9 +20,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useKonversationenQuery, useMarkAllKonversationenRead } from "@/lib/queries/use-konversationen";
 import { useActivitiesQuery } from "@/lib/queries/use-activities";
 import { findMandant, mandantName } from "@/data/mockData";
+import { toast } from "sonner";
 import type { ActivityType } from "@/data/types";
 
 const typeIcon: Record<ActivityType, LucideIcon> = {
@@ -47,6 +48,22 @@ const NotificationsDropdown = () => {
   const [open, setOpen] = useState(false);
   const { data: konversationen = [] } = useKonversationenQuery();
   const { data: activities = [] } = useActivitiesQuery();
+  const markAllRead = useMarkAllKonversationenRead();
+
+  const handleMarkAllRead = async () => {
+    try {
+      const res = await markAllRead.mutateAsync();
+      toast.success(
+        res.updated === 0
+          ? "Keine ungelesenen Konversationen"
+          : `${res.updated} Konversation${res.updated === 1 ? "" : "en"} als gelesen markiert`,
+      );
+    } catch (e) {
+      toast.error("Konnte nicht markieren", {
+        description: e instanceof Error ? e.message : String(e),
+      });
+    }
+  };
 
   const eskalierte = konversationen.filter(
     (k) => k.status === "escalated" && k.ungelesen,
@@ -78,15 +95,26 @@ const NotificationsDropdown = () => {
         className="w-[380px] p-0 max-h-[520px] overflow-hidden flex flex-col"
         align="end"
       >
-        <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between">
+        <div className="px-4 py-3 border-b border-border/50 flex items-center justify-between gap-2">
           <h3 className="font-display font-bold text-sm text-foreground">
             Benachrichtigungen
           </h3>
-          {totalCount > 0 && (
-            <span className="text-[10px] uppercase font-bold text-muted-foreground">
-              {totalCount} neu
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {totalCount > 0 && (
+              <span className="text-[10px] uppercase font-bold text-muted-foreground">
+                {totalCount} neu
+              </span>
+            )}
+            {totalCount > 0 && (
+              <button
+                onClick={handleMarkAllRead}
+                disabled={markAllRead.isPending}
+                className="text-[10px] font-medium text-accent hover:text-gold-dark disabled:opacity-50 disabled:pointer-events-none"
+              >
+                Alle gelesen
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="overflow-y-auto flex-1">
