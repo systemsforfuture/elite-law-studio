@@ -17,6 +17,8 @@ import type { AuditEvent } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import { useAuditLog } from "@/lib/queries/use-audit";
 import { isWithinLastHours, isWithinLastDays } from "@/lib/date-utils";
+import { csvEscape, downloadCsv } from "@/lib/datev-export";
+import { toast } from "sonner";
 
 const actionMeta: Record<
   AuditEvent["action"],
@@ -48,6 +50,43 @@ const AuditPage = () => {
   const entityTypes = Array.from(
     new Set(auditLog.map((e) => e.entity_type)),
   ).sort();
+
+  const handleExport = () => {
+    if (filtered.length === 0) {
+      toast.error("Keine Events zum Exportieren");
+      return;
+    }
+    const header = [
+      "Zeitpunkt",
+      "Akteur",
+      "Aktion",
+      "Entität",
+      "Entität-ID",
+      "IP-Adresse",
+      "Details",
+    ];
+    const lines = [header.map(csvEscape).join(";")];
+    for (const e of filtered) {
+      lines.push(
+        [
+          new Date(e.ts).toISOString(),
+          e.user_name,
+          e.action,
+          e.entity_type,
+          e.entity_id ?? "",
+          e.ip_address,
+          e.details ?? "",
+        ]
+          .map(csvEscape)
+          .join(";"),
+      );
+    }
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadCsv(lines.join("\n"), `audit-log-${stamp}.csv`);
+    toast.success(`${filtered.length} Events exportiert`, {
+      description: "Aufbewahrungspflicht §43e BRAO: 6 Jahre.",
+    });
+  };
 
   const stats = useMemo(() => {
     const last24 = auditLog.filter((e) => isWithinLastHours(e.ts, 24));
@@ -169,7 +208,13 @@ const AuditPage = () => {
               </option>
             ))}
           </select>
-          <Button variant="outline" size="sm" className="rounded-xl">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl"
+            onClick={handleExport}
+            disabled={filtered.length === 0}
+          >
             <Download className="mr-2 h-3.5 w-3.5" />
             DSGVO-Export
           </Button>
