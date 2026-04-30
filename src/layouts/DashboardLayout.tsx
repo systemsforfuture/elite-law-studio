@@ -410,15 +410,18 @@ const DashboardLayout = () => {
         <footer className="border-t border-border/50 px-3 sm:px-6 py-4 mt-8">
           <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center text-xs text-muted-foreground/60">
             <div className="flex flex-wrap gap-4 sm:gap-6">
-              <a href="#" className="hover:text-foreground transition-colors">
+              <Link to="/datenschutz" className="hover:text-foreground transition-colors">
                 Datenschutz
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
+              </Link>
+              <Link to="/impressum" className="hover:text-foreground transition-colors">
                 Impressum
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
+              </Link>
+              <Link to="/agb" className="hover:text-foreground transition-colors">
+                AGB
+              </Link>
+              <Link to="/avv" className="hover:text-foreground transition-colors">
                 AVV
-              </a>
+              </Link>
             </div>
             <div className="hidden sm:block">
               SYSTEMS™ v1.0 · {tenant.subdomain}

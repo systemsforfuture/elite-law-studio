@@ -40,11 +40,11 @@ const Footer = () => (
             Compliance
           </h4>
           <ul className="space-y-3 text-sm text-primary-foreground/40">
-            <li>DSGVO · EU-Hosting Frankfurt</li>
-            <li>§43e BRAO konform</li>
-            <li>Auftragsverarbeitungs-Vertrag</li>
-            <li>Beschlagnahmefreiheit</li>
-            <li>ISO 27001 (in Vorbereitung)</li>
+            <li><Link to="/datenschutz" className="hover:text-primary-foreground/70 transition-colors">DSGVO · EU-Hosting Frankfurt</Link></li>
+            <li><Link to="/agb" className="hover:text-primary-foreground/70 transition-colors">§43e BRAO konform</Link></li>
+            <li><Link to="/avv" className="hover:text-primary-foreground/70 transition-colors">Auftragsverarbeitungs-Vertrag</Link></li>
+            <li><Link to="/agb" className="hover:text-primary-foreground/70 transition-colors">Beschlagnahmefreiheit</Link></li>
+            <li><span className="opacity-70">ISO 27001 (in Vorbereitung)</span></li>
           </ul>
         </div>
 
@@ -67,11 +67,11 @@ const Footer = () => (
         <p className="text-xs text-primary-foreground/30">
           © {new Date().getFullYear()} SYSTEMS LLC. Alle Rechte vorbehalten.
         </p>
-        <div className="flex gap-8 text-xs text-primary-foreground/30">
-          <a href="#" className="hover:text-accent transition-colors duration-300">Datenschutzerklärung</a>
-          <a href="#" className="hover:text-accent transition-colors duration-300">Impressum</a>
-          <a href="#" className="hover:text-accent transition-colors duration-300">AGB</a>
-          <a href="#" className="hover:text-accent transition-colors duration-300">AVV</a>
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-primary-foreground/30">
+          <Link to="/datenschutz" className="hover:text-accent transition-colors duration-300">Datenschutz</Link>
+          <Link to="/impressum" className="hover:text-accent transition-colors duration-300">Impressum</Link>
+          <Link to="/agb" className="hover:text-accent transition-colors duration-300">AGB</Link>
+          <Link to="/avv" className="hover:text-accent transition-colors duration-300">AVV</Link>
         </div>
       </div>
     </div>
