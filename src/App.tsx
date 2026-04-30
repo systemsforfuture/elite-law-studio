@@ -45,6 +45,12 @@ const KanzleiTemplate = lazy(() => import("./pages/KanzleiTemplate.tsx"));
 const PortalLogin = lazy(() => import("./pages/portal/PortalLogin.tsx"));
 const PortalDashboard = lazy(() => import("./pages/portal/PortalDashboard.tsx"));
 
+// Lazy: legal / compliance pages
+const Datenschutz = lazy(() => import("./pages/legal/Datenschutz.tsx"));
+const Impressum = lazy(() => import("./pages/legal/Impressum.tsx"));
+const AGB = lazy(() => import("./pages/legal/AGB.tsx"));
+const AVV = lazy(() => import("./pages/legal/AVV.tsx"));
+
 // Lazy: kanzlei admin shell + 14 modules — heaviest part of app
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout.tsx"));
 const OverviewPage = lazy(() => import("./pages/dashboard/OverviewPage.tsx"));
@@ -98,6 +104,10 @@ const App = () => (
                 <Route path="/template/kanzlei" element={<KanzleiTemplate />} />
                 <Route path="/portal" element={<PortalLogin />} />
                 <Route path="/portal/dashboard" element={<PortalDashboard />} />
+                <Route path="/datenschutz" element={<Datenschutz />} />
+                <Route path="/impressum" element={<Impressum />} />
+                <Route path="/agb" element={<AGB />} />
+                <Route path="/avv" element={<AVV />} />
                 <Route path="/dashboard" element={<DashboardLayout />}>
                   <Route index element={<OverviewPage />} />
                   <Route path="voice" element={<VoicePage />} />
