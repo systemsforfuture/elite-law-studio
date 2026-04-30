@@ -49,11 +49,18 @@ const SalesCTASection = () => {
             </a>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6 text-xs text-muted-foreground/60">
-            <span>✓ DSGVO · EU-Hosting Frankfurt</span>
-            <span>✓ Auftragsverarbeitungs-Vertrag inklusive</span>
-            <span>✓ §43e BRAO konform</span>
-            <span>✓ Beschlagnahmefrei</span>
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground/60">
+            {[
+              "DSGVO · EU-Hosting Frankfurt",
+              "Auftragsverarbeitungs-Vertrag inklusive",
+              "§43e BRAO konform",
+              "Beschlagnahmefrei",
+            ].map((label) => (
+              <span key={label} className="inline-flex items-center gap-1.5">
+                <Check className="h-3 w-3 text-accent" />
+                {label}
+              </span>
+            ))}
           </div>
         </div>
       </div>
