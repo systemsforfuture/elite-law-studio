@@ -51,9 +51,9 @@ const ContactSection = () => {
               <span className="w-8 h-px bg-accent/50" />
               Kontakt
             </span>
-            <h2 className="text-[2rem] sm:text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em] leading-[1.05] break-words hyphens-auto">
+            <h2 className="text-[1.75rem] sm:text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em] leading-[1.1] break-words">
               Kostenlose{" "}
-              <span className="text-gradient-gold">Erstberatung</span>
+              <span className="text-gradient-gold inline-block">Erstberatung</span>
             </h2>
             <p className="text-muted-foreground mb-8 text-base sm:text-lg font-light">
               Schildern Sie uns Ihr Anliegen – wir melden uns innerhalb von 2 Stunden mit einer ersten Einschätzung.
