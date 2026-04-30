@@ -44,18 +44,18 @@ const ContactSection = () => {
     <section id="kontakt" className="py-20 sm:py-32 bg-card relative overflow-hidden">
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent/[0.03] rounded-full blur-[100px]" />
 
-      <div className="container mx-auto px-4 sm:px-6" ref={ref}>
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl" ref={ref}>
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
-          <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
+          <div className={`min-w-0 transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent mb-4">
               <span className="w-8 h-px bg-accent/50" />
               Kontakt
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em] leading-[1.05]">
+            <h2 className="text-[2rem] sm:text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em] leading-[1.05] break-words hyphens-auto">
               Kostenlose{" "}
               <span className="text-gradient-gold">Erstberatung</span>
             </h2>
-            <p className="text-muted-foreground mb-8 text-lg font-light">
+            <p className="text-muted-foreground mb-8 text-base sm:text-lg font-light">
               Schildern Sie uns Ihr Anliegen – wir melden uns innerhalb von 2 Stunden mit einer ersten Einschätzung.
             </p>
 
