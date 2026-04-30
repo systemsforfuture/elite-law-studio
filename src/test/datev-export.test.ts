@@ -49,7 +49,7 @@ const rechnungen: Rechnung[] = [
     betrag_brutto: 1000,
     rechnungsdatum: "2026-04-15",
     faelligkeit: "2026-04-29",
-    status: "offen",
+    status: "versendet",
     mahnstufe: 0,
   },
   {

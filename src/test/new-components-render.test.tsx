@@ -52,7 +52,7 @@ describe("MahnwesenAutopilot", () => {
       betrag_brutto: 119,
       rechnungsdatum: "2026-01-01",
       faelligkeit: "2026-01-15",
-      status: "offen",
+      status: "versendet",
       mahnstufe: 0,
     };
     const { container } = render(
