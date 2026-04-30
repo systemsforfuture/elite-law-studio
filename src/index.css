@@ -255,6 +255,13 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  /* Stelle sicher, dass Inhalte mit initial opacity-0 + forwards-Animationen
+     im reduced-motion-Modus trotzdem sichtbar sind. */
+  .opacity-0 {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
 }
 
 /* Focus visible polish */
