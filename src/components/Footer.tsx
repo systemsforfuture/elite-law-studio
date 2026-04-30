@@ -65,7 +65,7 @@ const Footer = () => (
 
       <div className="mt-16 pt-8 border-t border-white/[0.06] flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-xs text-primary-foreground/30">
-          © {new Date().getFullYear()} SYSTEMS GmbH. Alle Rechte vorbehalten.
+          © {new Date().getFullYear()} SYSTEMS LLC. Alle Rechte vorbehalten.
         </p>
         <div className="flex gap-8 text-xs text-primary-foreground/30">
           <a href="#" className="hover:text-accent transition-colors duration-300">Datenschutzerklärung</a>
