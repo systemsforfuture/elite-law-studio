@@ -53,18 +53,19 @@ const Footer = () => (
             Kontakt
           </h4>
           <ul className="space-y-3 text-sm text-primary-foreground/40">
-            <li>SYSTEMS GmbH</li>
-            <li>Friedrichstraße 123</li>
-            <li>10117 Berlin</li>
-            <li>+49 30 123 456 78</li>
-            <li className="text-accent/80">hello@systems-tm.de</li>
+            <li>SYSTEMS LLC</li>
+            <li className="text-accent/80">
+              <a href="mailto:systems.future@pm.me" className="hover:text-accent transition-colors">
+                systems.future@pm.me
+              </a>
+            </li>
           </ul>
         </div>
       </div>
 
       <div className="mt-16 pt-8 border-t border-white/[0.06] flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-xs text-primary-foreground/30">
-          © {new Date().getFullYear()} SYSTEMS GmbH. Alle Rechte vorbehalten.
+          © {new Date().getFullYear()} SYSTEMS LLC. Alle Rechte vorbehalten.
         </p>
         <div className="flex gap-8 text-xs text-primary-foreground/30">
           <a href="#" className="hover:text-accent transition-colors duration-300">Datenschutzerklärung</a>
