@@ -1,7 +1,7 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Phone, Sparkles, Check } from "lucide-react";
+import { ArrowRight, Mail, Sparkles, Check } from "lucide-react";
 
 const SalesCTASection = () => {
   const { ref, isVisible } = useScrollAnimation();
