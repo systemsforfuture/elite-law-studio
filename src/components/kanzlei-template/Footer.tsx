@@ -45,10 +45,10 @@ const Footer = () => (
         <p className="text-xs text-primary-foreground/30">
           © {new Date().getFullYear()} Kanzlei Bergmann. Alle Rechte vorbehalten.
         </p>
-        <div className="flex gap-8 text-xs text-primary-foreground/30">
-          <a href="#" className="hover:text-accent transition-colors duration-300">Datenschutzerklärung</a>
-          <a href="#" className="hover:text-accent transition-colors duration-300">Impressum</a>
-          <a href="#" className="hover:text-accent transition-colors duration-300">AGB</a>
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-primary-foreground/30">
+          <span title="Demo-Vorschau – im Live-Betrieb durch die Kanzlei zu pflegen" className="cursor-help">Datenschutzerklärung</span>
+          <span title="Demo-Vorschau – im Live-Betrieb durch die Kanzlei zu pflegen" className="cursor-help">Impressum</span>
+          <span title="Demo-Vorschau – im Live-Betrieb durch die Kanzlei zu pflegen" className="cursor-help">AGB</span>
         </div>
       </div>
     </div>
