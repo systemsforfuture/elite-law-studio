@@ -31,7 +31,7 @@ export const useSeedDemoData = () => {
           seeded: { mandanten: 3, akten: 3, termine: 2, rechnungen: 2 },
         };
       }
-      const { data, error } = await supabase.functions.invoke<SeedResult>(
+      const { data, error } = await supabase.functions.invoke(
         "seed-demo-data",
         { body: { force } },
       );

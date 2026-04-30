@@ -44,7 +44,7 @@ export const useAskAssistant = () => {
         await new Promise((r) => setTimeout(r, 800 + Math.random() * 600));
         return { reply: mockReply(), mock_mode: true };
       }
-      const { data, error } = await supabase.functions.invoke<AssistantReply>(
+      const { data, error } = await supabase.functions.invoke(
         "assistant-chat",
         { body: { message, history } },
       );
