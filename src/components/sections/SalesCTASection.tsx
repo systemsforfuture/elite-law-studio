@@ -41,10 +41,10 @@ const SalesCTASection = () => {
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
-            <a href="tel:+493012345678">
+            <a href="mailto:systems.future@pm.me">
               <Button variant="hero-outline" className="rounded-2xl group text-base px-10 py-6">
-                <Phone className="mr-2 h-4 w-4" />
-                +49 30 123 456 78
+                <Mail className="mr-2 h-4 w-4" />
+                systems.future@pm.me
               </Button>
             </a>
           </div>
