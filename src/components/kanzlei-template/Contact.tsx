@@ -73,7 +73,7 @@ const ContactSection = () => {
                   style={{ transitionDelay: `${400 + i * 100}ms` }}
                 >
                   <CheckCircle className="h-4 w-4 text-accent mt-0.5 shrink-0" />
-                  <span className="text-sm text-foreground/70">{item}</span>
+                  <span className="text-sm text-foreground/70 break-words min-w-0">{item}</span>
                 </div>
               ))}
             </div>
