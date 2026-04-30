@@ -28,7 +28,7 @@ const ContactSection = () => {
         beschreibung: formData.message || undefined,
         herkunft: "web",
       });
-      toast.success("Anfrage angekommen ✓", { id: t, description: result.message });
+      toast.success("Anfrage angekommen", { id: t, description: result.message });
       setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", rechtsgebiet: "" });
     } catch (err) {
       toast.error("Senden fehlgeschlagen", {
