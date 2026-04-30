@@ -41,7 +41,7 @@ export const buildIcs = ({
   mandant,
   kanzlei_name,
 }: IcsInput): string => {
-  const uid = `${termin.id}@systems-tm.de`;
+  const uid = `${termin.id}@systems-future`;
   const dtstamp = formatDate(new Date().toISOString());
   const dtstart = formatDate(termin.start_at);
   const dtend = termin.ende_at
