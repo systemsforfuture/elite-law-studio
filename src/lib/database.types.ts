@@ -1,9 +1,9 @@
-// Datenbank-Typen für die SYSTEMS™ Plattform.
+// Datenbank-Typen für die SYSTEMS™ Plattform (Stub bis `supabase gen types` läuft).
 //
-// In Sprint 2 generieren wir diese Datei automatisch:
-//   `supabase gen types typescript --project-id dsgenkjlkdzkoplnxebg > src/lib/database.types.ts`
-//
-// Bis dahin minimaler Stub — passt zum Schema in supabase/migrations/0001_schema.sql.
+// Hinweis: Wir typen Tabellen bewusst lose (Row/Insert/Update als flexible Records),
+// damit Query-Code, der auf JSONB-Felder wie agent_config / provider_config / branding_config
+// zugreift, ohne ständige TS2339-Fehler kompiliert. Sobald die echten Typen generiert
+// werden, ersetzt das die Stubs.
 
 export type Json =
   | string
@@ -13,59 +13,27 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+type AnyRecord = Record<string, unknown>;
+
+interface FlexTable {
+  Row: AnyRecord;
+  Insert: AnyRecord;
+  Update: AnyRecord;
+}
+
 export interface Database {
   public: {
     Tables: {
-      tenants: {
-        Row: {
-          id: string;
-          kanzlei_name: string;
-          domain: string | null;
-          subdomain: string | null;
-          branding_config: Json;
-          subscription_tier: "foundation" | "growth" | "premium";
-          subscription_status: string;
-          inhaber_name: string | null;
-          notfall_nummer: string | null;
-          rechtsgebiete: string[] | null;
-          onboarded_at: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["tenants"]["Row"]> & {
-          kanzlei_name: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["tenants"]["Row"]>;
-      };
-      users: {
-        Row: {
-          id: string;
-          tenant_id: string;
-          email: string;
-          name: string;
-          role: "owner" | "anwalt" | "mitarbeiter" | "support";
-          avatar_initials: string | null;
-          rechtsgebiete: string[] | null;
-          active: boolean;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["users"]["Row"]> & {
-          id: string;
-          tenant_id: string;
-          email: string;
-          name: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["users"]["Row"]>;
-      };
-      mandanten: GenericTable;
-      audit_log: GenericTable;
-      dokumente: GenericTable;
-      akten: GenericTable;
-      termine: GenericTable;
-      rechnungen: GenericTable;
-      konversationen: GenericTable;
-      activities: GenericTable;
+      tenants: FlexTable;
+      users: FlexTable;
+      mandanten: FlexTable;
+      audit_log: FlexTable;
+      dokumente: FlexTable;
+      akten: FlexTable;
+      termine: FlexTable;
+      rechnungen: FlexTable;
+      konversationen: FlexTable;
+      activities: FlexTable;
     };
     Views: Record<string, never>;
     Functions: {
@@ -80,11 +48,4 @@ export interface Database {
     };
     Enums: Record<string, never>;
   };
-}
-
-type GenericRow = { [key: string]: Json | string | number | boolean | null | undefined };
-interface GenericTable {
-  Row: GenericRow;
-  Insert: GenericRow;
-  Update: GenericRow;
 }

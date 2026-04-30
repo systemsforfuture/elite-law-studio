@@ -28,7 +28,7 @@ const ContactSection = () => {
         beschreibung: formData.message || undefined,
         herkunft: "web",
       });
-      toast.success("Anfrage angekommen ✓", { id: t, description: result.message });
+      toast.success("Anfrage angekommen", { id: t, description: result.message });
       setFormData({ firstName: "", lastName: "", email: "", phone: "", message: "", rechtsgebiet: "" });
     } catch (err) {
       toast.error("Senden fehlgeschlagen", {
@@ -44,18 +44,18 @@ const ContactSection = () => {
     <section id="kontakt" className="py-20 sm:py-32 bg-card relative overflow-hidden">
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent/[0.03] rounded-full blur-[100px]" />
 
-      <div className="container mx-auto px-4 sm:px-6" ref={ref}>
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl" ref={ref}>
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
-          <div className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
+          <div className={`min-w-0 transition-all duration-1000 ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}`}>
             <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-accent mb-4">
               <span className="w-8 h-px bg-accent/50" />
               Kontakt
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em] leading-[1.05]">
+            <h2 className="text-[1.75rem] sm:text-4xl md:text-6xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em] leading-[1.1] break-words">
               Kostenlose{" "}
-              <span className="text-gradient-gold">Erstberatung</span>
+              <span className="text-gradient-gold inline-block">Erstberatung</span>
             </h2>
-            <p className="text-muted-foreground mb-8 text-lg font-light">
+            <p className="text-muted-foreground mb-8 text-base sm:text-lg font-light">
               Schildern Sie uns Ihr Anliegen – wir melden uns innerhalb von 2 Stunden mit einer ersten Einschätzung.
             </p>
 
@@ -73,7 +73,7 @@ const ContactSection = () => {
                   style={{ transitionDelay: `${400 + i * 100}ms` }}
                 >
                   <CheckCircle className="h-4 w-4 text-accent mt-0.5 shrink-0" />
-                  <span className="text-sm text-foreground/70">{item}</span>
+                  <span className="text-sm text-foreground/70 break-words min-w-0">{item}</span>
                 </div>
               ))}
             </div>

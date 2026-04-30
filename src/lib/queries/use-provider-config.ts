@@ -156,7 +156,7 @@ export const useVoiceTestCall = () => {
           message: `Demo-Modus: Ihre KI würde jetzt ${input.call_to} anrufen.`,
         };
       }
-      const { data, error } = await supabase!.functions.invoke<TestCallResult>(
+      const { data, error } = await supabase!.functions.invoke(
         "voice-test-call",
         { body: input },
       );
@@ -194,7 +194,7 @@ export const useProvisionVoice = () => {
           message: "Demo-Modus: provisionierte Telefon-Nummer ist nicht real",
         };
       }
-      const { data, error } = await supabase!.functions.invoke<ProvisionVoiceResult>(
+      const { data, error } = await supabase!.functions.invoke(
         "provision-voice-number",
         { body: input },
       );
@@ -233,7 +233,7 @@ export const useLinkWhatsapp = () => {
           message: "Demo-Modus: WhatsApp-Verlinkung simuliert. Production: SYSTEMS-Team meldet sich in 24h.",
         };
       }
-      const { data, error } = await supabase!.functions.invoke<LinkWhatsappResult>(
+      const { data, error } = await supabase!.functions.invoke(
         "link-whatsapp-number",
         { body: input },
       );
@@ -283,7 +283,7 @@ export const useVerifyEmailDomain = () => {
           message: "Demo: trage diese 3 DNS-Records bei deinem Provider ein",
         };
       }
-      const { data, error } = await supabase!.functions.invoke<VerifyEmailResult>(
+      const { data, error } = await supabase!.functions.invoke(
         "verify-email-domain",
         { body: input },
       );
@@ -323,7 +323,7 @@ export const useConnectStripe = () => {
           message: "Demo-Modus: Stripe-Connect-Onboarding wird in Production zu Stripe weitergeleitet.",
         };
       }
-      const { data, error } = await supabase!.functions.invoke<ConnectStripeResult>(
+      const { data, error } = await supabase!.functions.invoke(
         "connect-stripe",
         { body: {} },
       );

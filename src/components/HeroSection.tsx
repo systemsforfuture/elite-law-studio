@@ -89,11 +89,14 @@ const HeroSection = () => {
           </div>
 
           <p
-            className="text-xs text-primary-foreground/30 mb-8 opacity-0"
+            className="text-xs text-primary-foreground/30 mb-8 opacity-0 flex flex-wrap items-center gap-x-3 gap-y-1"
             style={{ animation: "blur-in 0.8s ease-out 0.9s forwards" }}
           >
-            ✓ 14 Tage kostenlos testen · ✓ Keine Kreditkarte · ✓ Setup
-            inklusive
+            <span>14 Tage kostenlos testen</span>
+            <span className="w-1 h-1 rounded-full bg-primary-foreground/20" />
+            <span>Keine Kreditkarte</span>
+            <span className="w-1 h-1 rounded-full bg-primary-foreground/20" />
+            <span>Setup inklusive</span>
           </p>
 
           <Link

@@ -79,10 +79,14 @@ const HeroSection = () => {
 
           {/* Risk reversal micro-copy */}
           <p
-            className="text-xs text-primary-foreground/30 mb-20 opacity-0"
+            className="text-xs text-primary-foreground/30 mb-20 opacity-0 flex flex-wrap items-center gap-x-3 gap-y-1"
             style={{ animation: 'blur-in 0.8s ease-out 0.9s forwards' }}
           >
-            ✓ Kostenlos  ·  ✓ Unverbindlich  ·  ✓ Antwort in 2 Stunden
+            <span>Kostenlos</span>
+            <span className="w-1 h-1 rounded-full bg-primary-foreground/20" />
+            <span>Unverbindlich</span>
+            <span className="w-1 h-1 rounded-full bg-primary-foreground/20" />
+            <span>Antwort in 2 Stunden</span>
           </p>
 
           {/* Animated counter stats */}
