@@ -53,11 +53,12 @@ const Footer = () => (
             Kontakt
           </h4>
           <ul className="space-y-3 text-sm text-primary-foreground/40">
-            <li>SYSTEMS GmbH</li>
-            <li>Friedrichstraße 123</li>
-            <li>10117 Berlin</li>
-            <li>+49 30 123 456 78</li>
-            <li className="text-accent/80">hello@systems-tm.de</li>
+            <li>SYSTEMS LLC</li>
+            <li className="text-accent/80">
+              <a href="mailto:systems.future@pm.me" className="hover:text-accent transition-colors">
+                systems.future@pm.me
+              </a>
+            </li>
           </ul>
         </div>
       </div>
