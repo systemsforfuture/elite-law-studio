@@ -21,7 +21,7 @@ import {
 import { useTenant } from "@/contexts/TenantContext";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
-import { useTermineQuery } from "@/lib/queries/use-termine";
+import { useTermineQuery, useConfirmTermin } from "@/lib/queries/use-termine";
 import { useAktenQuery } from "@/lib/queries/use-akten";
 import { useMandantenQuery } from "@/lib/queries/use-mandanten";
 import { useSeedDemoData } from "@/lib/queries/use-seed-demo";
@@ -36,6 +36,7 @@ const OverviewPage = () => {
   const { data: konversationen = [] } = useKonversationenQuery();
   const { data: rechnungen = [] } = useRechnungenQuery();
   const { data: termine = [] } = useTermineQuery();
+  const confirmTermin = useConfirmTermin();
   const { data: akten = [] } = useAktenQuery();
   const { data: mandanten = [] } = useMandantenQuery();
   const { data: health } = useProviderHealth();
@@ -419,9 +420,25 @@ const OverviewPage = () => {
                       </div>
                     </div>
                     {!t.bestaetigt && (
-                      <span className="text-[10px] uppercase tracking-wider font-bold text-amber-700 bg-amber-500/15 px-2 py-1 rounded shrink-0">
-                        Unbestätigt
-                      </span>
+                      <button
+                        onClick={async () => {
+                          const tid = toast.loading("Wird bestätigt…");
+                          try {
+                            await confirmTermin.mutateAsync(t.id);
+                            toast.success("Termin bestätigt", { id: tid });
+                          } catch (e) {
+                            toast.error("Fehler", {
+                              id: tid,
+                              description: e instanceof Error ? e.message : String(e),
+                            });
+                          }
+                        }}
+                        disabled={confirmTermin.isPending}
+                        className="text-[10px] uppercase tracking-wider font-bold text-amber-700 bg-amber-500/15 hover:bg-amber-500/25 disabled:opacity-50 px-2 py-1 rounded shrink-0 transition-colors"
+                        title="Klicken zum Bestätigen"
+                      >
+                        Bestätigen
+                      </button>
                     )}
                   </div>
                 );
