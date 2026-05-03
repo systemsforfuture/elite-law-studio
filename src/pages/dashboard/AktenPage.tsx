@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   FolderOpen,
   ChevronRight,
@@ -14,6 +14,8 @@ import {
   ListChecks,
   Brain,
   Activity as ActivityIcon,
+  Search,
+  Filter,
 } from "lucide-react";
 import {
   findMandant,
@@ -27,7 +29,7 @@ import {
   useStrategienQuery,
 } from "@/lib/queries/use-akten";
 import { useActivitiesForAkte } from "@/lib/queries/use-activities";
-import type { Akte, AktenStufe } from "@/data/types";
+import type { Akte, AktenStufe, AktenStatus } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
 import EmptyState from "@/components/dashboard/EmptyState";
@@ -59,12 +61,29 @@ const AktenPage = () => {
   const [selected, setSelected] = useState<Akte | null>(null);
   const [tab, setTab] = useState<DetailTab>("ueberblick");
   const [iterationPrompt, setIterationPrompt] = useState("");
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<AktenStatus | "all">("all");
   const { data: akten = [] } = useAktenQuery();
   const { data: strategie } = useStrategieQuery(selected?.id);
   const { data: allStrategien = [] } = useStrategienQuery();
   const { data: acts = [] } = useActivitiesForAkte(selected?.id);
   const generateStrategie = useGenerateStrategie();
   const iterating = generateStrategie.isPending;
+
+  const filtered = useMemo(() => {
+    return akten.filter((a) => {
+      if (statusFilter !== "all" && a.status !== statusFilter) return false;
+      if (!query.trim()) return true;
+      const q = query.trim().toLowerCase();
+      const md = findMandant(a.mandant_id);
+      return (
+        a.titel.toLowerCase().includes(q) ||
+        a.aktenzeichen.toLowerCase().includes(q) ||
+        (a.rechtsgebiet ?? "").toLowerCase().includes(q) ||
+        (md ? mandantName(md).toLowerCase().includes(q) : false)
+      );
+    });
+  }, [akten, query, statusFilter]);
 
   const aktiveAkten = akten.filter(
     (a) => a.status === "in_bearbeitung" || a.status === "neu" || a.status === "wartend",
@@ -587,8 +606,55 @@ const AktenPage = () => {
           hint="KI-Strategie-Generator wartet auf Ihre erste Akte"
         />
       ) : (
+      <>
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[280px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Akte, Aktenzeichen oder Mandant suchen…"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+          />
+        </div>
+        <div className="flex gap-2 items-center flex-wrap">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          {(
+            [
+              { v: "all" as const, label: "Alle" },
+              { v: "neu" as const, label: "Neu" },
+              { v: "in_bearbeitung" as const, label: "In Bearbeitung" },
+              { v: "wartend" as const, label: "Wartend" },
+              { v: "abgeschlossen" as const, label: "Abgeschlossen" },
+            ]
+          ).map((s) => (
+            <button
+              key={s.v}
+              onClick={() => setStatusFilter(s.v)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                statusFilter === s.v
+                  ? "bg-navy text-primary-foreground"
+                  : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        {filtered.length !== akten.length && (
+          <span className="text-xs text-muted-foreground">
+            {filtered.length}/{akten.length}
+          </span>
+        )}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="glass-card p-8 text-center text-sm text-muted-foreground border-border/50">
+          Keine Akten in diesem Filter.
+        </div>
+      ) : (
       <div className="space-y-3">
-        {akten.map((a) => {
+        {filtered.map((a) => {
           const md = findMandant(a.mandant_id);
           const anwalt = findUser(a.zugewiesener_anwalt_id);
           const kritisch = a.fristen.some((f) => f.kritisch);
@@ -649,6 +715,8 @@ const AktenPage = () => {
           );
         })}
       </div>
+      )}
+      </>
       )}
     </div>
   );
