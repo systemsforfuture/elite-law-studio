@@ -315,12 +315,46 @@ const MandantenPage = () => {
     });
   }, [mandanten, query, statusFilter]);
 
+  const stats = useMemo(() => {
+    const aktiv = mandanten.filter((m) => m.status === "aktiv").length;
+    const interessent = mandanten.filter((m) => m.status === "interessent").length;
+    const abgeschlossen = mandanten.filter((m) => m.status === "abgeschlossen").length;
+    const offeneForderungen = mandanten.reduce(
+      (s, m) => s + (m.open_invoices_eur ?? 0),
+      0,
+    );
+    return { total: mandanten.length, aktiv, interessent, abgeschlossen, offeneForderungen };
+  }, [mandanten]);
+
   if (selected) {
     return <MandantDetail mandant={selected} onBack={() => setSelected(null)} />;
   }
 
   return (
     <div className="space-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <MStat label="Gesamt" value={stats.total.toString()} />
+        <MStat
+          label="Aktiv"
+          value={stats.aktiv.toString()}
+          accent="emerald"
+        />
+        <MStat
+          label="Interessenten"
+          value={stats.interessent.toString()}
+          accent="amber"
+        />
+        <MStat
+          label="Offene Forderungen"
+          value={
+            stats.offeneForderungen === 0
+              ? "—"
+              : `${stats.offeneForderungen.toLocaleString("de-DE")}€`
+          }
+          accent={stats.offeneForderungen > 0 ? "rose" : undefined}
+        />
+      </div>
+
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[280px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -513,5 +547,34 @@ const Mini = ({
     {sub && <div className="text-xs text-muted-foreground mt-1">{sub}</div>}
   </div>
 );
+
+const MStat = ({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: "emerald" | "amber" | "rose";
+}) => {
+  const cls =
+    accent === "emerald"
+      ? "text-emerald-600"
+      : accent === "amber"
+      ? "text-amber-600"
+      : accent === "rose"
+      ? "text-rose-600"
+      : "text-foreground";
+  return (
+    <div className="glass-card p-4 border-border/50">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+        {label}
+      </div>
+      <div className={`text-2xl font-display font-black tabular-nums ${cls}`}>
+        {value}
+      </div>
+    </div>
+  );
+};
 
 export default MandantenPage;
