@@ -177,15 +177,36 @@ const MahnwesenPage = () => {
                 {new Date(selected.faelligkeit).toLocaleDateString("de-DE")}
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-display font-black text-foreground tabular-nums">
-                {selected.betrag_brutto.toLocaleString("de-DE")}€
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="text-right">
+                <div className="text-3xl font-display font-black text-foreground tabular-nums">
+                  {selected.betrag_brutto.toLocaleString("de-DE")}€
+                </div>
+                <span
+                  className={`text-[10px] uppercase font-bold px-2 py-1 rounded inline-block mt-1 ${statusCls[selected.status]}`}
+                >
+                  {statusLabel[selected.status]}
+                </span>
               </div>
-              <span
-                className={`text-[10px] uppercase font-bold px-2 py-1 rounded inline-block mt-1 ${statusCls[selected.status]}`}
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-lg shrink-0"
+                onClick={async () => {
+                  const { generateRechnungPdf } = await import(
+                    "@/lib/generate-rechnung-pdf"
+                  );
+                  generateRechnungPdf({
+                    tenant,
+                    mandant: md ?? null,
+                    rechnung: selected,
+                  });
+                  toast.success("Rechnungs-PDF heruntergeladen");
+                }}
               >
-                {statusLabel[selected.status]}
-              </span>
+                <Download className="mr-2 h-3.5 w-3.5" />
+                Rechnung PDF
+              </Button>
             </div>
           </div>
         </div>
