@@ -86,12 +86,12 @@ const TASK_MODELS: Record<LlmTask, ModelChoice> = {
     max_tokens: 1024,
   },
 
-  // Tiefes Reasoning für Akten-Strategie
+  // Tiefes Reasoning für Akten-Strategie — Premium-Modell für maximale Rechts-Tiefe
   strategy_gen: {
-    primary: { provider: "anthropic", model: "claude-opus-4-6" },
-    fallback: { provider: "openai", model: "gpt-4o" },
+    primary: { provider: "anthropic", model: "claude-opus-4-7" },
+    fallback: { provider: "anthropic", model: "claude-opus-4-6" },
     temperature: 0.2,
-    max_tokens: 4096,
+    max_tokens: 6144,
   },
 
   // Conversational mit Kontext-Memory
@@ -112,6 +112,7 @@ const PRICING: Record<string, { input: number; output: number }> = {
   "claude-haiku-4-5-20251001": { input: 1.0, output: 5.0 },
   "claude-sonnet-4-6": { input: 3.0, output: 15.0 },
   "claude-opus-4-6": { input: 15.0, output: 75.0 },
+  "claude-opus-4-7": { input: 15.0, output: 75.0 },
   // OpenAI
   "gpt-4o-mini": { input: 0.15, output: 0.6 },
   "gpt-4o": { input: 2.5, output: 10.0 },

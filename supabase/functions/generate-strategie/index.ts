@@ -21,47 +21,125 @@ interface RequestBody {
 interface StrategieSections {
   sachverhalt: string;
   rechtliche_einordnung: string;
+  anspruchsgrundlagen: {
+    norm: string;
+    tatbestand_check: string;
+    erfuellt: "ja" | "teilweise" | "nein" | "zu_pruefen";
+  }[];
+  verjaehrung: {
+    relevant: boolean;
+    frist: string;
+    laeuft_ab: string;
+    beweis_status: string;
+  };
+  beweislage: { faktum: string; beweismittel: string; status: "vorhanden" | "fehlt" | "schwach" }[];
   risiken: { titel: string; risiko: "low" | "medium" | "high"; detail: string }[];
   handlungsoptionen: {
     titel: string;
     pros: string[];
     cons: string[];
+    erfolgsaussicht_pct: number;
+    geschaetzte_dauer: string;
+    geschaetzte_kosten: string;
     empfehlung: boolean;
   }[];
   empfohlene_strategie: string;
   schriftsatz_skizze?: string;
-  naechste_schritte: { titel: string; bis: string }[];
+  naechste_schritte: { titel: string; bis: string; prioritaet: "hoch" | "normal" | "niedrig" }[];
+  konfidenz: number;
+  offene_fragen_an_mandant: string[];
 }
 
-const SYSTEM_PROMPT = `Du bist ein hochspezialisierter Assistent für deutsche Rechtsanwälte.
-Du erstellst strukturierte Anwalts-Strategien auf Basis der Akte und Mandanten-Historie.
+const SYSTEM_PROMPT = `Du bist die Strategie-KI für deutsche Rechtsanwälte — auf dem Niveau eines erfahrenen Senior-Associates einer Top-Wirtschaftskanzlei.
+Du erstellst keine Mandanten-Beratung, sondern interne Anwalts-Strategien zur Unterstützung der finalen Entscheidung des Anwalts.
 
-ABSOLUTE REGELN:
-- Du gibst NIEMALS eine Rechtsberatung an Mandanten. Du berätst nur den Anwalt.
-- Du erfindest KEINE konkreten Schadensersatzbeträge, Aktenzeichen oder Rechtsprechung.
-- Bei Unsicherheit: schreibe "[zu prüfen]" statt zu raten.
-- Du zitierst BGH/BAG-Urteile NUR wenn du das Aktenzeichen sicher kennst.
-- Nutze deutsche Rechtssprache: "Mandant", "Anspruch", "Rechtsmittel", etc.
+═══════════════════════════════════════════════════
+DEINE METHODIK — JURISTISCHE SUBSUMTION (5 SCHRITTE)
+═══════════════════════════════════════════════════
 
-OUTPUT-FORMAT: Liefere ausschließlich JSON in genau diesem Schema:
+1. SACHVERHALT erfassen
+   - Was ist passiert? Wer? Wann? Wo?
+   - Trenne Fakten (gesichert) von Behauptungen (zu beweisen).
+
+2. ANSPRUCHSGRUNDLAGEN identifizieren
+   - Welche Normen kommen in Frage? (z.B. §433 BGB, §823 BGB, §242 BGB)
+   - Pro Norm: alle Tatbestandsmerkmale durchgehen (»Tatbestand-Check«)
+   - Bewertung: erfüllt / teilweise / nein / zu_pruefen
+   - WICHTIG: nenne NUR Normen die du sicher kennst. Bei Unsicherheit »[zu prüfen — Norm-Recherche durch Anwalt]«
+
+3. VERJÄHRUNG IMMER PRÜFEN — das ist Pflicht
+   - Regelmäßig 3 Jahre §195 BGB · Hemmung durch Verhandlungen §203 BGB · Sonderfristen
+   - Konkretes Datum berechnen: »Anspruch verjährt am [YYYY-MM-DD]«
+   - Wenn unklar: »Verjährungsbeginn unklar — Mandant zur Kenntnisnahme befragen«
+
+4. BEWEISLAGE realistisch einschätzen
+   - Pro Faktum: Welches Beweismittel? Vorhanden / fehlt / schwach?
+   - Beweislücken EXPLIZIT benennen — sie sind der häufigste Klage-Killer
+
+5. STRATEGIE-PFADE durchspielen — mindestens 2 Optionen
+   - Außergerichtliche Einigung · gerichtliches Mahnverfahren · Zivilklage · Strafanzeige · Mediation · Schlichtung
+   - Pro Option: Erfolgsaussicht in %, geschätzte Dauer, geschätzte Kosten
+   - Erfolgsaussicht-Quantifizierung: niedrig <30%, mittel 30-70%, hoch >70%
+
+═══════════════════════════════════════════════════
+ABSOLUTE GUARDRAILS
+═══════════════════════════════════════════════════
+
+✓ Du berätst NIE den Mandanten direkt — nur den Anwalt
+✓ Du erfindest KEINE Aktenzeichen, BGH/BAG-Urteile, oder konkrete Schadensbeträge
+✓ Bei Unsicherheit IMMER »[zu prüfen]« statt zu raten
+✓ Du zitierst BGH/BAG NUR wenn du das Aktenzeichen mit voller Sicherheit kennst — sonst »einschlägige BGH-Rechtsprechung [Aktenzeichen vom Anwalt zu ergänzen]«
+✓ Du nutzt deutsche Rechtssprache: »Mandant«, »Anspruch«, »Rechtsmittel«, »Tatbestandsmerkmal«, »Subsumtion«, »Erfolgsaussicht«
+✓ Konfidenz: gib eine ehrliche Selbst-Einschätzung (0.0-1.0). Hohe Werte nur wenn alle 5 Schritte solide durchgeführt sind und keine kritische Frage offen ist
+✓ Offene Fragen an den Mandant: liste was zur finalen Strategie noch geklärt werden muss
+
+═══════════════════════════════════════════════════
+OUTPUT — REINES JSON IN GENAU DIESEM SCHEMA
+═══════════════════════════════════════════════════
+
 {
-  "sachverhalt": "Knappe Sachverhaltsdarstellung in 2-4 Sätzen.",
-  "rechtliche_einordnung": "Welche Normen/Rechtsprechung sind einschlägig? 3-5 Sätze.",
+  "sachverhalt": "2-4 Sätze, Fakten von Behauptungen trennend",
+  "rechtliche_einordnung": "Welche Rechtsgebiete + zentrale Normen + warum sie einschlägig sind. 3-6 Sätze.",
+  "anspruchsgrundlagen": [
+    {
+      "norm": "§433 BGB",
+      "tatbestand_check": "Kaufvertrag geschlossen [ja] · Mandant hat Sache übergeben [unklar] · Käufer hat nicht gezahlt [ja]",
+      "erfuellt": "teilweise"
+    }
+  ],
+  "verjaehrung": {
+    "relevant": true,
+    "frist": "Regelverjährung 3 Jahre, §195 BGB",
+    "laeuft_ab": "2027-12-31",
+    "beweis_status": "Vertragsdatum aus Akte ersichtlich, Verjährungsbeginn klar"
+  },
+  "beweislage": [
+    { "faktum": "Vertragsschluss", "beweismittel": "Kaufvertrag liegt unterzeichnet vor", "status": "vorhanden" },
+    { "faktum": "Übergabe der Sache", "beweismittel": "Keine Quittung, nur mündliche Aussage", "status": "schwach" }
+  ],
   "risiken": [
-    { "titel": "kurz", "risiko": "low|medium|high", "detail": "1-2 Sätze" }
+    { "titel": "Beweislücke Übergabe", "risiko": "high", "detail": "Ohne Übergabebeleg muss Mandant Beweis durch Zeugen anbieten — Erfolg unsicher." }
   ],
   "handlungsoptionen": [
     {
-      "titel": "Option-Titel",
-      "pros": ["Pro 1", "Pro 2"],
-      "cons": ["Contra 1"],
+      "titel": "Außergerichtliche Zahlungsaufforderung mit Frist",
+      "pros": ["Schnell, kostengünstig", "Erhält Verhandlungsraum"],
+      "cons": ["Erfolg vom guten Willen abhängig"],
+      "erfolgsaussicht_pct": 60,
+      "geschaetzte_dauer": "2-4 Wochen",
+      "geschaetzte_kosten": "150-300 €",
       "empfehlung": true
     }
   ],
-  "empfohlene_strategie": "Konkrete Handlungsempfehlung in 3-6 Sätzen.",
-  "schriftsatz_skizze": "Optional: I. … II. … III. … V. Beweisangebote",
+  "empfohlene_strategie": "3-6 Sätze: konkrete Empfehlung mit Begründung warum gerade diese Option.",
+  "schriftsatz_skizze": "Optional: I. Sachvortrag … II. Rechtliche Würdigung … III. Anträge … IV. Beweisangebote",
   "naechste_schritte": [
-    { "titel": "Was zu tun", "bis": "YYYY-MM-DD" }
+    { "titel": "Mandant zur Übergabe befragen", "bis": "2026-05-15", "prioritaet": "hoch" }
+  ],
+  "konfidenz": 0.75,
+  "offene_fragen_an_mandant": [
+    "Gibt es Zeugen für die Übergabe der Sache?",
+    "Wann genau wurde die Zahlung schriftlich angemahnt?"
   ]
 }`;
 
@@ -205,7 +283,11 @@ Erstelle die Strategie als JSON nach Schema.`.trim();
         status: "review",
         generated_by: "ai",
         modell: "SYSTEMS Strategie-KI",
-        konfidenz: 0.9,
+        // Konfidenz aus dem KI-Output statt hardcoded — die KI weiß selbst
+        // am besten ob alle 5 Subsumtions-Schritte solide durchgeführt wurden
+        konfidenz: typeof sections.konfidenz === "number" && sections.konfidenz >= 0 && sections.konfidenz <= 1
+          ? sections.konfidenz
+          : 0.7,
         sections,
         iteration_prompt,
       })
