@@ -238,22 +238,46 @@ const TerminePage = () => {
               Anstehend
             </h3>
             <div className="space-y-3">
-              {termine.length === 0 && (
-                <div className="text-xs text-muted-foreground/70 italic px-1 py-3">
-                  Keine anstehenden Termine.
-                </div>
-              )}
-              {termine
-                .slice()
-                .sort((a, b) => a.start_at.localeCompare(b.start_at))
-                .slice(0, 5)
-                .map((t) => {
+              {(() => {
+                const now = Date.now();
+                const upcoming = termine
+                  .filter((t) => new Date(t.start_at).getTime() >= now - 60_000)
+                  .sort((a, b) => a.start_at.localeCompare(b.start_at))
+                  .slice(0, 5);
+
+                if (upcoming.length === 0) {
+                  return (
+                    <div className="text-xs text-muted-foreground/70 italic px-1 py-3">
+                      Keine anstehenden Termine.
+                    </div>
+                  );
+                }
+
+                return upcoming.map((t) => {
                   const md = findMandant(t.mandant_id);
                   const u = findUser(t.anwalt_id);
+                  const startMs = new Date(t.start_at).getTime();
+                  const isHeute = (() => {
+                    const d = new Date(t.start_at);
+                    const ref = new Date();
+                    return (
+                      d.getFullYear() === ref.getFullYear() &&
+                      d.getMonth() === ref.getMonth() &&
+                      d.getDate() === ref.getDate()
+                    );
+                  })();
+                  const minutesUntil = Math.round((startMs - now) / 60_000);
+                  const isImminent = minutesUntil >= 0 && minutesUntil <= 60;
                   return (
                     <div
                       key={t.id}
-                      className="p-3 rounded-xl border border-border/50 bg-muted/20"
+                      className={`p-3 rounded-xl border ${
+                        isImminent
+                          ? "border-accent/40 bg-accent/[0.05]"
+                          : isHeute
+                          ? "border-amber-500/30 bg-amber-500/[0.04]"
+                          : "border-border/50 bg-muted/20"
+                      }`}
                     >
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span
@@ -261,6 +285,16 @@ const TerminePage = () => {
                         >
                           {typLabel[t.typ]}
                         </span>
+                        {isImminent && (
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-accent/15 text-accent">
+                            in {minutesUntil} Min
+                          </span>
+                        )}
+                        {isHeute && !isImminent && (
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-700">
+                            heute
+                          </span>
+                        )}
                       </div>
                       <div className="text-sm font-semibold text-foreground">
                         {t.titel}
@@ -312,7 +346,8 @@ const TerminePage = () => {
                       </button>
                     </div>
                   );
-                })}
+                });
+              })()}
             </div>
           </div>
 
