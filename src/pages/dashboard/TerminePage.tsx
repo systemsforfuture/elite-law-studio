@@ -10,10 +10,12 @@ import {
   User,
   Sparkles,
   Bell,
+  CheckCircle2,
 } from "lucide-react";
 import { findMandant, findUser, mandantName } from "@/data/mockData";
 import type { TerminTyp } from "@/data/types";
-import { useTermineQuery } from "@/lib/queries/use-termine";
+import { useTermineQuery, useConfirmTermin } from "@/lib/queries/use-termine";
+import { toast } from "sonner";
 import { useAktenQuery } from "@/lib/queries/use-akten";
 import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
@@ -41,6 +43,7 @@ const TerminePage = () => {
   const { data: termine = [] } = useTermineQuery();
   const { data: akten = [] } = useAktenQuery();
   const { tenant } = useTenant();
+  const confirmTermin = useConfirmTermin();
 
   const monthStart = new Date(refMonth.getFullYear(), refMonth.getMonth(), 1);
   const monthEnd = new Date(refMonth.getFullYear(), refMonth.getMonth() + 1, 0);
@@ -327,23 +330,46 @@ const TerminePage = () => {
                           {mandantName(md)}
                         </div>
                       )}
-                      <button
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          const { downloadIcs } = await import(
-                            "@/lib/generate-ics"
-                          );
-                          downloadIcs({
-                            termin: t,
-                            anwalt: u,
-                            mandant: md,
-                            kanzlei_name: tenant.kanzlei_name,
-                          });
-                        }}
-                        className="text-[10px] text-accent hover:text-gold-dark mt-2 flex items-center gap-1"
-                      >
-                        <CalendarPlus className="h-3 w-3" /> .ics herunterladen
-                      </button>
+                      <div className="flex items-center gap-3 mt-2 flex-wrap">
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const { downloadIcs } = await import(
+                              "@/lib/generate-ics"
+                            );
+                            downloadIcs({
+                              termin: t,
+                              anwalt: u,
+                              mandant: md,
+                              kanzlei_name: tenant.kanzlei_name,
+                            });
+                          }}
+                          className="text-[10px] text-accent hover:text-gold-dark flex items-center gap-1"
+                        >
+                          <CalendarPlus className="h-3 w-3" /> .ics herunterladen
+                        </button>
+                        {!t.bestaetigt && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              const tid = toast.loading("Wird bestätigt…");
+                              try {
+                                await confirmTermin.mutateAsync(t.id);
+                                toast.success("Termin bestätigt", { id: tid });
+                              } catch (err) {
+                                toast.error("Fehler", {
+                                  id: tid,
+                                  description: err instanceof Error ? err.message : String(err),
+                                });
+                              }
+                            }}
+                            disabled={confirmTermin.isPending}
+                            className="text-[10px] text-amber-700 hover:text-amber-800 disabled:opacity-50 flex items-center gap-1"
+                          >
+                            <CheckCircle2 className="h-3 w-3" /> Bestätigen
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 });
