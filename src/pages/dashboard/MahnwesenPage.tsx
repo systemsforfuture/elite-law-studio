@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { findMandant, mandantName, mandanten as allMandanten } from "@/data/mockData";
 import type { Rechnung, RechnungStatus } from "@/data/types";
-import { useGenerateMahnung, useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useGenerateMahnung, useRechnungenQuery, useMarkRechnungBezahlt } from "@/lib/queries/use-rechnungen";
 import { useSendMessage } from "@/lib/queries/use-send-message";
 import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { isWithinLastDays } from "@/lib/date-utils";
@@ -84,6 +84,7 @@ const MahnwesenPage = () => {
   const { tenant } = useTenant();
   const offen = rechnungen.filter((r) => r.status !== "bezahlt");
   const generateMahnung = useGenerateMahnung();
+  const markBezahlt = useMarkRechnungBezahlt();
   const sendMessage = useSendMessage();
   const { data: providerHealth } = useProviderHealth();
   const emailReady = Boolean(
@@ -207,6 +208,33 @@ const MahnwesenPage = () => {
                 <Download className="mr-2 h-3.5 w-3.5" />
                 Rechnung PDF
               </Button>
+              {selected.status !== "bezahlt" && (
+                <Button
+                  variant="gold"
+                  size="sm"
+                  className="rounded-lg shrink-0"
+                  disabled={markBezahlt.isPending}
+                  onClick={async () => {
+                    const t = toast.loading("Wird als bezahlt markiert…");
+                    try {
+                      await markBezahlt.mutateAsync(selected.id);
+                      toast.success(`Rechnung ${selected.rechnungsnummer} ist bezahlt`, {
+                        id: t,
+                        description: "Status aktualisiert. Mahnungs-Stop sofort wirksam.",
+                      });
+                      setSelected(null);
+                    } catch (e) {
+                      toast.error("Fehler", {
+                        id: t,
+                        description: e instanceof Error ? e.message : String(e),
+                      });
+                    }
+                  }}
+                >
+                  <CheckCircle2 className="mr-2 h-3.5 w-3.5" />
+                  Als bezahlt markieren
+                </Button>
+              )}
             </div>
           </div>
         </div>
