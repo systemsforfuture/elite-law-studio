@@ -7,6 +7,7 @@
 
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { callerContext, supabaseAdmin } from "../_shared/supabase-admin.ts";
+import { buildVapiAssistantConfig } from "../_shared/voice-prompt.ts";
 
 interface RequestBody {
   area_code?: string;
@@ -32,7 +33,8 @@ Deno.serve(async (req) => {
 
     const body: RequestBody = await req.json();
     const apiKey = Deno.env.get("VAPI_API_KEY");
-    const assistantId = Deno.env.get("VAPI_DEFAULT_ASSISTANT_ID");
+    const fallbackAssistantId = Deno.env.get("VAPI_DEFAULT_ASSISTANT_ID");
+    const webhookBaseUrl = Deno.env.get("PUBLIC_BASE_URL");
 
     if (!apiKey) {
       return respond(
@@ -47,31 +49,59 @@ Deno.serve(async (req) => {
 
     const admin = supabaseAdmin();
 
-    // Tenant auf provisioning markieren
+    // Tenant auf provisioning markieren + Tonalität/Branding lesen
     const { data: tenant } = await admin
       .from("tenants")
-      .select("provider_config, kanzlei_name")
+      .select("provider_config, kanzlei_name, branding_config, rechtsgebiete, inhaber_name")
       .eq("id", ctx.tenant_id)
       .single();
     const baseCfg = (tenant?.provider_config ?? {}) as Record<string, Record<string, unknown>>;
+    const branding = (tenant?.branding_config ?? {}) as { tonalitaet?: string };
+    const greeting =
+      body.greeting ??
+      `Kanzlei ${tenant?.kanzlei_name ?? ""}, mein Name ist Anna. Wie kann ich Ihnen helfen?`;
     await admin
       .from("tenants")
       .update({
         provider_config: {
           ...baseCfg,
-          voice: {
-            ...(baseCfg.voice ?? {}),
-            status: "provisioning",
-            greeting:
-              body.greeting ??
-              `Kanzlei ${tenant?.kanzlei_name ?? ""}, mein Name ist Anna. Wie kann ich Ihnen helfen?`,
-          },
+          voice: { ...(baseCfg.voice ?? {}), status: "provisioning", greeting },
         },
       })
       .eq("id", ctx.tenant_id);
 
-    // Vapi: Buy Phone Number
-    // Doku: https://docs.vapi.ai/api-reference/phone-numbers/buy-phone-number
+    // Tenant-spezifischen Vapi-Assistant erstellen (oder Default-Fallback nutzen)
+    let assistantId: string | undefined = fallbackAssistantId ?? undefined;
+    const assistantConfig = buildVapiAssistantConfig({
+      kanzlei_name: tenant?.kanzlei_name ?? "Kanzlei",
+      tonalitaet: (branding.tonalitaet as "formal" | "freundlich" | "empathisch" | "direkt") ?? "freundlich",
+      rechtsgebiete: (tenant?.rechtsgebiete as string[] | undefined) ?? undefined,
+      greeting,
+      inhaber_name: tenant?.inhaber_name as string | undefined,
+    });
+    // Server-URL für Function-Tools + Webhook
+    if (webhookBaseUrl) {
+      (assistantConfig as Record<string, unknown>).serverUrl = `${webhookBaseUrl.replace(/\/$/, "")}/functions/v1/webhook-vapi`;
+    }
+    const createRes = await fetch("https://api.vapi.ai/assistant", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(assistantConfig),
+    });
+    if (createRes.ok) {
+      const created = (await createRes.json()) as { id?: string };
+      if (created.id) assistantId = created.id;
+    } else {
+      const err = await createRes.text();
+      console.warn(
+        `[provision-voice-number] Tenant-Assistant-Create failed (${createRes.status}), fallback auf Default-Assistant: ${err.slice(0, 200)}`,
+      );
+    }
+
+    // Vapi: Buy Phone Number — bindet sie an den eben erstellten Assistant
     const buyRes = await fetch("https://api.vapi.ai/phone-number/buy", {
       method: "POST",
       headers: {
@@ -80,9 +110,8 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         provider: "vapi",
-        // areaCode für DE-Nummern
         areaCode: body.area_code ?? "030",
-        assistantId: assistantId ?? undefined,
+        assistantId,
         name: `SYSTEMS-Tenant-${ctx.tenant_id.slice(0, 8)}`,
       }),
     });
@@ -126,9 +155,10 @@ Deno.serve(async (req) => {
             enabled: true,
             phone_number: result.number,
             phone_number_id: result.id,
+            assistant_id: assistantId ?? null,
             provisioned_at: new Date().toISOString(),
             status: "active",
-            greeting: body.greeting ?? (baseCfg.voice as { greeting?: string })?.greeting ?? null,
+            greeting,
           },
         },
       })
