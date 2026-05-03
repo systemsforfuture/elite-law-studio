@@ -32,6 +32,7 @@ import { useUrlaubQuery } from "@/lib/queries/use-personal";
 import { useLlmUsage } from "@/lib/queries/use-llm-usage";
 import { isSameDay } from "@/lib/date-utils";
 import { CommandPalette, useCommandPalette } from "@/components/dashboard/CommandPalette";
+import KeyboardShortcutsModal, { useKeyboardShortcutsModal } from "@/components/dashboard/KeyboardShortcutsModal";
 import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
 import WelcomeTour from "@/components/dashboard/WelcomeTour";
@@ -141,6 +142,7 @@ const DashboardLayout = () => {
   useRealtimeSubscriptions();
   useRealtimeToasts();
   const cmdk = useCommandPalette();
+  const shortcuts = useKeyboardShortcutsModal();
   const { data: providerHealth } = useProviderHealth();
   const { data: konversationen = [] } = useKonversationenQuery();
   const { data: rechnungen = [] } = useRechnungenQuery();
@@ -400,6 +402,7 @@ const DashboardLayout = () => {
         </header>
 
         <CommandPalette open={cmdk.open} onOpenChange={cmdk.setOpen} />
+        <KeyboardShortcutsModal open={shortcuts.open} onOpenChange={shortcuts.setOpen} />
         <WelcomeTour />
         <AssistantWidget />
 
