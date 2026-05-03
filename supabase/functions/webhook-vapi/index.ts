@@ -36,6 +36,10 @@ interface VapiWebhookPayload {
     };
     messages?: { role: string; message: string; time?: number }[];
   };
+  functionCall?: {
+    name: string;
+    parameters: Record<string, unknown>;
+  };
 }
 
 Deno.serve(async (req: Request) => {
@@ -109,6 +113,222 @@ Deno.serve(async (req: Request) => {
         .or(`telefon.eq.${fromNumber},whatsapp.eq.${fromNumber}`)
         .maybeSingle();
       mandant_id = m?.id ?? null;
+    }
+
+    // ─────────────────────────────────────────────────────
+    // Function-Tool-Calls vom Voice-Assistant
+    // ─────────────────────────────────────────────────────
+    if (payload.type === "function-call" && payload.functionCall) {
+      const { name, parameters } = payload.functionCall;
+      const respond = (result: unknown, status = 200) =>
+        new Response(JSON.stringify({ result }), {
+          status,
+          headers: { ...corsHeaders, "content-type": "application/json" },
+        });
+
+      try {
+        if (name === "lookup_mandant") {
+          const q = String(parameters.name_or_phone ?? "").trim();
+          if (!q) return respond({ found: false });
+          const phone = normalizePhone(q);
+          const { data } = await admin
+            .from("mandanten")
+            .select("id, vorname, nachname, firmenname, email, telefon, rechtsgebiet")
+            .eq("tenant_id", tenant_id)
+            .or(
+              phone
+                ? `telefon.eq.${phone},whatsapp.eq.${phone}`
+                : `nachname.ilike.%${q}%,firmenname.ilike.%${q}%`,
+            )
+            .limit(1)
+            .maybeSingle();
+          return respond(
+            data
+              ? {
+                  found: true,
+                  mandant_id: data.id,
+                  name: data.firmenname ?? `${data.vorname ?? ""} ${data.nachname ?? ""}`.trim(),
+                  rechtsgebiet: data.rechtsgebiet ?? null,
+                }
+              : { found: false },
+          );
+        }
+
+        if (name === "check_availability") {
+          const dateIso = String(parameters.date_iso ?? "");
+          const dauer = Number(parameters.dauer_min ?? 30);
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dateIso)) {
+            return respond({ slots: [], error: "Datum-Format YYYY-MM-DD erwartet" }, 200);
+          }
+          // Hole alle Termine an diesem Tag, finde freie 30-Min-Slots zwischen 9-17 Uhr.
+          const dayStart = new Date(`${dateIso}T00:00:00Z`);
+          const dayEnd = new Date(`${dateIso}T23:59:59Z`);
+          const { data: existing = [] } = await admin
+            .from("termine")
+            .select("start_at, ende_at")
+            .eq("tenant_id", tenant_id)
+            .gte("start_at", dayStart.toISOString())
+            .lte("start_at", dayEnd.toISOString());
+          const occupied = (existing ?? []).map((t) => ({
+            start: new Date(t.start_at).getTime(),
+            end: t.ende_at
+              ? new Date(t.ende_at).getTime()
+              : new Date(t.start_at).getTime() + 30 * 60_000,
+          }));
+          const slots: string[] = [];
+          for (let h = 9; h < 17 && slots.length < 5; h++) {
+            for (const m of [0, 30]) {
+              const slotStart = new Date(`${dateIso}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`);
+              const slotEnd = new Date(slotStart.getTime() + dauer * 60_000);
+              const conflict = occupied.some(
+                (o) => o.start < slotEnd.getTime() && o.end > slotStart.getTime(),
+              );
+              if (!conflict) {
+                slots.push(slotStart.toISOString());
+                if (slots.length >= 5) break;
+              }
+            }
+          }
+          return respond({ slots, dauer_min: dauer });
+        }
+
+        if (name === "book_appointment") {
+          const startIso = String(parameters.start_at_iso ?? "");
+          const dauer = Number(parameters.dauer_min ?? 30);
+          const titel = String(parameters.titel ?? "Erstgespräch");
+          const mandantIdParam = parameters.mandant_id ? String(parameters.mandant_id) : null;
+          const telefon = String(parameters.telefon ?? "");
+          const notiz = String(parameters.notiz ?? "");
+          if (!startIso || !telefon) {
+            return respond({ ok: false, error: "start_at_iso und telefon sind Pflicht" });
+          }
+          const endeIso = new Date(new Date(startIso).getTime() + dauer * 60_000).toISOString();
+          // Default-Anwalt: Owner des Tenants
+          const { data: owner } = await admin
+            .from("users")
+            .select("id")
+            .eq("tenant_id", tenant_id)
+            .eq("role", "owner")
+            .limit(1)
+            .maybeSingle();
+          const { data: termin, error: tErr } = await admin
+            .from("termine")
+            .insert({
+              tenant_id,
+              titel,
+              typ: "erstgespraech",
+              start_at: startIso,
+              ende_at: endeIso,
+              mandant_id: mandantIdParam ?? mandant_id,
+              anwalt_id: owner?.id ?? null,
+              notiz: `${notiz}${notiz ? "\n\n" : ""}Telefon: ${telefon}\nGebucht via KI-Telefon.`,
+              bestaetigt: false,
+            })
+            .select()
+            .single();
+          if (tErr) throw tErr;
+          await admin.from("activities").insert({
+            tenant_id,
+            mandant_id: mandantIdParam ?? mandant_id,
+            type: "termin_created",
+            actor: "ai",
+            actor_name: "Voice-Receptionist",
+            title: `Termin gebucht: ${titel}`,
+            detail: `${new Date(startIso).toLocaleString("de-DE")} · ${dauer} Min · Anrufer: ${telefon}`,
+            link_to: { module: "termine", id: termin.id },
+          });
+          return respond({ ok: true, termin_id: termin.id, start_at: startIso });
+        }
+
+        if (name === "capture_lead") {
+          const fullName = String(parameters.name ?? "").trim();
+          const telefon = normalizePhone(String(parameters.telefon ?? ""));
+          const anliegen = String(parameters.anliegen ?? "").trim();
+          const rechtsgebiet = String(parameters.rechtsgebiet ?? "").trim();
+          if (!fullName || !telefon) {
+            return respond({ ok: false, error: "name und telefon sind Pflicht" });
+          }
+          const parts = fullName.split(/\s+/);
+          const vorname = parts.length > 1 ? parts.slice(0, -1).join(" ") : null;
+          const nachname = parts.length > 1 ? parts[parts.length - 1] : fullName;
+          const { data: m, error: mErr } = await admin
+            .from("mandanten")
+            .insert({
+              tenant_id,
+              typ: "privat",
+              vorname,
+              nachname,
+              email: "",
+              telefon,
+              status: "interessent",
+              rechtsgebiet: rechtsgebiet || null,
+              herkunft: "voice",
+              notes_preview: anliegen.slice(0, 200),
+            })
+            .select()
+            .single();
+          if (mErr) throw mErr;
+          await admin.from("activities").insert({
+            tenant_id,
+            mandant_id: m.id,
+            type: "mandant_status_change",
+            actor: "ai",
+            actor_name: "Voice-Receptionist",
+            title: "Neuer Lead aus KI-Anruf",
+            detail: `${fullName} · ${telefon} · ${anliegen.slice(0, 200)}`,
+            link_to: { module: "mandanten", id: m.id },
+          });
+          return respond({ ok: true, mandant_id: m.id });
+        }
+
+        if (name === "escalate_to_lawyer") {
+          const grund = String(parameters.grund ?? "Eskalation vom KI-Receptionist");
+          const dringlichkeit = String(parameters.dringlichkeit ?? "rueckruf_naechster_werktag");
+          // Persistiere als hochpriorisierte Konversation, Realtime-Toast greift sofort
+          const { data: konv } = await admin
+            .from("konversationen")
+            .insert({
+              tenant_id,
+              mandant_id,
+              kanal: "voice",
+              richtung: "inbound",
+              status: "escalated",
+              intent: "eskalation",
+              preview: grund,
+              ai_handled: false,
+              ungelesen: true,
+              zeitpunkt: new Date().toISOString(),
+            })
+            .select()
+            .single();
+          await admin.from("activities").insert({
+            tenant_id,
+            mandant_id,
+            type: "voice_call",
+            actor: "ai",
+            actor_name: "Voice-Receptionist",
+            title: `Eskalation: ${dringlichkeit}`,
+            detail: grund,
+            link_to: konv ? { module: "voice", id: konv.id } : undefined,
+          });
+          // Action-Hinweis für die KI: was sie dem Anrufer sagen soll
+          const message =
+            dringlichkeit === "sofort_durchstellen"
+              ? "Ich verbinde Sie sofort mit dem Anwalt — bitte einen Moment."
+              : dringlichkeit === "rueckruf_heute"
+                ? "Ein Anwalt ruft Sie heute noch zurück."
+                : "Ein Anwalt ruft Sie am nächsten Werktag zurück.";
+          return respond({ ok: true, message });
+        }
+
+        return respond({ error: `Unbekannte Funktion: ${name}` }, 400);
+      } catch (e) {
+        console.error("[webhook-vapi] function-call error:", e);
+        return respond(
+          { error: e instanceof Error ? e.message : String(e) },
+          200, // Vapi sieht Fehler im result, retried sonst
+        );
+      }
     }
 
     // Event-Type-spezifische Verarbeitung
