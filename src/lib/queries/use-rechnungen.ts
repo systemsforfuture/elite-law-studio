@@ -71,3 +71,49 @@ export const useGenerateMahnung = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["rechnungen"] }),
   });
 };
+
+/**
+ * Markiert eine Rechnung als bezahlt. Setzt status=bezahlt und bezahlt_am=now().
+ * Mock-Modus mutiert das mockRechnungen-Array damit andere Pages den Effekt sehen.
+ */
+export const useMarkRechnungBezahlt = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string): Promise<Rechnung | null> => {
+      const nowIso = new Date().toISOString();
+      if (shouldMock()) {
+        const r = mockRechnungen.find((x) => x.id === id);
+        if (!r) return null;
+        r.status = "bezahlt";
+        r.bezahlt_am = nowIso;
+        return r;
+      }
+      const { data, error } = await supabase!
+        .from("rechnungen")
+        .update({ status: "bezahlt", bezahlt_am: nowIso })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as Rechnung;
+    },
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ["rechnungen"] });
+      const previous = qc.getQueryData<Rechnung[]>(["rechnungen"]);
+      qc.setQueryData<Rechnung[]>(["rechnungen"], (old) =>
+        (old ?? []).map((r) =>
+          r.id === id
+            ? { ...r, status: "bezahlt", bezahlt_am: new Date().toISOString() }
+            : r,
+        ),
+      );
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx && "previous" in ctx && ctx.previous) {
+        qc.setQueryData(["rechnungen"], ctx.previous);
+      }
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["rechnungen"] }),
+  });
+};
