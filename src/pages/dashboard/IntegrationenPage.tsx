@@ -67,6 +67,20 @@ const IntegrationenPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.get("stripe")]);
 
+  // Setup-Progress: zähle wieviele Module live sind
+  const isVoiceReady = Boolean(cfg?.voice?.enabled && cfg.voice.phone_number);
+  const isWhatsappReady = Boolean(
+    cfg?.whatsapp?.enabled && cfg.whatsapp.verification_status === "verified",
+  );
+  const isEmailReady = Boolean(
+    cfg?.email?.enabled && cfg.email.verification_status === "verified",
+  );
+  const isStripeReady = Boolean(cfg?.stripe?.enabled && cfg.stripe.charges_enabled);
+  const ready = [isVoiceReady, isWhatsappReady, isEmailReady, isStripeReady].filter(
+    Boolean,
+  ).length;
+  const pct = (ready / 4) * 100;
+
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
@@ -79,6 +93,59 @@ const IntegrationenPage = () => {
           Details, nur Ihre Kanzlei-Daten.
         </p>
       </div>
+
+      {cfg && (
+        <div
+          className={`glass-card p-5 border-border/50 ${
+            ready === 4 ? "bg-emerald-500/[0.03] border-emerald-500/20" : ""
+          }`}
+        >
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div className="flex items-center gap-3">
+              <span
+                className={`text-2xl font-display font-black tabular-nums ${
+                  ready === 4
+                    ? "text-emerald-600"
+                    : ready === 0
+                    ? "text-muted-foreground"
+                    : "text-amber-600"
+                }`}
+              >
+                {ready}
+                <span className="text-base text-muted-foreground/60">/4</span>
+              </span>
+              <div>
+                <div className="text-sm font-display font-bold text-foreground">
+                  {ready === 4
+                    ? "Alle Integrationen live"
+                    : ready === 0
+                    ? "Setup starten"
+                    : "Fast fertig"}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {ready === 4
+                    ? "Ihre Kanzlei kann KI-gestützt operieren."
+                    : `Noch ${4 - ready} von 4 Modulen einrichten.`}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold">
+              <SetupBadge label="Voice" ready={isVoiceReady} />
+              <SetupBadge label="WhatsApp" ready={isWhatsappReady} />
+              <SetupBadge label="E-Mail" ready={isEmailReady} />
+              <SetupBadge label="Zahlung" ready={isStripeReady} />
+            </div>
+          </div>
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+            <div
+              className={`h-full transition-all duration-500 ${
+                ready === 4 ? "bg-emerald-500" : "bg-accent"
+              }`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {!cfg ? (
         <div className="glass-card p-8 border-border/50 text-center">
@@ -96,6 +163,19 @@ const IntegrationenPage = () => {
     </div>
   );
 };
+
+const SetupBadge = ({ label, ready }: { label: string; ready: boolean }) => (
+  <span
+    className={`px-2 py-1 rounded-md ${
+      ready
+        ? "bg-emerald-500/15 text-emerald-700"
+        : "bg-muted/40 text-muted-foreground"
+    }`}
+    title={ready ? `${label} ist eingerichtet` : `${label} noch nicht eingerichtet`}
+  >
+    {label}
+  </span>
+);
 
 const ProvisioningHistoryTile = () => {
   const { data: audit = [] } = useAuditLog();
