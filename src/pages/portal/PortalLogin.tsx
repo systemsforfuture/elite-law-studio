@@ -21,7 +21,6 @@ const PortalLogin = () => {
   useDocumentTitle(`Mandanten-Portal · ${tenant.kanzlei_name}`);
   const mandantAuth = useMandantAuth();
   const [email, setEmail] = useState("");
-  const [aktenzeichen, setAktenzeichen] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const navigate = useNavigate();
@@ -155,20 +154,6 @@ const PortalLogin = () => {
                   className="w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all placeholder:text-muted-foreground/40"
                   autoFocus
                   autoComplete="email"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Aktenzeichen{" "}
-                  <span className="text-muted-foreground font-normal">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={aktenzeichen}
-                  onChange={(e) => setAktenzeichen(e.target.value)}
-                  placeholder="z.B. 1234/26"
-                  className="w-full px-4 py-3.5 rounded-xl border border-border/50 bg-background/50 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/30 transition-all placeholder:text-muted-foreground/40 font-mono"
                 />
               </div>
 
