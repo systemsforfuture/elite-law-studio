@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Dokument, DokumentStatus } from "@/data/types";
-import { useDokumenteQuery, useUploadDokument, useSignedUrl } from "@/lib/queries/use-dokumente";
+import { useDokumenteQuery, useUploadDokument, useSignedUrl, useAnalyzeDocument } from "@/lib/queries/use-dokumente";
 import { useTenant } from "@/contexts/TenantContext";
 import { isSameDay } from "@/lib/date-utils";
 import { toast } from "sonner";
@@ -45,6 +45,7 @@ const DokumentePage = () => {
   const [query, setQuery] = useState("");
   const { data: dokumente = [], isLoading } = useDokumenteQuery();
   const upload = useUploadDokument();
+  const analyze = useAnalyzeDocument();
   const { tenant } = useTenant();
   const fileRef = useRef<HTMLInputElement>(null);
   const { url: previewUrl } = useSignedUrl(selected?.storage_path);
@@ -147,11 +148,31 @@ const DokumentePage = () => {
             </div>
 
             <div className="flex gap-2 mt-5">
-              <Button variant="gold" size="sm" className="rounded-xl flex-1">
+              <Button
+                variant="gold"
+                size="sm"
+                className="rounded-xl flex-1"
+                disabled
+                title="Status-Update kommt in einer kommenden Version. Aktuell: Status manuell in DB ändern oder via KI-Analyse-Re-Run."
+              >
                 Freigeben
               </Button>
-              <Button variant="outline" size="sm" className="rounded-xl">
-                Download
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl"
+                asChild
+                disabled={!previewUrl}
+              >
+                <a
+                  href={previewUrl ?? "#"}
+                  download={selected.dateiname}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`${selected.dateiname} herunterladen`}
+                >
+                  Download
+                </a>
               </Button>
             </div>
           </div>
@@ -269,9 +290,26 @@ const DokumentePage = () => {
                 <p className="text-xs text-muted-foreground mb-4">
                   Dokument wurde gerade hochgeladen. Analyse-Dauer ~30 Sek.
                 </p>
-                <Button variant="gold" size="sm" className="rounded-xl">
+                <Button
+                  variant="gold"
+                  size="sm"
+                  className="rounded-xl"
+                  disabled={analyze.isPending}
+                  onClick={async () => {
+                    const t = toast.loading("KI analysiert das Dokument…");
+                    try {
+                      await analyze.mutateAsync(selected.id);
+                      toast.success("Analyse abgeschlossen", { id: t });
+                    } catch (e) {
+                      toast.error("Analyse fehlgeschlagen", {
+                        id: t,
+                        description: e instanceof Error ? e.message : String(e),
+                      });
+                    }
+                  }}
+                >
                   <Sparkles className="mr-2 h-3.5 w-3.5" />
-                  Analyse jetzt starten
+                  {analyze.isPending ? "Analysiere…" : "Analyse jetzt starten"}
                 </Button>
               </div>
             )}

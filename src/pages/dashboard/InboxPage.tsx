@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { findMandant, mandantName } from "@/data/mockData";
 import type { Konversation } from "@/data/types";
-import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
+import { useKonversationenQuery, useMarkAllKonversationenRead } from "@/lib/queries/use-konversationen";
 import { useTriageInbox, type TriageResult } from "@/lib/queries/use-triage";
 import { useSendMessage } from "@/lib/queries/use-send-message";
 import { toast } from "sonner";
@@ -35,6 +35,7 @@ const InboxPage = () => {
   const { data: konversationen = [], isLoading } = useKonversationenQuery();
   const triageInbox = useTriageInbox();
   const sendMessage = useSendMessage();
+  const markAllRead = useMarkAllKonversationenRead();
 
   const handleSend = async (k: Konversation) => {
     if (!reply.trim()) {
@@ -377,14 +378,51 @@ const InboxPage = () => {
                 Schnell-Aktionen
               </h3>
               <div className="space-y-2">
-                <Button variant="outline" className="w-full rounded-xl justify-start" size="sm">
-                  Termin-Link senden
-                </Button>
-                <Button variant="outline" className="w-full rounded-xl justify-start" size="sm">
-                  Akte öffnen
-                </Button>
-                <Button variant="outline" className="w-full rounded-xl justify-start" size="sm">
-                  Als erledigt markieren
+                {md && (
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-xl justify-start"
+                    size="sm"
+                    asChild
+                  >
+                    <a
+                      href={`mailto:${md.email}?subject=Termin-Vorschlag&body=${encodeURIComponent(
+                        "Sehr geehrte/r " + mandantName(md) + ",\n\nfür ein Erstgespräch schlage ich folgende Termine vor:\n\n– \n– \n– \n\nMit freundlichen Grüßen",
+                      )}`}
+                    >
+                      Termin-Link senden
+                    </a>
+                  </Button>
+                )}
+                {selected.akte_id ? (
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-xl justify-start"
+                    size="sm"
+                    asChild
+                  >
+                    <a href={`/dashboard/akten?id=${selected.akte_id}`}>
+                      Akte öffnen
+                    </a>
+                  </Button>
+                ) : null}
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl justify-start"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      await markAllRead.mutateAsync();
+                      toast.success("Als gelesen markiert");
+                      setSelected(null);
+                    } catch (e) {
+                      toast.error("Fehler", {
+                        description: e instanceof Error ? e.message : String(e),
+                      });
+                    }
+                  }}
+                >
+                  Als gelesen markieren
                 </Button>
               </div>
             </div>

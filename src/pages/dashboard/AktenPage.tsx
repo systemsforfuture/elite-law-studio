@@ -329,11 +329,23 @@ const AktenPage = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="rounded-xl">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl"
+                        disabled
+                        title="Manuelle Bearbeitung der KI-Strategie kommt in einer kommenden Version. Aktuell: »Iterations-Wunsch« unten nutzen oder neue Version generieren."
+                      >
                         <FileEdit className="mr-2 h-3.5 w-3.5" />
                         Manuell bearbeiten
                       </Button>
-                      <Button variant="gold" size="sm" className="rounded-xl">
+                      <Button
+                        variant="gold"
+                        size="sm"
+                        className="rounded-xl"
+                        disabled
+                        title="Strategie-Freigabe-Workflow kommt in einer kommenden Version. Aktuell: jede neue Version startet im Status »review« — eine explizite Freigabe ist noch nicht implementiert."
+                      >
                         Freigeben
                       </Button>
                     </div>

@@ -59,9 +59,17 @@ const AbrechnungPage = () => {
                 </span>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="rounded-xl">
-              <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
-              Upgrade
+            <Button variant="outline" size="sm" className="rounded-xl" asChild>
+              <a
+                href={`mailto:support@systems-tm.de?subject=${encodeURIComponent(
+                  `Tier-Upgrade-Anfrage · ${tenant.kanzlei_name}`,
+                )}&body=${encodeURIComponent(
+                  `Aktueller Tier: ${tier.label}\nKanzlei: ${tenant.kanzlei_name}\n\nIch möchte gern auf den nächst-höheren Tier wechseln. Bitte um Rückmeldung mit Konditionen.`,
+                )}`}
+              >
+                <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
+                Upgrade anfragen
+              </a>
             </Button>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
@@ -154,9 +162,17 @@ const AbrechnungPage = () => {
                         </div>
                       </div>
                     </div>
-                    <Button variant="gold" size="sm" className="rounded-lg shrink-0">
-                      <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
-                      Auf {tenant.subscription_tier === "foundation" ? "Growth" : "Premium"} upgraden
+                    <Button variant="gold" size="sm" className="rounded-lg shrink-0" asChild>
+                      <a
+                        href={`mailto:support@systems-tm.de?subject=${encodeURIComponent(
+                          `Tier-Upgrade · ${tenant.subscription_tier === "foundation" ? "Foundation→Growth" : "Growth→Premium"} · ${tenant.kanzlei_name}`,
+                        )}&body=${encodeURIComponent(
+                          `Wir haben das KI-Token-Limit unseres aktuellen Tiers überschritten und möchten upgraden.\n\nKanzlei: ${tenant.kanzlei_name}\nAktueller Tier: ${tier.label}\nGewünschter Tier: ${tenant.subscription_tier === "foundation" ? "Growth (2M Tokens, 990€/Monat)" : "Premium (unbegrenzt, 1890€/Monat)"}`,
+                        )}`}
+                      >
+                        <ArrowUpRight className="mr-2 h-3.5 w-3.5" />
+                        Auf {tenant.subscription_tier === "foundation" ? "Growth" : "Premium"} upgraden
+                      </a>
                     </Button>
                   </div>
                 </div>
