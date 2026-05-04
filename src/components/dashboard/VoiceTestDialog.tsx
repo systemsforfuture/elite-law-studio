@@ -27,17 +27,20 @@ interface Turn {
   text: string;
 }
 
-const FAKE_RESPONSES = [
-  "Kanzlei Bergmann, mein Name ist Anna. Wie kann ich Ihnen helfen?",
-  "Das tut mir leid zu hören. Damit ich Sie an die richtige Person weiterleiten kann: Können Sie mir kurz schildern, worum es genau geht?",
-  "Verstehe. Ich biete Ihnen einen Erstgespräch-Termin am 03. Mai um 14 Uhr an. Passt das?",
-  "Termin ist gebucht. Sie bekommen gleich eine Bestätigung per E-Mail. Soll ich Ihnen vorab eine Liste mit Unterlagen schicken, die Sie mitbringen sollten?",
+// Demo-Konversation für die Chat-Simulation. KEIN echter LLM-Call —
+// der echte Voice-Test (mit Vapi + ElevenLabs) läuft über IntegrationenPage »Test-Anruf«.
+const buildFakeResponses = (kanzleiName: string): string[] => [
+  `Kanzlei ${kanzleiName}, mein Name ist Anna. Wie kann ich Ihnen helfen?`,
+  "Mhm, das tut mir leid zu hören. Damit ich Sie an die richtige Person weiterleiten kann — können Sie mir kurz schildern worum es genau geht?",
+  "Ja, verstehe. Ich schaue eben für Sie nach freien Terminen für ein Erstgespräch. Einen Moment bitte… Ich hätte einen Termin nächste Woche frei. Würde Ihnen das passen?",
+  "Termin ist notiert. Sie bekommen gleich eine Bestätigung per E-Mail. Soll ich Ihnen vorab eine Liste mit Unterlagen schicken die Sie mitbringen sollten?",
 ];
 
 const VoiceTestDialog = ({ open, onOpenChange }: Props) => {
   const { tenant } = useTenant();
+  const fakeResponses = buildFakeResponses(tenant.kanzlei_name);
   const [turns, setTurns] = useState<Turn[]>([
-    { speaker: "ai", text: tenant.branding_config.greeting ?? FAKE_RESPONSES[0] },
+    { speaker: "ai", text: tenant.branding_config.greeting ?? fakeResponses[0] },
   ]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -49,11 +52,12 @@ const VoiceTestDialog = ({ open, onOpenChange }: Props) => {
     setInput("");
     setThinking(true);
 
-    // Simulate thinking + response (would be triage-inbox edge function in production)
+    // Demo-only: simuliert Antworten ohne echten LLM-Call. Der echte Test
+    // mit Vapi-Stimme + 5 Function-Tools läuft über IntegrationenPage »Test-Anruf«.
     setTimeout(
       () => {
         const reply =
-          FAKE_RESPONSES[Math.min(turns.length / 2, FAKE_RESPONSES.length - 1)];
+          fakeResponses[Math.min(turns.length / 2, fakeResponses.length - 1)];
         setTurns((t) => [...t, { speaker: "ai", text: reply }]);
         setThinking(false);
       },
@@ -65,7 +69,7 @@ const VoiceTestDialog = ({ open, onOpenChange }: Props) => {
     setTurns([
       {
         speaker: "ai",
-        text: tenant.branding_config.greeting ?? FAKE_RESPONSES[0],
+        text: tenant.branding_config.greeting ?? fakeResponses[0],
       },
     ]);
 
@@ -85,8 +89,12 @@ const VoiceTestDialog = ({ open, onOpenChange }: Props) => {
             </span>
           </DialogTitle>
           <DialogDescription>
-            Simulation eines Anrufers. Tippen Sie was ein Mandant sagen würde —
-            die SYSTEMS-Voice-KI antwortet wie im Live-Betrieb.
+            Chat-Simulation eines Anrufers — nur für Vorschau-Zwecke.
+            Echter Test mit Anna-Stimme + Termin-Buchung läuft über{" "}
+            <a href="/dashboard/integrationen" className="text-accent underline-offset-2 hover:underline">
+              Setup → Integrationen → Test-Anruf
+            </a>
+            .
           </DialogDescription>
         </DialogHeader>
 
