@@ -386,10 +386,16 @@ const VoicePage = () => {
                   <p className="text-sm text-foreground font-medium">
                     Keine Anrufe protokolliert
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                  <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto mb-4">
                     Sobald jemand auf Ihrer Kanzlei-Nummer anruft, übernimmt
                     der Voice-Receptionist und Sie sehen das Protokoll hier.
                   </p>
+                  <a
+                    href="/dashboard/integrationen"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-accent border border-accent/30 hover:bg-accent/[0.04] transition-colors"
+                  >
+                    KI-Telefon einrichten →
+                  </a>
                 </div>
               )}
               {!isLoading && voiceCalls.length > 0 && filteredCalls.length === 0 && (
