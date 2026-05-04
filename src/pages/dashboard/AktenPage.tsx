@@ -275,6 +275,7 @@ const AktenPage = () => {
                   size="lg"
                   className="rounded-xl glow-sm-gold"
                   disabled={iterating}
+                  title="Premium-KI (Opus 4.7) erstellt strukturierte Subsumtion · ~30 Sek · zählt zum monatlichen Tier-Limit"
                   onClick={() => selected && triggerGenerate(selected.id)}
                 >
                   {iterating ? (
