@@ -426,11 +426,18 @@ const DokumentePage = () => {
                   <p className="text-sm text-foreground font-medium">
                     Keine Dokumente
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+                  <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto mb-4">
                     Hochgeladene Dokumente werden hier angezeigt — die KI
                     analysiert automatisch Vertragsparteien, Fristen und
                     kritische Klauseln.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-accent border border-accent/30 hover:bg-accent/[0.04] transition-colors"
+                  >
+                    Erstes Dokument hochladen →
+                  </button>
                 </div>
               )}
               {filtered.map((d) => {

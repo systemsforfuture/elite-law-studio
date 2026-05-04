@@ -106,6 +106,26 @@ const TerminePage = () => {
 
   return (
     <div className="space-y-6">
+      {termine.length === 0 && (
+        <div className="glass-card p-5 border-accent/20 bg-accent/[0.03] flex items-start gap-3 flex-wrap">
+          <CalIcon className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-display font-bold text-foreground">
+              Noch keine Termine
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Termine werden automatisch vom KI-Voice-Receptionist gebucht (wenn Mandanten anrufen
+              und einen Termin wünschen). Stelle sicher, dass dein KI-Telefon eingerichtet ist.
+            </div>
+          </div>
+          <a
+            href="/dashboard/integrationen"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-accent border border-accent/30 hover:bg-accent/[0.04] transition-colors"
+          >
+            KI-Telefon prüfen →
+          </a>
+        </div>
+      )}
       <div className="grid sm:grid-cols-4 gap-4">
         <Stat
           label="Termine diese Woche"

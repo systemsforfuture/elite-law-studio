@@ -372,6 +372,8 @@ const AgentenPage = () => {
                 <div className="flex items-center gap-3">
                   <input
                     type="range"
+                    aria-label="Confidence-Threshold prozentual"
+                    aria-valuetext={`${(draftThreshold * 100).toFixed(0)} Prozent`}
                     min="0.5"
                     max="0.99"
                     step="0.01"
