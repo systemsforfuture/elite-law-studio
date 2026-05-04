@@ -177,6 +177,7 @@ const AuditPage = () => {
         <div className="flex gap-2 flex-wrap">
           <input
             type="search"
+            aria-label="Audit-Log durchsuchen"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Suchen…"

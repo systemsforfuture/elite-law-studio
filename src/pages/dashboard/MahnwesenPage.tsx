@@ -551,8 +551,17 @@ const MahnwesenPage = () => {
                 return (
                   <tr
                     key={r.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Rechnung ${r.rechnungsnummer} öffnen`}
                     onClick={() => setSelected(r)}
-                    className="border-t border-border/30 hover:bg-muted/20 transition-colors cursor-pointer"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelected(r);
+                      }
+                    }}
+                    className="border-t border-border/30 hover:bg-muted/20 transition-colors cursor-pointer focus:outline-none focus:bg-accent/[0.04]"
                   >
                     <td className="p-4 font-mono text-foreground">
                       {r.rechnungsnummer}

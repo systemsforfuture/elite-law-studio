@@ -76,6 +76,13 @@ const buildSteps = (kanzlei: string): Step[] => [
   },
 ];
 
+/** Manual trigger to re-open the tour from anywhere (z.B. ProfileMenu). */
+export const restartWelcomeTour = () => {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(STORAGE_KEY);
+  window.dispatchEvent(new CustomEvent("systems-welcome-tour-restart"));
+};
+
 const WelcomeTour = () => {
   const { tenant } = useTenant();
   const navigate = useNavigate();
@@ -90,6 +97,16 @@ const WelcomeTour = () => {
       const t = setTimeout(() => setOpen(true), 600);
       return () => clearTimeout(t);
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => {
+      setStep(0);
+      setOpen(true);
+    };
+    window.addEventListener("systems-welcome-tour-restart", handler);
+    return () => window.removeEventListener("systems-welcome-tour-restart", handler);
   }, []);
 
   const steps = buildSteps(tenant.inhaber_name?.split(" ").pop() ?? tenant.kanzlei_name);

@@ -232,70 +232,29 @@ const AbrechnungPage = () => {
         </div>
 
         <div className="glass-card p-6 border-border/50 lg:col-span-3">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 className="font-display font-bold text-foreground flex items-center gap-2">
               <CreditCard className="h-4 w-4 text-accent" />
-              Letzte Rechnungen
+              Plattform-Rechnungen
             </h3>
-            <Button variant="outline" size="sm" className="rounded-xl">
-              <Download className="mr-2 h-3.5 w-3.5" />
-              Alle exportieren
-            </Button>
+            <span className="text-xs text-muted-foreground">
+              SYSTEMS-Plattform (separate von Mandanten-Rechnungen)
+            </span>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-xs uppercase tracking-wider text-muted-foreground/70 border-b border-border/40">
-                <tr>
-                  <th className="text-left py-3 font-semibold">Rechnung</th>
-                  <th className="text-left py-3 font-semibold">Periode</th>
-                  <th className="text-left py-3 font-semibold">Position</th>
-                  <th className="text-right py-3 font-semibold">Betrag</th>
-                  <th className="text-right py-3 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  {
-                    nr: "SYS-2026-04-018",
-                    period: "Apr 2026",
-                    pos: "Growth-Subscription · Telefon 187€",
-                    sum: 1177,
-                    status: "Bezahlt",
-                  },
-                  {
-                    nr: "SYS-2026-03-012",
-                    period: "Mär 2026",
-                    pos: "Growth-Subscription · Telefon 142€",
-                    sum: 1132,
-                    status: "Bezahlt",
-                  },
-                  {
-                    nr: "SYS-2026-02-008",
-                    period: "Feb 2026",
-                    pos: "Setup-Fee + erste Subscription",
-                    sum: 8890,
-                    status: "Bezahlt",
-                  },
-                ].map((r) => (
-                  <tr
-                    key={r.nr}
-                    className="border-b border-border/30 last:border-0"
-                  >
-                    <td className="py-3 font-mono text-foreground">{r.nr}</td>
-                    <td className="py-3 text-muted-foreground">{r.period}</td>
-                    <td className="py-3 text-foreground">{r.pos}</td>
-                    <td className="py-3 text-right font-bold text-foreground tabular-nums">
-                      {r.sum.toLocaleString("de-DE")}€
-                    </td>
-                    <td className="py-3 text-right">
-                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded">
-                        {r.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="rounded-xl border border-dashed border-border/50 bg-muted/10 p-6 text-center">
+            <CreditCard className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+            <p className="text-sm text-foreground font-medium">
+              Plattform-Rechnungen werden monatlich per E-Mail zugeschickt.
+            </p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+              Die SYSTEMS-Plattform-Subscription wird via Stripe abgerechnet — die Rechnung
+              landet in Ihrem Postfach am 1. jeden Monats. Ihre eigene Mandanten-Abrechnung
+              finden Sie unter{" "}
+              <a href="/dashboard/mahnwesen" className="text-accent font-medium hover:text-gold-dark">
+                Mahnwesen
+              </a>
+              .
+            </p>
           </div>
         </div>
       </div>

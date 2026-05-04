@@ -404,6 +404,8 @@ const DokumentePage = () => {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              type="search"
+              aria-label="Dokumente durchsuchen"
               placeholder="Dokumente suchen…"
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
             />

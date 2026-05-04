@@ -15,9 +15,12 @@ import {
   LogOut,
   Palette,
   ExternalLink,
+  Sparkles,
+  Keyboard,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { restartWelcomeTour } from "@/components/dashboard/WelcomeTour";
 import { toast } from "sonner";
 
 const ProfileMenu = () => {
@@ -86,6 +89,26 @@ const ProfileMenu = () => {
             <ShieldCheck className="mr-2 h-4 w-4" />
             <span>Audit-Log</span>
           </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onSelect={() => {
+            restartWelcomeTour();
+            toast.success("Willkommens-Tour gestartet");
+          }}
+        >
+          <Sparkles className="mr-2 h-4 w-4 text-accent" />
+          <span>Willkommens-Tour erneut starten</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={() => {
+            window.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }));
+          }}
+        >
+          <Keyboard className="mr-2 h-4 w-4" />
+          <span>Tastatur-Kürzel anzeigen</span>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

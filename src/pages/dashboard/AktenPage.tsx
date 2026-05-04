@@ -613,6 +613,8 @@ const AktenPage = () => {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            type="search"
+            aria-label="Akten, Aktenzeichen oder Mandant durchsuchen"
             placeholder="Akte, Aktenzeichen oder Mandant suchen…"
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
           />
@@ -659,14 +661,24 @@ const AktenPage = () => {
           const anwalt = findUser(a.zugewiesener_anwalt_id);
           const kritisch = a.fristen.some((f) => f.kritisch);
           const hasStrategy = allStrategien.some((s) => s.akte_id === a.id);
+          const open = () => {
+            setSelected(a);
+            setTab("ueberblick");
+          };
           return (
             <div
               key={a.id}
-              onClick={() => {
-                setSelected(a);
-                setTab("ueberblick");
+              role="button"
+              tabIndex={0}
+              aria-label={`Akte ${a.titel} öffnen`}
+              onClick={open}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  open();
+                }
               }}
-              className="glass-card p-5 border-border/50 hover:border-accent/30 transition-all cursor-pointer group"
+              className="glass-card p-5 border-border/50 hover:border-accent/30 transition-all cursor-pointer group focus:outline-none focus:ring-2 focus:ring-accent/40"
             >
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4 min-w-0">
