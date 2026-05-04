@@ -108,11 +108,27 @@ const MandantDetail = ({
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="rounded-xl">
-              <Phone className="mr-2 h-3.5 w-3.5" /> Anrufen
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              asChild
+              disabled={!mandant.telefon}
+            >
+              <a href={mandant.telefon ? `tel:${mandant.telefon}` : "#"} aria-label={`${mandant.telefon ?? "Keine"} Telefon-Nummer anrufen`}>
+                <Phone className="mr-2 h-3.5 w-3.5" /> Anrufen
+              </a>
             </Button>
-            <Button variant="gold" size="sm" className="rounded-xl">
-              <MessageCircle className="mr-2 h-3.5 w-3.5" /> Nachricht
+            <Button
+              variant="gold"
+              size="sm"
+              className="rounded-xl"
+              asChild
+              disabled={!mandant.email}
+            >
+              <a href={mandant.email ? `mailto:${mandant.email}` : "#"} aria-label={`E-Mail an ${mandant.email ?? "Mandant"}`}>
+                <MessageCircle className="mr-2 h-3.5 w-3.5" /> Nachricht
+              </a>
             </Button>
           </div>
         </div>

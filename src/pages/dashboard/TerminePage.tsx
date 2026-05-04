@@ -190,7 +190,13 @@ const TerminePage = () => {
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
-              <Button variant="gold" size="sm" className="rounded-xl ml-2">
+              <Button
+                variant="gold"
+                size="sm"
+                className="rounded-xl ml-2"
+                disabled
+                title="Termine werden automatisch vom KI-Voice-Receptionist gebucht. Manuelle Anlage kommt in einer kommenden Version."
+              >
                 <Plus className="mr-2 h-3.5 w-3.5" />
                 Neu
               </Button>

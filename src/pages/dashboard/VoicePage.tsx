@@ -273,7 +273,12 @@ const VoicePage = () => {
               </div>
             </div>
 
-            <Button variant="outline" className="w-full rounded-xl">
+            <Button
+              variant="outline"
+              className="w-full rounded-xl"
+              disabled
+              title="Nachträgliche Eskalation eines beendeten Anrufs ist aktuell nicht möglich. Eskalation passiert während des Anrufs durch die KI selbst (Tool-Call escalate_to_lawyer)."
+            >
               An Anwalt eskalieren
             </Button>
           </div>
@@ -498,20 +503,25 @@ const VoicePage = () => {
               <h4 className="text-sm font-semibold text-foreground mb-3">
                 Stimme
               </h4>
-              <div className="flex items-center justify-between p-4 rounded-xl border border-accent/30 bg-accent/[0.04]">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-accent/30 bg-accent/[0.04] flex-wrap gap-3">
                 <div className="flex items-center gap-3">
                   <Mic className="h-5 w-5 text-accent" />
                   <div>
                     <div className="text-sm font-semibold text-foreground">
-                      Voice-Cloning · Dr. Bergmann
+                      SYSTEMS Anna · Deutsche KI-Stimme
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Eigene Stimme geklont · 99% Naturklang
+                      Studio-Qualität · natürliches Sprechtempo · konfigurierbar
                     </div>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="rounded-lg">
-                  Test
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-lg"
+                  onClick={() => setTestOpen(true)}
+                >
+                  Test-Anruf
                 </Button>
               </div>
             </div>
@@ -569,9 +579,11 @@ const VoicePage = () => {
               </div>
             </div>
 
-            <Button variant="gold" className="w-full rounded-xl">
-              <Sparkles className="mr-2 h-4 w-4" />
-              Konfiguration speichern
+            <Button variant="gold" className="w-full rounded-xl" asChild>
+              <a href="/dashboard/branding" aria-label="Tonalität und Begrüßung in Branding bearbeiten">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Tonalität & Begrüßung anpassen
+              </a>
             </Button>
           </div>
         </div>

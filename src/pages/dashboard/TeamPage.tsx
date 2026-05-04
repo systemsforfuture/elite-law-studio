@@ -82,12 +82,26 @@ const TeamDetail = ({
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="rounded-xl">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl"
+              disabled
+              title="Berechtigungs-Editor kommt in einer kommenden Version. Aktuell: alle Mitglieder haben Owner-Rechte (Tenant-Owner) oder Anwalt-Rechte."
+            >
               Berechtigungen bearbeiten
             </Button>
-            <Button variant="gold" size="sm" className="rounded-xl">
-              <Mail className="mr-2 h-3.5 w-3.5" />
-              Nachricht
+            <Button
+              variant="gold"
+              size="sm"
+              className="rounded-xl"
+              asChild
+              disabled={!user.email}
+            >
+              <a href={user.email ? `mailto:${user.email}` : "#"}>
+                <Mail className="mr-2 h-3.5 w-3.5" />
+                Nachricht
+              </a>
             </Button>
           </div>
         </div>
@@ -360,8 +374,10 @@ const TeamPage = () => {
               für Owner und Anwälte. Audit-Log aller Logins ist für 1 Jahr
               verfügbar.
             </p>
-            <Button variant="outline" size="sm" className="rounded-xl">
-              2FA-Status verwalten
+            <Button variant="outline" size="sm" className="rounded-xl" asChild>
+              <a href="/dashboard/audit">
+                Audit-Log öffnen
+              </a>
             </Button>
           </div>
         </div>
