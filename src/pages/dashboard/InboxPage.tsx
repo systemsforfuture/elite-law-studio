@@ -430,6 +430,7 @@ const InboxPage = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="search"
+                aria-label="Inbox durchsuchen"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Mandant, Betreff, Inhalt…"
@@ -484,11 +485,16 @@ const InboxPage = () => {
               <p className="text-sm text-foreground font-medium">
                 Keine Nachrichten
               </p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+              <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto mb-4">
                 Sobald Mandanten per Email oder WhatsApp schreiben, erscheinen
-                ihre Nachrichten hier — die KI hat schon eine Antwort
-                vorbereitet.
+                ihre Nachrichten hier — die KI hat schon eine Antwort vorbereitet.
               </p>
+              <a
+                href="/dashboard/integrationen"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-accent border border-accent/30 hover:bg-accent/[0.04] transition-colors"
+              >
+                E-Mail / WhatsApp einrichten →
+              </a>
             </div>
           )}
           {items.map((k) => {

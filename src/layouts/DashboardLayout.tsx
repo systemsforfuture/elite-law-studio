@@ -215,14 +215,17 @@ const DashboardLayout = () => {
       >
         <div className="p-6 border-b border-white/[0.06]">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
               <Cpu className="h-5 w-5 text-accent" />
             </div>
-            <div>
-              <span className="text-sm font-display font-bold text-primary-foreground">
+            <div className="min-w-0 flex-1">
+              <span
+                className="text-sm font-display font-bold text-primary-foreground block truncate"
+                title={tenant.kanzlei_name}
+              >
                 {tenant.kanzlei_name.toUpperCase()}
               </span>
-              <span className="block text-[10px] text-primary-foreground/30 tracking-[0.2em] uppercase">
+              <span className="block text-[10px] text-primary-foreground/30 tracking-[0.2em] uppercase truncate">
                 · powered by SYSTEMS™
               </span>
             </div>

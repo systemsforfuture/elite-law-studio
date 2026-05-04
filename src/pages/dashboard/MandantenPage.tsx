@@ -361,6 +361,8 @@ const MandantenPage = () => {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            type="search"
+            aria-label="Mandanten durchsuchen"
             placeholder="Mandant suchen…"
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border/50 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
           />
@@ -440,8 +442,17 @@ const MandantenPage = () => {
               {filtered.map((m) => (
                 <tr
                   key={m.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Mandant ${mandantName(m)} öffnen`}
                   onClick={() => setSelected(m)}
-                  className="border-t border-border/30 hover:bg-muted/20 transition-colors cursor-pointer"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelected(m);
+                    }
+                  }}
+                  className="border-t border-border/30 hover:bg-muted/20 transition-colors cursor-pointer focus:outline-none focus:bg-accent/[0.04]"
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
