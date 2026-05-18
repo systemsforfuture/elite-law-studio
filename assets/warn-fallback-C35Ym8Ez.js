@@ -1,0 +1,1 @@
+import{i as o,b as n}from"./index-CaA1KmlM.js";const a=new Set,i=(r,e)=>{o&&(a.has(r)||(a.add(r),console.error(`[${r}] fallback to mock-data:`,e),n.error("Daten aktuell nicht erreichbar",{description:`Modul »${r}« zeigt Demo-Daten. Backend prüfen.`,duration:8e3})))};export{i as w};
