@@ -24,7 +24,7 @@ const statusBadge: Record<DokumentStatus, { label: string; cls: string }> = {
   neu: { label: "Neu", cls: "status-info" },
   ki_analysiert: {
     label: "KI-analysiert",
-    cls: "bg-purple-500/15 text-purple-700",
+    cls: "bg-[hsl(var(--status-info))]/15 text-info",
   },
   geprueft: { label: "Geprüft", cls: "status-success" },
   freigegeben: {
@@ -87,7 +87,7 @@ const DokumentePage = () => {
         </button>
 
         <div className="grid lg:grid-cols-[1fr_1.3fr] gap-6">
-          <div className="glass-card p-6 border-border/50">
+          <div className="surface p-5">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-[hsl(var(--status-critical))]/10 flex items-center justify-center shrink-0">
                 <FileText className="h-5 w-5 text-critical" />
@@ -180,15 +180,15 @@ const DokumentePage = () => {
           <div className="space-y-4">
             {ai ? (
               <>
-                <div className="glass-card p-6 border-purple-500/30 bg-purple-500/[0.03]">
+                <div className="surface p-5 border-[hsl(var(--status-info))]/30 bg-[hsl(var(--status-info))]/[0.025]">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <ScanLine className="h-4 w-4 text-purple-600" />
+                      <ScanLine className="h-4 w-4 text-info" />
                       <h3 className="text-sm font-display font-bold text-foreground">
                         KI-Extraktion
                       </h3>
                     </div>
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-purple-700 bg-purple-500/15 px-2 py-0.5 rounded">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-info bg-[hsl(var(--status-info))]/15 px-2 py-0.5 rounded">
                       Konfidenz {(ai.konfidenz * 100).toFixed(0)}%
                     </span>
                   </div>
@@ -225,7 +225,7 @@ const DokumentePage = () => {
                 </div>
 
                 {ai.kritische_klauseln && ai.kritische_klauseln.length > 0 && (
-                  <div className="glass-card p-6 surface-warning">
+                  <div className="surface-warning p-5">
                     <h3 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
                       <AlertOctagon className="h-4 w-4 text-warning" />
                       Kritische Klauseln
@@ -259,7 +259,7 @@ const DokumentePage = () => {
                 )}
 
                 {ai.fristen && ai.fristen.length > 0 && (
-                  <div className="glass-card p-6 border-border/50">
+                  <div className="surface p-5">
                     <h3 className="text-sm font-display font-bold text-foreground mb-3">
                       Erkannte Fristen
                     </h3>
@@ -282,7 +282,7 @@ const DokumentePage = () => {
                 )}
               </>
             ) : (
-              <div className="glass-card p-8 border-border/50 text-center">
+              <div className="surface p-6 text-center">
                 <ScanLine className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
                 <p className="text-sm font-semibold text-foreground mb-2">
                   KI-Analyse läuft…
@@ -367,25 +367,25 @@ const DokumentePage = () => {
           label="KI-analysiert"
           value={stats.analysiert.toLocaleString("de-DE")}
           sub={stats.total === 0 ? "—" : `${stats.aiPct}% Auto-Quote`}
-          accent="emerald"
+          severity="success"
         />
         <Stat
           label="Heute hochgeladen"
           value={stats.todayCount.toString()}
           sub={stats.todayCount === 0 ? "—" : `${stats.todayMandant} von Mandanten`}
-          accent="purple"
+          severity="info"
         />
         <Stat
           label="Risiko-Klauseln"
           value={stats.risikoKlauseln.toString()}
           sub={stats.risikoHigh === 0 ? "Keine kritisch" : `${stats.risikoHigh} kritisch`}
-          accent="amber"
+          severity="warning"
         />
       </div>
 
       <div className="grid lg:grid-cols-[1fr_3fr] gap-6">
         <div
-          className="glass-card p-6 border-2 border-dashed border-accent/20 bg-accent/[0.02] text-center"
+          className="surface p-5 border-2 border-dashed border-accent/30 text-center"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
             e.preventDefault();
@@ -449,7 +449,7 @@ const DokumentePage = () => {
             />
           </div>
 
-          <div className="glass-card border-border/50 overflow-hidden">
+          <div className="surface overflow-hidden">
             <div className="divide-y divide-border/40">
               {isLoading && filtered.length === 0 && (
                 <>
@@ -528,30 +528,35 @@ const Stat = ({
   label,
   value,
   sub,
-  accent,
+  severity,
 }: {
   label: string;
   value: string;
   sub: string;
-  accent?: "emerald" | "purple" | "amber";
+  severity?: "success" | "info" | "warning" | "critical";
 }) => {
-  const cls =
-    accent === "emerald"
-      ? "text-success"
-      : accent === "purple"
-      ? "text-purple-600"
-      : accent === "amber"
-      ? "text-warning"
-      : "text-foreground";
+  const colorVar =
+    severity === "success"
+      ? "hsl(var(--status-success))"
+      : severity === "info"
+        ? "hsl(var(--status-info))"
+        : severity === "warning"
+          ? "hsl(var(--status-warning))"
+          : severity === "critical"
+            ? "hsl(var(--status-critical))"
+            : "hsl(var(--foreground))";
   return (
-    <div className="glass-card p-5 border-border/50">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+    <div className="surface p-4">
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         {label}
       </div>
-      <div className={`text-3xl font-display font-black tabular-nums ${cls}`}>
+      <div
+        className="text-[22px] font-display font-bold tabular-nums leading-none tracking-tight"
+        style={{ color: colorVar }}
+      >
         {value}
       </div>
-      <div className="text-xs text-muted-foreground mt-1">{sub}</div>
+      <div className="text-[11px] text-muted-foreground/80 mt-1">{sub}</div>
     </div>
   );
 };

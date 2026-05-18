@@ -120,7 +120,7 @@ const AuditPage = () => {
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-3 gap-4">
-        <div className="glass-card p-5 surface-success">
+        <div className="surface-success p-4">
           <div className="flex items-center gap-2 mb-2">
             <ShieldCheck className="h-4 w-4 text-success" />
             <span className="text-xs uppercase tracking-wider font-semibold text-success">
@@ -134,7 +134,7 @@ const AuditPage = () => {
             Audit-Log 1 Jahr · AVV signiert · TDE aktiv
           </div>
         </div>
-        <div className="glass-card p-5 border-border/50">
+        <div className="surface p-4">
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
             Events 24h
           </div>
@@ -147,7 +147,7 @@ const AuditPage = () => {
               : `${stats.aiCount} KI · ${stats.userCount} Nutzer`}
           </div>
         </div>
-        <div className="glass-card p-5 border-border/50">
+        <div className="surface p-4">
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
             Lösch-Aktionen
           </div>
@@ -222,7 +222,7 @@ const AuditPage = () => {
         </div>
       </div>
 
-      <div className="glass-card border-border/50 overflow-hidden">
+      <div className="surface overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-xs uppercase tracking-wider text-muted-foreground/70 bg-muted/20">
@@ -294,7 +294,7 @@ const AuditPage = () => {
         </div>
       </div>
 
-      <div className="glass-card p-6 border-border/50">
+      <div className="surface p-5">
         <h3 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-accent" />
           Compliance-Status
