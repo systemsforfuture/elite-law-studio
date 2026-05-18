@@ -109,7 +109,7 @@ const Login = () => {
           </p>
 
           {!isConfigured && (
-            <div className="mb-6 p-3 rounded-xl border border-amber-500/30 bg-amber-500/[0.04] text-xs text-amber-700 flex items-start gap-2">
+            <div className="mb-6 p-3 rounded-xl surface-warning border text-xs text-warning flex items-start gap-2">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
               <span>
                 Demo-Modus: Backend ist nicht konfiguriert. Login führt direkt
@@ -135,8 +135,8 @@ const Login = () => {
           </div>
 
           {sent ? (
-            <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.04] mb-6">
-              <CheckCircle2 className="h-8 w-8 text-emerald-600 mb-3" />
+            <div className="p-6 rounded-2xl surface-success border mb-6">
+              <CheckCircle2 className="h-8 w-8 text-success mb-3" />
               <h3 className="text-base font-semibold text-foreground mb-1">
                 Magic-Link unterwegs
               </h3>
@@ -174,7 +174,7 @@ const Login = () => {
               </div>
 
               {error && (
-                <div className="p-3 rounded-xl border border-rose-500/30 bg-rose-500/[0.04] text-xs text-rose-700 flex items-start gap-2">
+                <div className="p-3 rounded-xl surface-critical border text-xs text-critical flex items-start gap-2">
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>

@@ -628,11 +628,11 @@ const Onboarding = () => {
               </div>
 
               {magicSent ? (
-                <div className="p-5 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.04]">
+                <div className="p-5 rounded-xl surface-success border">
                   <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
                     <div className="text-sm text-primary-foreground/80">
-                      <strong className="text-emerald-400">
+                      <strong className="text-success">
                         Magic-Link gesendet
                       </strong>
                       <div className="mt-1">
@@ -708,7 +708,7 @@ const Onboarding = () => {
                 key={i}
                 className={`h-1.5 rounded-full transition-all ${
                   i < step
-                    ? "w-6 bg-emerald-500/70"
+                    ? "w-6 bg-[hsl(var(--status-success))]/70"
                     : i === step
                     ? "w-10 bg-accent"
                     : "w-6 bg-primary-foreground/15"
@@ -730,7 +730,7 @@ const Onboarding = () => {
               variant="outline"
               onClick={() => navigate("/login")}
               size="sm"
-              className="rounded-xl border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/10 shrink-0"
+              className="rounded-xl border-[hsl(var(--status-success))]/30 text-success hover:bg-[hsl(var(--status-success))]/10 shrink-0"
             >
               <CheckCircle2 className="mr-2 h-4 w-4" />
               <span className="truncate">Zum Login</span>

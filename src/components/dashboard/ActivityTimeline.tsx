@@ -35,7 +35,7 @@ const meta: Record<
   whatsapp: {
     icon: MessageCircle,
     cls: "text-success",
-    bg: "bg-green-500/10",
+    bg: "bg-[hsl(var(--status-success))]/10",
   },
   document_upload: {
     icon: FileText,
@@ -70,7 +70,7 @@ const meta: Record<
   mahnung_sent: {
     icon: AlertOctagon,
     cls: "text-warning",
-    bg: "bg-orange-500/10",
+    bg: "bg-[hsl(var(--status-warning))]/10",
   },
   akte_status_change: {
     icon: RefreshCw,

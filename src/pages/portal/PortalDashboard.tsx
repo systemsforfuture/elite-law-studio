@@ -483,7 +483,7 @@ const PortalDashboard = () => {
                       </div>
                     </div>
                     {t.bestaetigt ? (
-                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded shrink-0 self-start sm:self-auto">
+                      <span className="text-[10px] uppercase font-bold text-success bg-[hsl(var(--status-success))]/15 px-2 py-1 rounded shrink-0 self-start sm:self-auto">
                         Bestätigt
                       </span>
                     ) : (
@@ -520,8 +520,8 @@ const PortalDashboard = () => {
                     key={d.id}
                     className="glass-card p-4 border-border/50 flex items-center gap-4 hover:border-accent/20 transition-colors cursor-pointer"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
-                      <FileText className="h-4 w-4 text-rose-600" />
+                    <div className="w-10 h-10 rounded-xl bg-[hsl(var(--status-critical))]/10 flex items-center justify-center shrink-0">
+                      <FileText className="h-4 w-4 text-critical" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-foreground truncate">
@@ -567,7 +567,7 @@ const PortalDashboard = () => {
                       {r.betrag_brutto.toLocaleString("de-DE")}€
                     </div>
                     {r.status === "bezahlt" ? (
-                      <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-1 rounded">
+                      <span className="text-[10px] uppercase font-bold text-success bg-[hsl(var(--status-success))]/15 px-2 py-1 rounded">
                         Bezahlt
                       </span>
                     ) : (

@@ -30,7 +30,7 @@ const TestimonialsSection = () => {
         <div className={`flex justify-center mb-16 transition-all duration-700 delay-200 ${isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
           <div className="glass-dark px-8 py-4 flex items-center gap-5">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-green-400" />
+              <ShieldCheck className="h-5 w-5 text-[hsl(var(--status-success))]" />
               <span className="text-xs font-medium text-primary-foreground/60">Verifiziert</span>
             </div>
             <div className="w-px h-8 bg-white/10" />
@@ -69,7 +69,7 @@ const TestimonialsSection = () => {
                     <div className="flex items-center gap-2">
                       <h4 className="text-sm font-semibold text-primary-foreground">{t.name}</h4>
                       {t.verified && (
-                        <CheckCircle className="h-3.5 w-3.5 text-green-400" />
+                        <CheckCircle className="h-3.5 w-3.5 text-[hsl(var(--status-success))]" />
                       )}
                     </div>
                     <p className="text-xs text-primary-foreground/40">{t.role}</p>

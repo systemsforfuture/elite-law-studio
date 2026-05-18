@@ -120,8 +120,8 @@ const PortalLogin = () => {
           </p>
 
           {sent ? (
-            <div className="p-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.04] mb-6">
-              <CheckCircle2 className="h-8 w-8 text-emerald-600 mb-3" />
+            <div className="p-6 rounded-2xl border border-[hsl(var(--status-success))]/30 bg-[hsl(var(--status-success))]/10 mb-6">
+              <CheckCircle2 className="h-8 w-8 text-success mb-3" />
               <h3 className="text-base font-semibold text-foreground mb-1">
                 Login-Link unterwegs
               </h3>
