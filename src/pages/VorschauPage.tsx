@@ -284,9 +284,12 @@ function PreviewBanner({ config }: { config: KanzleiConfig }) {
 const VorschauPage = () => {
   const [searchParams] = useSearchParams();
 
-  const firma = decodeURIComponent(searchParams.get("firma") ?? "Ihre Kanzlei");
-  const ort = decodeURIComponent(searchParams.get("ort") ?? "Deutschland");
-  const rechtsgebiet = decodeURIComponent(searchParams.get("rechtsgebiet") ?? "Wirtschaftsrecht");
+  // Fallbacks zeigen auf DEFAULT_CONFIG damit der Mass-Search-Replace im
+  // per-Lead-Build (Jarvis) die Strings einbiegen kann. Ohne URL-Params zeigt
+  // die deployed Site dann die Lead-spezifischen Defaults statt "Ihre Kanzlei".
+  const firma = decodeURIComponent(searchParams.get("firma") ?? DEFAULT_CONFIG.firma);
+  const ort = decodeURIComponent(searchParams.get("ort") ?? DEFAULT_CONFIG.ort);
+  const rechtsgebiet = decodeURIComponent(searchParams.get("rechtsgebiet") ?? DEFAULT_CONFIG.rechtsgebiet);
   const anwaelte = (() => { const n = parseInt(searchParams.get("anwaelte") ?? "15", 10); return isNaN(n) || n < 1 ? 15 : n; })();
 
   const config: KanzleiConfig = {
