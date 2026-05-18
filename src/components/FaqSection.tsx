@@ -28,6 +28,22 @@ const faqs = [
     q: "Was, wenn wir nach 14 Tagen merken, dass es nichts ist?",
     a: "Dann zahlen Sie nichts. Setup-Fee wird erst bei Live-Schaltung fällig. Kommen wir nicht ans Ziel — kein Cent. Die ersten 14 Tage volle Plattform inklusive. Faire Sache.",
   },
+  {
+    q: "Halluziniert die KI rechtliche Aussagen?",
+    a: "Die Empfangs-KI gibt explizit KEINE Rechtsberatung — das ist im System-Prompt hart kodiert. Bei jeder juristischen Sachfrage sagt sie wörtlich »Eine rechtliche Einschätzung kann Ihnen nur ein Anwalt geben« und eskaliert. Die Strategie-KI in Akten generiert Vorschläge, die immer als »Entwurf zur Anwalts-Prüfung« markiert sind — kein Versand ohne Ihre Freigabe.",
+  },
+  {
+    q: "Verstößt das KI-Marketing gegen §43b BRAO oder das UWG?",
+    a: "Nein. Die Plattform tut nur, was Sie als Anwalt selbst dürften — Mandanten-Anfragen aufnehmen, Termine koordinieren, Mahnungen schreiben, Marketingseiten betreiben. Keine reißerische Werbung, keine unsachliche Ansprache, keine vergleichende Werbung. Die Landingpages folgen den BRAO-Werberichtlinien — Trustpilot/Bewertungen werden nur eingebunden, wenn Sie verifizierte Bewertungen haben.",
+  },
+  {
+    q: "Mein Mandatsgeheimnis ist sensibel — wer kann meine Akten lesen?",
+    a: "Optional: niemand außer Ihnen. Mit der E2E-Verschlüsselung (1-Klick im Dashboard aktivieren) werden Strategien, Mandanten-Notizen und Akten-Beschreibungen client-side mit Ihrer Passphrase verschlüsselt (AES-256-GCM). Auch wir als Plattform-Betreiber sehen nur Ciphertext. Sie kriegen einen 12-Wort-Recovery-Code zum Ausdrucken. §203 StGB-konform auf struktureller Ebene, nicht nur per AVV.",
+  },
+  {
+    q: "Was passiert mit unseren Daten wenn wir kündigen?",
+    a: "Sie kriegen einen vollständigen Export: Mandanten, Akten, Konversationen als CSV/JSON, Dokumente als Original-Dateien, Rechnungen als DATEV-Export — innerhalb von 48h nach Kündigung. Die Daten gehören Ihnen, nicht uns. 30 Tage nach Export werden alle Daten unwiderruflich gelöscht (DSGVO-Recht auf Vergessenwerden).",
+  },
 ];
 
 const FaqSection = () => {

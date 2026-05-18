@@ -55,7 +55,7 @@ const ROICalculator = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          <div className="glass-card p-8 border-border/50">
+          <div className="surface p-6">
             <h3 className="text-lg font-display font-bold text-foreground mb-6">
               Ihre Kanzlei
             </h3>
@@ -125,7 +125,7 @@ const ROICalculator = () => {
           </div>
 
           <div className="space-y-4">
-            <div className="glass-card p-6 border-accent/20 bg-accent/[0.03]">
+            <div className="surface p-5 border-accent/20">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">
@@ -145,7 +145,7 @@ const ROICalculator = () => {
               </div>
             </div>
 
-            <div className="glass-card p-6 border-accent/20 bg-accent/[0.03]">
+            <div className="surface p-5 border-accent/20">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1">
@@ -165,7 +165,7 @@ const ROICalculator = () => {
               </div>
             </div>
 
-            <div className="glass-card p-6 border-accent shadow-2xl shadow-accent/10 bg-gradient-to-br from-accent/10 to-transparent">
+            <div className="surface p-5 border-accent shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <TrendingUp className="h-5 w-5 text-accent" />
                 <span className="text-xs uppercase tracking-wider text-accent font-bold">

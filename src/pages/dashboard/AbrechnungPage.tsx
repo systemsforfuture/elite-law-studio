@@ -41,7 +41,7 @@ const AbrechnungPage = () => {
   return (
     <div className="space-y-6">
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="glass-card p-6 border-accent/30 bg-accent/[0.03] lg:col-span-2">
+        <div className="surface p-5 border-accent/30 lg:col-span-2">
           <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
             <div>
               <div className="text-xs uppercase tracking-wider text-accent font-semibold mb-1">
@@ -75,11 +75,11 @@ const AbrechnungPage = () => {
           <div className="grid sm:grid-cols-3 gap-4">
             <Mini label="Monatlich" value={`${tier.monthly}€`} />
             <Mini label="Mandanten" value={(tenant.mandanten_count ?? 0).toLocaleString("de-DE")} />
-            <Mini label="MRR" value={`${tier.monthly}€`} accent="emerald" />
+            <Mini label="MRR" value={`${tier.monthly}€`} severity="success" />
           </div>
         </div>
 
-        <div className="glass-card p-6 border-border/50">
+        <div className="surface p-5">
           <div className="flex items-center gap-2 mb-2">
             <Phone className="h-4 w-4 text-accent" />
             <h3 className="text-sm font-display font-bold text-foreground">
@@ -114,7 +114,7 @@ const AbrechnungPage = () => {
         </div>
 
         {/* KI-Verbrauch im aktuellen Monat */}
-        <div className="glass-card p-6 border-border/50 lg:col-span-3">
+        <div className="surface p-5 lg:col-span-3">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
             <h3 className="font-display font-bold text-foreground flex items-center gap-2">
               <Cpu className="h-4 w-4 text-accent" />
@@ -247,7 +247,7 @@ const AbrechnungPage = () => {
           </div>
         </div>
 
-        <div className="glass-card p-6 border-border/50 lg:col-span-3">
+        <div className="surface p-5 lg:col-span-3">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h3 className="font-display font-bold text-foreground flex items-center gap-2">
               <CreditCard className="h-4 w-4 text-accent" />
@@ -334,20 +334,28 @@ const DailyTrend = ({ rows }: { rows: LlmUsageDayRow[] }) => {
 const Mini = ({
   label,
   value,
-  accent,
+  severity,
 }: {
   label: string;
   value: string;
-  accent?: "emerald";
+  severity?: "success" | "warning" | "critical";
 }) => (
-  <div className="p-3 rounded-xl bg-background/50 border border-border/40">
+  <div className="surface p-3">
     <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 mb-0.5">
       {label}
     </div>
     <div
-      className={`text-lg font-display font-bold tabular-nums ${
-        accent === "emerald" ? "text-success" : "text-foreground"
-      }`}
+      className="text-lg font-display font-bold tabular-nums"
+      style={{
+        color:
+          severity === "success"
+            ? "hsl(var(--status-success))"
+            : severity === "warning"
+              ? "hsl(var(--status-warning))"
+              : severity === "critical"
+                ? "hsl(var(--status-critical))"
+                : "hsl(var(--foreground))",
+      }}
     >
       {value}
     </div>
