@@ -52,7 +52,9 @@ Deno.serve(async (req) => {
     // Tenant auf provisioning markieren + Tonalität/Branding lesen
     const { data: tenant } = await admin
       .from("tenants")
-      .select("provider_config, kanzlei_name, branding_config, rechtsgebiete, inhaber_name")
+      .select(
+        "provider_config, kanzlei_name, branding_config, rechtsgebiete, inhaber_name, notfall_nummer",
+      )
       .eq("id", ctx.tenant_id)
       .single();
     const baseCfg = (tenant?.provider_config ?? {}) as Record<string, Record<string, unknown>>;
@@ -78,6 +80,7 @@ Deno.serve(async (req) => {
       rechtsgebiete: (tenant?.rechtsgebiete as string[] | undefined) ?? undefined,
       greeting,
       inhaber_name: tenant?.inhaber_name as string | undefined,
+      notfall_nummer: tenant?.notfall_nummer ?? null,
     });
     // Server-URL für Function-Tools + Webhook
     if (webhookBaseUrl) {

@@ -210,6 +210,49 @@ export const useProvisionVoice = () => {
 };
 
 // =============================================================
+// Voice — Assistant-Config resyncen (Branding/Tonalität/Greeting)
+// =============================================================
+
+interface UpdateVoiceInput {
+  greeting?: string;
+  tonalitaet?: "formal" | "freundlich" | "empathisch" | "direkt";
+}
+
+interface UpdateVoiceResult {
+  ok: boolean;
+  message?: string;
+  greeting?: string;
+  tonalitaet?: string;
+}
+
+export const useUpdateVoiceAssistant = () => {
+  const qc = useQueryClient();
+  return useMutation<UpdateVoiceResult, Error, UpdateVoiceInput>({
+    mutationFn: async (input) => {
+      if (shouldMock()) {
+        await new Promise((r) => setTimeout(r, 700));
+        return {
+          ok: true,
+          message: "Demo-Modus: Voice-Resync simuliert.",
+          greeting: input.greeting,
+          tonalitaet: input.tonalitaet,
+        };
+      }
+      const { data, error } = await supabase!.functions.invoke(
+        "update-voice-assistant",
+        { body: input },
+      );
+      if (error) throw error;
+      if (!data) throw new Error("Keine Antwort");
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["provider-config"] });
+    },
+  });
+};
+
+// =============================================================
 // WhatsApp — eigene Nummer einrichten lassen
 // =============================================================
 

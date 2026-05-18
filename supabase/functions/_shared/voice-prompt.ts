@@ -12,9 +12,51 @@ export interface VoiceAssistantInput {
   tonalitaet?: Tonalitaet;
   rechtsgebiete?: string[];
   greeting?: string;
+  /** Anwalts-Hotline für Transfer bei sofort_durchstellen */
   notfall_nummer?: string | null;
   inhaber_name?: string;
 }
+
+const ANALYSIS_SUMMARY_PROMPT = `Fasse den Anruf in 1–2 Sätzen zusammen.
+Stil: nüchtern, anwaltlich. Was wollte der Anrufer, wurde es erledigt,
+gibt es offene Punkte?`;
+
+const ANALYSIS_STRUCTURED_PROMPT = `Extrahiere strukturierte Felder aus dem Anruf.
+Antworte AUSSCHLIESSLICH mit dem JSON-Objekt — keine Kommentare, keine Markdown.`;
+
+const ANALYSIS_STRUCTURED_SCHEMA = {
+  type: "object",
+  properties: {
+    urgency: {
+      type: "string",
+      enum: ["low", "medium", "high", "critical"],
+      description: "low = Info-Anfrage, medium = Standard-Termin, high = Rückruf gleicher Werktag, critical = Notfall/Frist",
+    },
+    area: {
+      type: "string",
+      description: "Rechtsgebiet falls erkennbar: familienrecht | strafrecht | arbeitsrecht | mietrecht | erbrecht | wirtschaftsrecht | sonstiges",
+    },
+    action: {
+      type: "string",
+      enum: ["termin_gebucht", "lead_erfasst", "eskaliert", "info_gegeben", "spam", "kein_ergebnis"],
+      description: "Was wurde am Ende erreicht?",
+    },
+    sentiment: {
+      type: "string",
+      enum: ["ruhig", "verärgert", "verzweifelt", "neutral"],
+    },
+    lead_quality: {
+      type: "string",
+      enum: ["hot", "warm", "cold", "n/a"],
+      description: "Einschätzung des Mandats-Potenzials. n/a wenn bereits Bestandsmandant.",
+    },
+    next_step: {
+      type: "string",
+      description: "Was sollte der Anwalt als nächstes tun? Max. 1 Satz.",
+    },
+  },
+  required: ["urgency", "action"],
+};
 
 const tonHinweis: Record<Tonalitaet, string> = {
   formal:
@@ -340,5 +382,55 @@ export const buildVapiAssistantConfig = (input: VoiceAssistantInput) => {
     responseDelaySeconds: 0.6,
     llmRequestDelaySeconds: 0.2,
     numWordsToInterruptAssistant: 3,
+    // Recording: Audio + Transcript persistieren — Voraussetzung für Audit
+    // und das Recording-Player-Widget in der VoicePage.
+    recordingEnabled: true,
+    artifactPlan: {
+      recordingEnabled: true,
+      videoRecordingEnabled: false,
+      transcriptPlan: { enabled: true, assistantName: "Anna" },
+    },
+    // Voicemail-Detection: wenn die Voice-KI auf einem AB landet (z.B. weil
+    // der Anrufer von dort weitergeleitet wurde), soll sie nicht ins Leere
+    // reden — Vapi nutzt OpenAI Beep-Detection.
+    voicemailDetection: {
+      provider: "twilio" as const,
+      voicemailDetectionTypes: ["machine_start", "machine_end_beep", "machine_end_silence"],
+      enabled: true,
+      machineDetectionTimeout: 25,
+      machineDetectionSpeechThreshold: 2400,
+      machineDetectionSpeechEndThreshold: 1200,
+    },
+    voicemailMessage:
+      `Guten Tag, hier ist die Kanzlei ${input.kanzlei_name}. Wir haben versucht, Sie zu erreichen. Bitte rufen Sie uns gerne zurück.`,
+    // Analysis-Plan: KI extrahiert nach jedem Anruf strukturierte Felder
+    // (urgency, area, action, sentiment, lead_quality, next_step) +
+    // Summary in 1-2 Sätzen. Landet in konversationen.structured_data.
+    analysisPlan: {
+      summaryPrompt: ANALYSIS_SUMMARY_PROMPT,
+      structuredDataPrompt: ANALYSIS_STRUCTURED_PROMPT,
+      structuredDataSchema: ANALYSIS_STRUCTURED_SCHEMA,
+      successEvaluationPrompt:
+        "Wurde das Anliegen des Anrufers gelöst (Termin gebucht / Eskalation / qualifizierter Lead)? Antworte: 'true' oder 'false'.",
+      successEvaluationRubric: "PassFail" as const,
+    },
+    // Transfer-Plan: ermöglicht der KI, einen Anruf an die Anwalts-Hotline
+    // (notfall_nummer) weiterzuleiten — Vapi unterstützt entweder warm-transfer
+    // (Anwalt hört kurzen KI-Briefing) oder cold-transfer (direkte Bridge).
+    // Wir nutzen cold um Latenz minimal zu halten.
+    ...(input.notfall_nummer
+      ? {
+          forwardingPhoneNumber: input.notfall_nummer,
+          forwardingPhoneNumbers: [
+            {
+              number: input.notfall_nummer,
+              message:
+                "Ich verbinde Sie jetzt mit dem Anwalt — bitte einen Moment.",
+              description: "Anwalts-Notfall-Hotline (sofort_durchstellen)",
+              transferPlan: { mode: "blind-transfer" as const },
+            },
+          ],
+        }
+      : {}),
   };
 };

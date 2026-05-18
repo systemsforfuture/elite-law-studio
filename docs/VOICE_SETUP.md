@@ -34,6 +34,7 @@ Beim Klick »KI-Telefon einrichten« in der Anwalts-UI passiert serverseitig:
 ```bash
 supabase secrets set VAPI_API_KEY=vapi_...
 supabase secrets set PUBLIC_BASE_URL=https://systems-tm.de
+supabase secrets set VAPI_WEBHOOK_SECRET=$(openssl rand -hex 32)
 ```
 
 Optional als Fallback wenn die Tenant-Assistant-Erstellung scheitert (z.B. Vapi-Outage):
@@ -41,6 +42,21 @@ Optional als Fallback wenn die Tenant-Assistant-Erstellung scheitert (z.B. Vapi-
 ```bash
 supabase secrets set VAPI_DEFAULT_ASSISTANT_ID=asst_...
 ```
+
+**Für Eskalations-Notifications (out-of-band an Owner):**
+
+```bash
+# Email an Owner-Anwalt bei JEDER Eskalation
+supabase secrets set RESEND_API_KEY=re_...
+supabase secrets set RESEND_FROM_EMAIL=noreply@systems-tm.de
+# SMS an Anwalts-Hotline (nur sofort_durchstellen + rueckruf_heute)
+# Plattform-Outbound-Vapi-Nummer-ID — gekauft im Vapi-Dashboard
+supabase secrets set VAPI_SMS_PHONE_NUMBER_ID=phn_...
+```
+
+Ohne diese Secrets: Anrufe + Eskalationen werden trotzdem in der DB
+persistiert und im Dashboard als Realtime-Toast angezeigt; nur die
+Push-Wege Email/SMS sind dann inaktiv.
 
 ## ElevenLabs Voice-ID
 
