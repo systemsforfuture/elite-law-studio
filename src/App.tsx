@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { TenantProvider } from "@/contexts/TenantContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MandantAuthProvider } from "@/contexts/MandantAuthContext";
+import { EncryptionProvider } from "@/contexts/EncryptionContext";
 import { ErrorBoundary } from "@/lib/sentry";
 
 const ErrorFallback = () => (
@@ -91,6 +92,7 @@ const App = () => (
       <AuthProvider>
         <MandantAuthProvider>
           <TenantProvider>
+            <EncryptionProvider>
             <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -132,6 +134,7 @@ const App = () => (
             </Suspense>
           </BrowserRouter>
             </TooltipProvider>
+            </EncryptionProvider>
           </TenantProvider>
         </MandantAuthProvider>
       </AuthProvider>

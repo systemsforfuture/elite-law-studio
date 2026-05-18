@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { TenantProvider } from "@/contexts/TenantContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MandantAuthProvider } from "@/contexts/MandantAuthContext";
+import { EncryptionProvider } from "@/contexts/EncryptionContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const renderWithProviders = (ui: ReactElement, route = "/") => {
@@ -17,9 +18,11 @@ export const renderWithProviders = (ui: ReactElement, route = "/") => {
         <AuthProvider>
           <MandantAuthProvider>
             <TenantProvider>
-              <TooltipProvider>
-                <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
-              </TooltipProvider>
+              <EncryptionProvider>
+                <TooltipProvider>
+                  <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+                </TooltipProvider>
+              </EncryptionProvider>
             </TenantProvider>
           </MandantAuthProvider>
         </AuthProvider>

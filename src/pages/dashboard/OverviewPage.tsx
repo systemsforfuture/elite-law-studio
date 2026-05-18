@@ -48,6 +48,7 @@ import { useConfirmTermin } from "@/lib/queries/use-termine";
 import { useProviderHealth } from "@/lib/queries/use-provider-config";
 import { useSeedDemoData } from "@/lib/queries/use-seed-demo";
 import { useTenant } from "@/contexts/TenantContext";
+import { useEncryption } from "@/contexts/EncryptionContext";
 import { greetingForTime } from "@/lib/date-utils";
 import { findMandant, findUser, mandantName } from "@/data/mockData";
 import type { AktenStufe } from "@/data/types";
@@ -93,6 +94,7 @@ const deltaPct = (values: number[]): string => {
 
 const OverviewPage = () => {
   const { tenant } = useTenant();
+  const enc = useEncryption();
   const metrics = useDashboardMetrics();
   const { data: akten = [] } = useAktenQuery();
   const { data: mandanten = [] } = useMandantenQuery();
@@ -222,10 +224,23 @@ const OverviewPage = () => {
             <ShieldCheck className="h-3.5 w-3.5 text-[hsl(var(--status-success))]" />
             Mandatsgeheimnis-konform
           </span>
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border/60 text-xs text-muted-foreground">
-            <Lock className="h-3.5 w-3.5" />
-            E2E-Verschlüsselt
-          </span>
+          {enc.enabled ? (
+            <span
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium"
+              style={{
+                color: "hsl(var(--status-success))",
+                background: "hsl(var(--status-success-soft))",
+              }}
+            >
+              <Lock className="h-3.5 w-3.5" />
+              E2E-verschlüsselt
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border/60 text-xs text-muted-foreground">
+              <Lock className="h-3.5 w-3.5 opacity-50" />
+              Verschlüsselung verfügbar
+            </span>
+          )}
         </div>
       </header>
 
