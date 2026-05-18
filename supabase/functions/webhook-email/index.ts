@@ -79,7 +79,7 @@ Deno.serve(async (req: Request) => {
       });
     }
     void verifyHmac;
-    }
+
     if (!tenant_id) {
       console.warn("[webhook-email] Tenant nicht resolvable für to=", toEmail);
       return new Response(

@@ -116,7 +116,10 @@ const buildContext = async (
   ).length;
 
   const rechnungen_offen_eur = (rechnungen.data ?? []).reduce(
-    (sum: number, r: { betrag_brutto: number }) => sum + (Number(r.betrag_brutto) ?? 0),
+    (sum: number, r: { betrag_brutto: number }) => {
+      const amount = Number(r.betrag_brutto);
+      return sum + (Number.isFinite(amount) ? amount : 0);
+    },
     0,
   );
 

@@ -50,6 +50,42 @@ const DokumentePage = () => {
   const fileRef = useRef<HTMLInputElement>(null);
   const { url: previewUrl } = useSignedUrl(selected?.storage_path);
 
+  const filtered = dokumente.filter((d) =>
+    !query || d.dateiname.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  const stats = useMemo(() => {
+    const total = dokumente.length;
+    const totalBytes = dokumente.reduce((s, d) => s + (d.groesse_bytes ?? 0), 0);
+    const analysiert = dokumente.filter(
+      (d) => d.status !== "neu" || d.ai_extracted,
+    ).length;
+    const aiPct = total === 0 ? 0 : Math.round((analysiert / total) * 100);
+    const today = dokumente.filter((d) => isSameDay(d.uploaded_at));
+    const todayMandant = today.filter((d) => d.uploaded_by === "mandant").length;
+    const risikoKlauseln = dokumente.reduce(
+      (s, d) => s + (d.ai_extracted?.kritische_klauseln?.length ?? 0),
+      0,
+    );
+    const risikoHigh = dokumente.reduce(
+      (s, d) =>
+        s +
+        (d.ai_extracted?.kritische_klauseln?.filter((k) => k.risiko === "high")
+          .length ?? 0),
+      0,
+    );
+    return {
+      total,
+      totalBytes,
+      analysiert,
+      aiPct,
+      todayCount: today.length,
+      todayMandant,
+      risikoKlauseln,
+      risikoHigh,
+    };
+  }, [dokumente]);
+
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
     const file = files[0];
@@ -318,42 +354,6 @@ const DokumentePage = () => {
       </div>
     );
   }
-
-  const filtered = dokumente.filter((d) =>
-    !query || d.dateiname.toLowerCase().includes(query.toLowerCase()),
-  );
-
-  const stats = useMemo(() => {
-    const total = dokumente.length;
-    const totalBytes = dokumente.reduce((s, d) => s + (d.groesse_bytes ?? 0), 0);
-    const analysiert = dokumente.filter(
-      (d) => d.status !== "neu" || d.ai_extracted,
-    ).length;
-    const aiPct = total === 0 ? 0 : Math.round((analysiert / total) * 100);
-    const today = dokumente.filter((d) => isSameDay(d.uploaded_at));
-    const todayMandant = today.filter((d) => d.uploaded_by === "mandant").length;
-    const risikoKlauseln = dokumente.reduce(
-      (s, d) => s + (d.ai_extracted?.kritische_klauseln?.length ?? 0),
-      0,
-    );
-    const risikoHigh = dokumente.reduce(
-      (s, d) =>
-        s +
-        (d.ai_extracted?.kritische_klauseln?.filter((k) => k.risiko === "high")
-          .length ?? 0),
-      0,
-    );
-    return {
-      total,
-      totalBytes,
-      analysiert,
-      aiPct,
-      todayCount: today.length,
-      todayMandant,
-      risikoKlauseln,
-      risikoHigh,
-    };
-  }, [dokumente]);
 
   return (
     <div className="space-y-6">

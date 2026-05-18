@@ -119,7 +119,6 @@ Deno.serve(async (req: Request) => {
       );
     }
     const stripeKey = platformKey;
-    }
 
     const md = r.mandant as
       | { email?: string; vorname?: string; nachname?: string; firmenname?: string }
