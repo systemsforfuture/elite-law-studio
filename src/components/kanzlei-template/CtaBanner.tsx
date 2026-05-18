@@ -18,8 +18,8 @@ const CtaBanner = () => {
         <div className={`text-center max-w-3xl mx-auto transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-[0.98]"}`}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-8">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400/60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--status-success))]/60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(var(--status-success))]" />
             </span>
             <span className="text-xs text-accent font-medium">Noch heute einen Termin sichern</span>
           </div>

@@ -124,7 +124,7 @@ const PortalUploader = ({
           isPending
             ? "border-accent/40 bg-accent/[0.06] cursor-wait"
             : done
-            ? "border-emerald-500/40 bg-emerald-500/[0.04]"
+            ? "border-[hsl(var(--status-success))]/30 bg-[hsl(var(--status-success))]/10"
             : dragOver
             ? "border-accent/60 bg-accent/[0.08]"
             : "border-accent/20 bg-accent/[0.02] hover:bg-accent/[0.04]"
@@ -142,7 +142,7 @@ const PortalUploader = ({
           </>
         ) : done ? (
           <>
-            <CheckCircle2 className={`text-emerald-600 mx-auto mb-2 ${compact ? "h-7 w-7" : "h-10 w-10"}`} />
+            <CheckCircle2 className={`text-success mx-auto mb-2 ${compact ? "h-7 w-7" : "h-10 w-10"}`} />
             <h3 className="text-sm font-display font-bold text-foreground mb-1">
               Erfolgreich hochgeladen
             </h3>

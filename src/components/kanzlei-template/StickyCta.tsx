@@ -25,8 +25,8 @@ const StickyCta = () => {
         <div className="container mx-auto flex items-center justify-between gap-4">
           <div className="hidden sm:flex items-center gap-3">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400/60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--status-success))]/60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(var(--status-success))]" />
             </span>
             <span className="text-sm text-primary-foreground/60">
               <strong className="text-primary-foreground">Jetzt verfügbar</strong> – Kostenlose Erstberatung

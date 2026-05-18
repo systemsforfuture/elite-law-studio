@@ -181,12 +181,12 @@ const VoicePage = () => {
                       <div
                         className={`text-base font-display font-bold tabular-nums mt-1 ${
                           selected.structured_data.urgency === "critical"
-                            ? "text-rose-700"
+                            ? "text-critical"
                             : selected.structured_data.urgency === "high"
-                              ? "text-amber-700"
+                              ? "text-warning"
                               : selected.structured_data.urgency === "medium"
                                 ? "text-foreground"
-                                : "text-emerald-700"
+                                : "text-success"
                         }`}
                       >
                         {selected.structured_data.urgency}
@@ -219,8 +219,8 @@ const VoicePage = () => {
               )}
 
               {selected.escalation_reason && (
-                <div className="mt-4 p-4 rounded-xl bg-rose-500/[0.05] border border-rose-500/30">
-                  <div className="text-[10px] uppercase tracking-wider text-rose-700 font-semibold mb-1 flex items-center gap-1.5">
+                <div className="mt-4 p-4 rounded-xl bg-[hsl(var(--status-critical))]/10 border border-[hsl(var(--status-critical))]/30">
+                  <div className="text-[10px] uppercase tracking-wider text-critical font-semibold mb-1 flex items-center gap-1.5">
                     <AlertTriangle className="h-3 w-3" />
                     Eskaliert · {selected.escalation_urgency ?? "—"}
                   </div>
@@ -499,10 +499,10 @@ const VoicePage = () => {
                             </span>
                           )}
                           {c.status === "pending" && !c.ended_at && (
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700 bg-rose-500/15 px-2 py-0.5 rounded flex items-center gap-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-critical bg-[hsl(var(--status-critical))]/15 px-2 py-0.5 rounded flex items-center gap-1">
                               <span className="relative flex h-1.5 w-1.5">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500/60" />
-                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500" />
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--status-critical))]/60" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[hsl(var(--status-critical))]" />
                               </span>
                               live
                             </span>

@@ -33,7 +33,7 @@ const ROICalculator = () => {
   return (
     <section className="py-32 bg-card relative overflow-hidden">
       <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-accent/[0.05] rounded-full blur-[150px]" />
-      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-emerald-500/[0.04] rounded-full blur-[120px]" />
+      <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-[hsl(var(--status-success))]/10 rounded-full blur-[120px]" />
 
       <div className="container mx-auto px-6 relative" ref={ref}>
         <div
@@ -135,7 +135,7 @@ const ROICalculator = () => {
                     {numbers.eingesparte_h_jahr.toLocaleString("de-DE")}h
                   </div>
                 </div>
-                <span className="text-2xl font-display font-bold text-emerald-600 tabular-nums">
+                <span className="text-2xl font-display font-bold text-success tabular-nums">
                   {numbers.eingespart_eur.toLocaleString("de-DE")}€
                 </span>
               </div>
@@ -155,7 +155,7 @@ const ROICalculator = () => {
                     {numbers.gewonnene_mandate_jahr}
                   </div>
                 </div>
-                <span className="text-2xl font-display font-bold text-emerald-600 tabular-nums">
+                <span className="text-2xl font-display font-bold text-success tabular-nums">
                   +{numbers.mehrumsatz_eur.toLocaleString("de-DE")}€
                 </span>
               </div>
