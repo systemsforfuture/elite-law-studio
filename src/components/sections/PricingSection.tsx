@@ -198,9 +198,9 @@ const PricingSection = () => {
         >
           <p className="text-sm text-muted-foreground">
             Sie wollen es zuerst sehen?{" "}
-            <Link to="/onboarding" className="text-accent font-medium hover:text-gold-dark">
-              30-Sekunden Live-Demo
-            </Link>{" "}
+            <a href="#live-demo" className="text-accent font-medium hover:text-gold-dark">
+              3 Live-Demos ohne Anmeldung
+            </a>{" "}
             · oder{" "}
             <a
               href="#contact"

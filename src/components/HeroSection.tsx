@@ -52,7 +52,7 @@ const HeroSection = () => {
           </div>
 
           <h1
-            className="text-[2.5rem] sm:text-5xl md:text-7xl lg:text-[5.5rem] font-display font-black text-primary-foreground leading-[1.05] tracking-[-0.04em] mb-8 opacity-0 break-words hyphens-auto"
+            className="text-[2rem] sm:text-5xl md:text-7xl lg:text-[5.5rem] font-display font-black text-primary-foreground leading-[1.05] tracking-[-0.04em] mb-6 sm:mb-8 opacity-0 break-words hyphens-auto"
             style={{ animation: "blur-in 1s ease-out 0.4s forwards" }}
           >
             Ihre Kanzlei,
@@ -61,7 +61,7 @@ const HeroSection = () => {
           </h1>
 
           <p
-            className="text-lg md:text-2xl text-primary-foreground/55 leading-relaxed mb-10 max-w-2xl font-light opacity-0"
+            className="text-base sm:text-lg md:text-2xl text-primary-foreground/55 leading-relaxed mb-8 sm:mb-10 max-w-2xl font-light opacity-0"
             style={{ animation: "blur-in 0.8s ease-out 0.6s forwards" }}
           >
             Voice-Agent, WhatsApp-Inbox, Termin-Koordination, Mahnwesen,
