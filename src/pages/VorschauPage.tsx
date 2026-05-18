@@ -101,28 +101,32 @@ const DEFAULT_CONTACT: KanzleiContact = {
   hours: "Mo–Fr: 09:00 – 18:00 Uhr",
 };
 
+// HINWEIS (Jarvis 2026-05-18): Team-Defaults sind bewusst generisch gehalten
+// damit per-Lead-Demos keine erfundenen "Dr. Bergmann"-Namen anzeigen, die der
+// Lead als fake erkennen wuerde. Per-Lead-Override geht ueber config.team aus
+// echten Daten (LinkedIn-Research / Lead-Enrichment) wenn vorhanden.
 const DEFAULT_TEAM: KanzleiTeamMember[] = [
   {
-    name: "Dr. Alexander Bergmann",
-    role: "Gründungspartner · Fachanwalt für Handelsrecht",
+    name: "Gründungspartner:in",
+    role: "Fachanwalt:in · Schwerpunkt Handelsrecht",
     specialties: ["Unternehmensrecht", "M&A", "Gesellschaftsrecht"],
     quote: "Ihr Recht ist keine Verhandlungssache.",
   },
   {
-    name: "Dr. Katharina Weber",
-    role: "Partnerin · Fachanwältin für Familienrecht",
+    name: "Partner:in",
+    role: "Fachanwalt:in · Schwerpunkt Familienrecht",
     specialties: ["Familienrecht", "Erbrecht", "Mediation"],
     quote: "Familien verdienen Lösungen, keine Schlachtfelder.",
   },
   {
-    name: "Maximilian Richter",
-    role: "Senior Associate · Fachanwalt für Arbeitsrecht",
+    name: "Senior Associate",
+    role: "Fachanwalt:in · Schwerpunkt Arbeitsrecht",
     specialties: ["Arbeitsrecht", "Kündigungsschutz", "Abfindungen"],
     quote: "Kein Arbeitnehmer sollte Unrecht hinnehmen.",
   },
   {
-    name: "Dr. Sophie Müller",
-    role: "Partnerin · Fachanwältin für Strafrecht",
+    name: "Partner:in",
+    role: "Fachanwalt:in · Schwerpunkt Strafrecht",
     specialties: ["Strafrecht", "Wirtschaftsstrafrecht", "Compliance"],
     quote: "Jeder verdient eine Verteidigung auf Augenhöhe.",
   },

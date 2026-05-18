@@ -1,15 +1,15 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Linkedin, Mail } from "lucide-react";
-import teamBergmann from "@/assets/team-bergmann.jpg";
-import teamWeber from "@/assets/team-weber.jpg";
-import teamRichter from "@/assets/team-richter.jpg";
-import teamMueller from "@/assets/team-mueller.jpg";
+import teamPartner1 from "@/assets/team-partner-1.jpg";
+import teamPartner2 from "@/assets/team-weber.jpg";
+import teamPartner3 from "@/assets/team-richter.jpg";
+import teamPartner4 from "@/assets/team-mueller.jpg";
 import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 // Fallback-Asset-Mapping nach Position (Dev-Mode ohne übergebene Images).
 // Bei Lead-Generierung können stattdessen über config.team[i].image
 // externe URLs (z.B. /lawyer-X.jpg im Lead-Repo) gesetzt werden.
-const FALLBACK_IMAGES = [teamBergmann, teamWeber, teamRichter, teamMueller];
+const FALLBACK_IMAGES = [teamPartner1, teamPartner2, teamPartner3, teamPartner4];
 
 const TeamSection = () => {
   const { ref, isVisible } = useScrollAnimation();
