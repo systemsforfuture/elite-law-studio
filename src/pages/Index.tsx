@@ -9,6 +9,7 @@ import AgentsSection from "@/components/sections/AgentsSection";
 import AutomationSection from "@/components/AutomationSection";
 import ROICalculator from "@/components/sections/ROICalculator";
 import PricingSection from "@/components/sections/PricingSection";
+import RiskFreeSection from "@/components/sections/RiskFreeSection";
 import ComparisonSection from "@/components/ComparisonSection";
 import IntegrationsSection from "@/components/sections/IntegrationsSection";
 import OnboardingTeaser from "@/components/sections/OnboardingTeaser";
@@ -41,6 +42,7 @@ const Index = () => (
     <AutomationSection />
     <ROICalculator />
     <PricingSection />
+    <RiskFreeSection />
     <ComparisonSection />
     <IntegrationsSection />
     <OnboardingTeaser />
