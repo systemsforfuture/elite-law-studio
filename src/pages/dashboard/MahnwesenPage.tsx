@@ -36,14 +36,14 @@ const statusLabel: Record<RechnungStatus, string> = {
 };
 
 const statusCls: Record<RechnungStatus, string> = {
-  entwurf: "bg-muted text-muted-foreground",
-  versendet: "bg-sky-500/15 text-sky-700",
-  bezahlt: "bg-emerald-500/15 text-emerald-700",
-  ueberfaellig: "bg-amber-500/15 text-amber-700",
-  mahnung_1: "bg-amber-500/15 text-amber-700",
-  mahnung_2: "bg-orange-500/15 text-orange-700",
-  mahnung_3: "bg-rose-500/15 text-rose-700",
-  gerichtlich: "bg-rose-500/20 text-rose-800",
+  entwurf: "status-neutral",
+  versendet: "status-info",
+  bezahlt: "status-success",
+  ueberfaellig: "status-warning",
+  mahnung_1: "status-warning",
+  mahnung_2: "status-warning",
+  mahnung_3: "status-critical",
+  gerichtlich: "status-critical",
 };
 
 const eskalationsStufen = [
@@ -184,7 +184,7 @@ const MahnwesenPage = () => {
                   {selected.betrag_brutto.toLocaleString("de-DE")}€
                 </div>
                 <span
-                  className={`text-[10px] uppercase font-bold px-2 py-1 rounded inline-block mt-1 ${statusCls[selected.status]}`}
+                  className={`status-pill mt-1 ${statusCls[selected.status]}`}
                 >
                   {statusLabel[selected.status]}
                 </span>
@@ -258,7 +258,7 @@ const MahnwesenPage = () => {
                   key={s.stufe}
                   className={`p-5 rounded-2xl border transition-all ${
                     erledigt
-                      ? "border-emerald-500/30 bg-emerald-500/[0.03]"
+                      ? "surface-success"
                       : aktiv
                       ? "border-accent/40 bg-accent/[0.04] shadow-lg"
                       : "border-border/50 bg-muted/20 opacity-60"
@@ -268,7 +268,7 @@ const MahnwesenPage = () => {
                     <div
                       className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
                         erledigt
-                          ? "bg-emerald-500/15 text-emerald-700"
+                          ? "status-success"
                           : aktiv
                           ? "bg-accent/15 text-accent"
                           : "bg-muted text-muted-foreground"
@@ -288,7 +288,7 @@ const MahnwesenPage = () => {
                           Stufe {s.stufe} · {s.titel}
                         </h4>
                         {erledigt && (
-                          <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/15 px-2 py-0.5 rounded">
+                          <span className="text-[10px] uppercase font-bold text-success bg-[hsl(var(--status-success))]/15 px-2 py-0.5 rounded">
                             Erledigt
                           </span>
                         )}
@@ -425,8 +425,8 @@ const MahnwesenPage = () => {
   return (
     <div className="space-y-6">
       {!emailReady && (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.04] p-4 flex items-center gap-3 flex-wrap">
-          <AlertOctagon className="h-4 w-4 text-amber-600 shrink-0" />
+        <div className="surface-warning rounded-xl border p-4 flex items-center gap-3 flex-wrap">
+          <AlertOctagon className="h-4 w-4 text-warning shrink-0" />
           <div className="flex-1 min-w-0">
             <span className="text-sm font-medium text-foreground">
               E-Mail-Integration nicht aktiv.
@@ -581,12 +581,12 @@ const MahnwesenPage = () => {
                             className={`w-2 h-5 rounded-sm ${
                               r.mahnstufe >= i
                                 ? i === 3
-                                  ? "bg-rose-500"
+                                  ? "bg-[hsl(var(--status-critical))]"
                                   : i === 2
-                                  ? "bg-orange-500"
+                                  ? "bg-[hsl(var(--status-warning))]"
                                   : i === 1
-                                  ? "bg-amber-500"
-                                  : "bg-sky-500"
+                                  ? "bg-[hsl(var(--status-warning))]"
+                                  : "bg-[hsl(var(--status-info))]"
                                 : "bg-muted"
                             }`}
                           />
@@ -594,9 +594,7 @@ const MahnwesenPage = () => {
                       </div>
                     </td>
                     <td className="p-4">
-                      <span
-                        className={`text-[10px] uppercase font-bold px-2 py-1 rounded ${statusCls[r.status]}`}
-                      >
+                      <span className={`status-pill ${statusCls[r.status]}`}>
                         {statusLabel[r.status]}
                       </span>
                     </td>
@@ -632,11 +630,11 @@ const Stat = ({
 }) => {
   const cls =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : accent === "rose"
-      ? "text-rose-600"
+      ? "text-critical"
       : "text-foreground";
   return (
     <div className="glass-card p-5 border-border/50">

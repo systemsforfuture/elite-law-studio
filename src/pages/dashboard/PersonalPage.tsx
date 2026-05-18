@@ -38,22 +38,22 @@ const eur = (n: number) =>
   });
 
 const artLabel: Record<ZeiterfassungArt, { label: string; cls: string }> = {
-  billable: { label: "Mandantenarbeit", cls: "bg-emerald-500/15 text-emerald-700" },
-  intern: { label: "Intern", cls: "bg-sky-500/15 text-sky-700" },
+  billable: { label: "Mandantenarbeit", cls: "status-success" },
+  intern: { label: "Intern", cls: "status-info" },
   training: { label: "Schulung", cls: "bg-purple-500/15 text-purple-700" },
 };
 
 const urlaubArtLabel: Record<UrlaubArt, { label: string; icon: typeof Plane; cls: string }> = {
   urlaub: { label: "Urlaub", icon: Plane, cls: "bg-accent/15 text-accent" },
-  krankheit: { label: "Krankheit", icon: Stethoscope, cls: "bg-rose-500/15 text-rose-700" },
-  home_office: { label: "Home-Office", icon: Home, cls: "bg-sky-500/15 text-sky-700" },
+  krankheit: { label: "Krankheit", icon: Stethoscope, cls: "status-critical" },
+  home_office: { label: "Home-Office", icon: Home, cls: "status-info" },
   sonstiges: { label: "Sonstiges", icon: CalendarRange, cls: "bg-muted text-muted-foreground" },
 };
 
 const urlaubStatusLabel: Record<UrlaubStatus, { label: string; cls: string }> = {
-  pending: { label: "Offen", cls: "bg-amber-500/15 text-amber-700" },
-  approved: { label: "Genehmigt", cls: "bg-emerald-500/15 text-emerald-700" },
-  rejected: { label: "Abgelehnt", cls: "bg-rose-500/15 text-rose-700" },
+  pending: { label: "Offen", cls: "status-warning" },
+  approved: { label: "Genehmigt", cls: "status-success" },
+  rejected: { label: "Abgelehnt", cls: "status-critical" },
 };
 
 type Tab = "uebersicht" | "zeit" | "urlaub";
@@ -252,10 +252,10 @@ const PersonalPage = () => {
                           <span
                             className={`font-semibold ${
                               auslastungPct > 110
-                                ? "text-rose-600"
+                                ? "text-critical"
                                 : auslastungPct >= 95
-                                ? "text-amber-600"
-                                : "text-emerald-600"
+                                ? "text-warning"
+                                : "text-success"
                             }`}
                           >
                             {auslastungPct}%
@@ -265,10 +265,10 @@ const PersonalPage = () => {
                           <div
                             className={`h-full ${
                               auslastungPct > 110
-                                ? "bg-rose-500"
+                                ? "bg-[hsl(var(--status-critical))]"
                                 : auslastungPct >= 95
-                                ? "bg-amber-500"
-                                : "bg-emerald-500"
+                                ? "bg-[hsl(var(--status-warning))]"
+                                : "bg-[hsl(var(--status-success))]"
                             }`}
                             style={{ width: `${Math.min(auslastungPct, 130)}%` }}
                           />
@@ -322,7 +322,7 @@ const PersonalPage = () => {
                       {formatHours(z.dauer_min)}
                     </div>
                     {z.art === "billable" && z.tarif_eur && (
-                      <div className="text-xs text-emerald-600 font-medium">{eur(eurValue)}</div>
+                      <div className="text-xs text-success font-medium">{eur(eurValue)}</div>
                     )}
                   </div>
                 </div>
@@ -375,7 +375,7 @@ const PersonalPage = () => {
                       <div className="flex gap-1.5 shrink-0">
                         <button
                           onClick={() => handleApprove(u.id, true)}
-                          className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20 transition-colors flex items-center justify-center"
+                          className="w-8 h-8 rounded-lg bg-[hsl(var(--status-success))]/10 text-success hover:bg-[hsl(var(--status-success))]/20 transition-colors flex items-center justify-center"
                           title="Genehmigen"
                           aria-label="Antrag genehmigen"
                         >
@@ -383,7 +383,7 @@ const PersonalPage = () => {
                         </button>
                         <button
                           onClick={() => handleApprove(u.id, false)}
-                          className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-700 hover:bg-rose-500/20 transition-colors flex items-center justify-center"
+                          className="w-8 h-8 rounded-lg bg-[hsl(var(--status-critical))]/10 text-critical hover:bg-[hsl(var(--status-critical))]/20 transition-colors flex items-center justify-center"
                           title="Ablehnen"
                           aria-label="Antrag ablehnen"
                         >
@@ -429,7 +429,7 @@ const KpiTile = ({
   const tones = {
     navy: "bg-navy/10 text-navy",
     gold: "bg-accent/15 text-accent",
-    amber: "bg-amber-500/15 text-amber-700",
+    amber: "status-warning",
     muted: "bg-muted text-muted-foreground",
   };
   return (
@@ -461,7 +461,7 @@ const Row = ({
   <div className="flex justify-between items-baseline text-sm">
     <span className="text-muted-foreground">{label}</span>
     <span className="text-right">
-      <span className={`font-semibold ${tone === "warn" ? "text-amber-600" : "text-foreground"}`}>
+      <span className={`font-semibold ${tone === "warn" ? "text-warning" : "text-foreground"}`}>
         {value}
       </span>
       {sub && <span className="block text-xs text-muted-foreground">{sub}</span>}

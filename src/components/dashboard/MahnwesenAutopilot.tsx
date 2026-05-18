@@ -138,7 +138,7 @@ const MahnwesenAutopilot = ({ open, onOpenChange, rechnungen }: Props) => {
               key={i}
               className={`h-1 flex-1 rounded-full ${
                 i < step
-                  ? "bg-emerald-500"
+                  ? "bg-[hsl(var(--status-success))]"
                   : i === step
                   ? "bg-accent"
                   : "bg-muted"
@@ -149,8 +149,8 @@ const MahnwesenAutopilot = ({ open, onOpenChange, rechnungen }: Props) => {
 
         {done ? (
           <div className="text-center py-8">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 flex items-center justify-center mx-auto mb-3">
-              <CheckCircle2 className="h-7 w-7 text-emerald-600" />
+            <div className="w-14 h-14 rounded-2xl bg-[hsl(var(--status-success))]/15 flex items-center justify-center mx-auto mb-3">
+              <CheckCircle2 className="h-7 w-7 text-success" />
             </div>
             <h3 className="text-lg font-display font-bold text-foreground mb-1">
               Auto-Pilot abgeschlossen

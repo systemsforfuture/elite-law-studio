@@ -22,7 +22,7 @@ import InviteUserDialog from "@/components/dashboard/InviteUserDialog";
 const roleLabel = {
   owner: { label: "Owner", cls: "bg-accent/15 text-accent" },
   anwalt: { label: "Anwalt", cls: "bg-navy/15 text-navy" },
-  mitarbeiter: { label: "Mitarbeiter", cls: "bg-sky-500/15 text-sky-700" },
+  mitarbeiter: { label: "Mitarbeiter", cls: "status-info" },
   support: { label: "Support", cls: "bg-muted text-muted-foreground" },
 };
 
@@ -178,7 +178,7 @@ const TeamDetail = ({
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             {kritisch && (
-                              <AlertTriangle className="h-4 w-4 text-amber-600" />
+                              <AlertTriangle className="h-4 w-4 text-warning" />
                             )}
                             <span className="text-xs font-bold tabular-nums text-foreground">
                               {(a.streitwert_eur ?? 0).toLocaleString("de-DE")}€
@@ -344,7 +344,7 @@ const TeamPage = () => {
                     </div>
                   </div>
                   <div>
-                    <div className="text-lg font-display font-bold text-emerald-600 tabular-nums">
+                    <div className="text-lg font-display font-bold text-success tabular-nums">
                       {stats.erfolgsquote_pct}%
                     </div>
                     <div className="text-[9px] uppercase tracking-wider text-muted-foreground/70">
@@ -403,9 +403,9 @@ const Stat = ({
 }) => {
   const cls =
     accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : "text-foreground";
   return (
     <div className="glass-card p-5 border-border/50">
@@ -424,10 +424,10 @@ const Stat = ({
           <div
             className={`h-full ${
               progress > 85
-                ? "bg-amber-500"
+                ? "bg-[hsl(var(--status-warning))]"
                 : progress > 70
-                ? "bg-emerald-500"
-                : "bg-sky-500"
+                ? "bg-[hsl(var(--status-success))]"
+                : "bg-[hsl(var(--status-info))]"
             }`}
             style={{ width: `${progress}%` }}
           />

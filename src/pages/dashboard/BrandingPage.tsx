@@ -86,17 +86,17 @@ const BrandingPage = () => {
             </p>
           </div>
           <div className="space-y-3">
-            <div className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/[0.04]">
+            <div className="p-3 surface-success rounded-xl border">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-emerald-700 font-semibold">
+                  <div className="text-xs uppercase tracking-wider text-success font-semibold">
                     Aktiv
                   </div>
                   <div className="font-mono text-sm font-semibold text-foreground">
                     {tenant.domain}
                   </div>
                 </div>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[hsl(var(--status-success))] animate-pulse" />
               </div>
             </div>
             <div className="p-3 rounded-xl border border-border/50 bg-muted/20">

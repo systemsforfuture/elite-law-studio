@@ -78,12 +78,12 @@ const VoiceTestDialog = ({ open, onOpenChange }: Props) => {
       <DialogContent className="sm:max-w-[640px] max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <PhoneIncoming className="h-5 w-5 text-emerald-600" />
+            <PhoneIncoming className="h-5 w-5 text-success" />
             Voice-Agent · Test-Anruf
-            <span className="text-[10px] uppercase font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full ml-auto flex items-center gap-1.5">
+            <span className="text-[10px] uppercase font-bold text-success bg-[hsl(var(--status-success))]/10 border border-emerald-500/20 px-2 py-0.5 rounded-full ml-auto flex items-center gap-1.5">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500/60" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(var(--status-success))]/60" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[hsl(var(--status-success))]" />
               </span>
               Live-Demo
             </span>

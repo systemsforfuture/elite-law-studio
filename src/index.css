@@ -215,6 +215,33 @@
   .surface-elevated {
     @apply rounded-xl border border-border/60 bg-card shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.08)];
   }
+  /* Akzentuierte Surfaces — wenn eine Card semantisch eine Severity hat
+     (z.B. „Kritische Fristen"). Dezente Tinte aus den Status-Tokens. */
+  .surface-critical {
+    @apply rounded-xl border;
+    border-color: hsl(var(--status-critical) / 0.35);
+    background: hsl(var(--status-critical-soft));
+  }
+  .surface-warning {
+    @apply rounded-xl border;
+    border-color: hsl(var(--status-warning) / 0.35);
+    background: hsl(var(--status-warning-soft));
+  }
+  .surface-success {
+    @apply rounded-xl border;
+    border-color: hsl(var(--status-success) / 0.35);
+    background: hsl(var(--status-success-soft));
+  }
+  .surface-info {
+    @apply rounded-xl border;
+    border-color: hsl(var(--status-info) / 0.35);
+    background: hsl(var(--status-info-soft));
+  }
+  /* Text-Token-Color-Helper */
+  .text-critical { color: hsl(var(--status-critical)); }
+  .text-warning { color: hsl(var(--status-warning)); }
+  .text-success { color: hsl(var(--status-success)); }
+  .text-info { color: hsl(var(--status-info)); }
 }
 
 /* Animations */

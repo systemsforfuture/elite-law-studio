@@ -120,7 +120,7 @@ const NotificationsDropdown = () => {
         <div className="overflow-y-auto flex-1">
           {eskalierte.length > 0 && (
             <div className="px-4 pt-3 pb-2">
-              <div className="text-[10px] uppercase tracking-wider font-bold text-amber-700 mb-2 flex items-center gap-1.5">
+              <div className="text-[10px] uppercase tracking-wider font-bold text-warning mb-2 flex items-center gap-1.5">
                 <AlertTriangle className="h-3 w-3" />
                 Eskaliert · braucht Sie
               </div>
@@ -138,10 +138,10 @@ const NotificationsDropdown = () => {
                       key={k.id}
                       to="/dashboard/inbox"
                       onClick={() => setOpen(false)}
-                      className="block p-2.5 rounded-xl border border-amber-500/30 bg-amber-500/[0.04] hover:bg-amber-500/[0.08] transition-colors"
+                      className="block p-2.5 surface-warning rounded-xl border hover:bg-[hsl(var(--status-warning))]/[0.08] transition-colors"
                     >
                       <div className="flex items-start gap-2.5">
-                        <Icon className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                        <Icon className="h-4 w-4 text-warning shrink-0 mt-0.5" />
                         <div className="flex-1 min-w-0">
                           <div className="text-xs font-semibold text-foreground truncate">
                             {md ? mandantName(md) : "Unbekannt"}

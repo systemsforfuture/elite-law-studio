@@ -98,7 +98,7 @@ const IntegrationenPage = () => {
       {cfg && (
         <div
           className={`glass-card p-5 border-border/50 ${
-            ready === 4 ? "bg-emerald-500/[0.03] border-emerald-500/20" : ""
+            ready === 4 ? "bg-[hsl(var(--status-success))]/[0.03] border-[hsl(var(--status-success))]/30" : ""
           }`}
         >
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
@@ -106,10 +106,10 @@ const IntegrationenPage = () => {
               <span
                 className={`text-2xl font-display font-black tabular-nums ${
                   ready === 4
-                    ? "text-emerald-600"
+                    ? "text-success"
                     : ready === 0
                     ? "text-muted-foreground"
-                    : "text-amber-600"
+                    : "text-warning"
                 }`}
               >
                 {ready}
@@ -140,7 +140,7 @@ const IntegrationenPage = () => {
           <div className="h-1.5 rounded-full bg-muted overflow-hidden">
             <div
               className={`h-full transition-all duration-500 ${
-                ready === 4 ? "bg-emerald-500" : "bg-accent"
+                ready === 4 ? "bg-[hsl(var(--status-success))]" : "bg-accent"
               }`}
               style={{ width: `${pct}%` }}
             />
@@ -169,7 +169,7 @@ const SetupBadge = ({ label, ready }: { label: string; ready: boolean }) => (
   <span
     className={`px-2 py-1 rounded-md ${
       ready
-        ? "bg-emerald-500/15 text-emerald-700"
+        ? "status-success"
         : "bg-muted/40 text-muted-foreground"
     }`}
     title={ready ? `${label} ist eingerichtet` : `${label} noch nicht eingerichtet`}
@@ -363,8 +363,8 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
 
   const status = config.phone_number
     ? config.status === "active"
-      ? { label: "Aktiv", cls: "bg-emerald-500/15 text-emerald-700", Icon: CheckCircle2 }
-      : { label: "Wird eingerichtet", cls: "bg-amber-500/15 text-amber-700", Icon: Loader2 }
+      ? { label: "Aktiv", cls: "status-success", Icon: CheckCircle2 }
+      : { label: "Wird eingerichtet", cls: "status-warning", Icon: Loader2 }
     : { label: "Noch keine Nummer", cls: "bg-muted text-muted-foreground", Icon: AlertCircle };
 
   return (
@@ -380,8 +380,8 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
     >
       {config.phone_number ? (
         <div className="space-y-4">
-          <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/[0.04] p-4">
-            <div className="text-[10px] uppercase tracking-wider font-semibold text-emerald-700 mb-1">
+          <div className="surface-success rounded-xl border p-4">
+            <div className="text-[10px] uppercase tracking-wider font-semibold text-success mb-1">
               Ihre KI-Telefonnummer
             </div>
             <div className="flex items-center gap-2">
@@ -410,7 +410,7 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 KI gelöst
               </div>
-              <div className="text-xl font-display font-bold text-emerald-600 tabular-nums mt-1">
+              <div className="text-xl font-display font-bold text-success tabular-nums mt-1">
                 {calls24h.length - escalated24h}
               </div>
             </div>
@@ -418,7 +418,7 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 Eskaliert
               </div>
-              <div className={`text-xl font-display font-bold tabular-nums mt-1 ${escalated24h > 0 ? "text-amber-600" : "text-foreground"}`}>
+              <div className={`text-xl font-display font-bold tabular-nums mt-1 ${escalated24h > 0 ? "text-warning" : "text-foreground"}`}>
                 {escalated24h}
               </div>
             </div>
@@ -602,9 +602,9 @@ const WhatsappCard = ({ config }: { config: WhatsappIntegration }) => {
 
   const status =
     config.verification_status === "verified"
-      ? { label: "Verifiziert", cls: "bg-emerald-500/15 text-emerald-700", Icon: CheckCircle2 }
+      ? { label: "Verifiziert", cls: "status-success", Icon: CheckCircle2 }
       : config.phone_number
-        ? { label: "Wird verifiziert", cls: "bg-amber-500/15 text-amber-700", Icon: Loader2 }
+        ? { label: "Wird verifiziert", cls: "status-warning", Icon: Loader2 }
         : { label: "Noch keine Nummer", cls: "bg-muted text-muted-foreground", Icon: AlertCircle };
 
   return (
@@ -653,7 +653,7 @@ const WhatsappCard = ({ config }: { config: WhatsappIntegration }) => {
           )}
         </Button>
         {config.phone_number && config.verification_status !== "verified" && (
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/[0.03] p-3 space-y-1">
+          <div className="surface-warning rounded-xl border p-3 space-y-1">
             <div className="text-xs">
               <strong className="text-foreground">Verifizierung läuft.</strong>{" "}
               Eingereicht{" "}
@@ -779,9 +779,9 @@ const EmailCard = ({ config }: { config: EmailIntegration }) => {
 
   const status =
     config.verification_status === "verified"
-      ? { label: "Verifiziert", cls: "bg-emerald-500/15 text-emerald-700", Icon: CheckCircle2 }
+      ? { label: "Verifiziert", cls: "status-success", Icon: CheckCircle2 }
       : config.custom_domain
-        ? { label: "DNS ausstehend", cls: "bg-amber-500/15 text-amber-700", Icon: AlertCircle }
+        ? { label: "DNS ausstehend", cls: "status-warning", Icon: AlertCircle }
         : { label: "Keine Domain", cls: "bg-muted text-muted-foreground", Icon: AlertCircle };
 
   return (
@@ -919,8 +919,8 @@ const StripeCard = ({ config }: { config: StripeIntegration }) => {
   const status = !config.connect_account_id
     ? { label: "Nicht verbunden", cls: "bg-muted text-muted-foreground", Icon: AlertCircle }
     : config.charges_enabled
-      ? { label: "Zahlungen aktiv", cls: "bg-emerald-500/15 text-emerald-700", Icon: CheckCircle2 }
-      : { label: "Verifizierung läuft", cls: "bg-amber-500/15 text-amber-700", Icon: Loader2 };
+      ? { label: "Zahlungen aktiv", cls: "status-success", Icon: CheckCircle2 }
+      : { label: "Verifizierung läuft", cls: "status-warning", Icon: Loader2 };
 
   return (
     <Card
@@ -1039,7 +1039,7 @@ const Row = ({
 }) => (
   <div className="flex items-center justify-between text-sm">
     <span className="text-foreground">{label}</span>
-    <span className={`text-xs font-semibold inline-flex items-center gap-1 ${ok ? "text-emerald-700" : "text-amber-700"}`}>
+    <span className={`text-xs font-semibold inline-flex items-center gap-1 ${ok ? "text-success" : "text-warning"}`}>
       {ok ? <CheckCircle2 className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
       {ok ? okText : warnText}
     </span>

@@ -131,16 +131,16 @@ const SystemStatusPage = () => {
       <div
         className={`glass-card p-5 ${
           overallReady
-            ? "border-emerald-500/30 bg-emerald-500/[0.04]"
-            : "border-amber-500/30 bg-amber-500/[0.04]"
+            ? "surface-success"
+            : "surface-warning"
         }`}
       >
         <div className="flex items-center gap-4">
           <div
             className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
               overallReady
-                ? "bg-emerald-500/15 text-emerald-700"
-                : "bg-amber-500/15 text-amber-700"
+                ? "status-success"
+                : "status-warning"
             }`}
           >
             {overallReady ? <CheckCircle2 className="h-7 w-7" /> : <AlertCircle className="h-7 w-7" />}
@@ -211,9 +211,9 @@ const SystemStatusPage = () => {
               const Icon = it.icon;
               const StatusIcon = it.ok ? CheckCircle2 : it.pendingReason ? Loader2 : XCircle;
               const statusCls = it.ok
-                ? "text-emerald-700"
+                ? "text-success"
                 : it.pendingReason
-                  ? "text-amber-700"
+                  ? "text-warning"
                   : "text-muted-foreground";
               const statusLabel = it.ok ? "Live" : it.pendingReason ?? "Nicht eingerichtet";
 
@@ -268,9 +268,9 @@ const FoundationTile = ({
   okText: string;
   warnText: string;
 }) => (
-  <div className={`glass-card p-4 ${ok ? "border-emerald-500/30 bg-emerald-500/[0.03]" : "border-amber-500/30 bg-amber-500/[0.03]"}`}>
+  <div className={`glass-card p-4 ${ok ? "surface-success" : "surface-warning"}`}>
     <div className="flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${ok ? "bg-emerald-500/15 text-emerald-700" : "bg-amber-500/15 text-amber-700"}`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${ok ? "status-success" : "status-warning"}`}>
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0">

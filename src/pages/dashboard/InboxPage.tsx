@@ -183,8 +183,8 @@ const InboxPage = () => {
                   <div
                     className={`w-11 h-11 rounded-2xl flex items-center justify-center ${
                       selected.kanal === "whatsapp"
-                        ? "bg-green-500/15 text-green-600"
-                        : "bg-sky-500/15 text-sky-600"
+                        ? "status-success"
+                        : "status-info"
                     }`}
                   >
                     {selected.kanal === "whatsapp" ? (
@@ -204,7 +204,7 @@ const InboxPage = () => {
                   </div>
                 </div>
                 {selected.status === "escalated" && (
-                  <span className="px-3 py-1 rounded-lg text-xs font-medium bg-amber-500/15 text-amber-700">
+                  <span className="px-3 py-1 rounded-lg text-xs font-medium status-warning">
                     Eskaliert
                   </span>
                 )}
@@ -222,7 +222,7 @@ const InboxPage = () => {
             <div
               className={`glass-card p-6 ${
                 triageEskaliert
-                  ? "border-amber-500/30 bg-amber-500/[0.04]"
+                  ? "surface-warning"
                   : "border-accent/30 bg-accent/[0.04]"
               }`}
             >
@@ -244,7 +244,7 @@ const InboxPage = () => {
                 )}
               </div>
               {triageEskaliert && triage?.eskalation_grund && (
-                <div className="text-xs text-amber-700 font-medium mb-2">
+                <div className="text-xs text-warning font-medium mb-2">
                   Empfehlung: An Anwalt eskalieren — {triage.eskalation_grund}
                 </div>
               )}
@@ -356,9 +356,9 @@ const InboxPage = () => {
             </div>
 
             {selected.status === "escalated" && (
-              <div className="glass-card p-5 border-amber-500/30 bg-amber-500/[0.03]">
+              <div className="glass-card p-5 surface-warning">
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                  <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
                   <div>
                     <h3 className="text-sm font-display font-bold text-foreground mb-1">
                       Warum eskaliert?
@@ -549,8 +549,8 @@ const InboxPage = () => {
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                       k.kanal === "whatsapp"
-                        ? "bg-green-500/15 text-green-600"
-                        : "bg-sky-500/15 text-sky-600"
+                        ? "status-success"
+                        : "status-info"
                     }`}
                   >
                     {k.kanal === "whatsapp" ? (
@@ -568,12 +568,12 @@ const InboxPage = () => {
                         <span className="w-2 h-2 rounded-full bg-accent shrink-0" />
                       )}
                       {k.status === "escalated" && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-500/15 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-warning bg-[hsl(var(--status-warning))]/15 px-2 py-0.5 rounded">
                           eskaliert
                         </span>
                       )}
                       {k.ai_handled && k.status !== "escalated" && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-500/15 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-success bg-[hsl(var(--status-success))]/15 px-2 py-0.5 rounded">
                           KI
                         </span>
                       )}
@@ -618,11 +618,11 @@ const Stat = ({
 }) => {
   const cls =
     accent === "green"
-      ? "text-green-600"
+      ? "text-success"
       : accent === "sky"
-      ? "text-sky-600"
+      ? "text-info"
       : accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : "text-foreground";
   return (
     <div className="glass-card p-5 border-border/50">

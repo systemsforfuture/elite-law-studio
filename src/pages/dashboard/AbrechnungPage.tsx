@@ -54,7 +54,7 @@ const AbrechnungPage = () => {
                 Aktiv seit{" "}
                 {new Date(tenant.onboarded_at).toLocaleDateString("de-DE")} ·
                 Status:{" "}
-                <span className="text-emerald-700 font-semibold">
+                <span className="text-success font-semibold">
                   {tenant.subscription_status}
                 </span>
               </div>
@@ -132,25 +132,25 @@ const AbrechnungPage = () => {
                 <span className="text-muted-foreground">
                   {totalTokens.toLocaleString("de-DE")} / {tier.kiTokens.toLocaleString("de-DE")} Tokens
                 </span>
-                <span className={`font-semibold ${overLimit ? "text-rose-600" : limitPct > 80 ? "text-amber-600" : "text-emerald-600"}`}>
+                <span className={`font-semibold ${overLimit ? "text-critical" : limitPct > 80 ? "text-warning" : "text-success"}`}>
                   {limitPct.toFixed(0)}%
                 </span>
               </div>
               <div className="h-2 rounded-full bg-muted overflow-hidden">
                 <div
                   className={`h-full transition-all ${
-                    overLimit ? "bg-rose-500" : limitPct > 80 ? "bg-amber-500" : "bg-emerald-500"
+                    overLimit ? "bg-[hsl(var(--status-critical))]" : limitPct > 80 ? "bg-[hsl(var(--status-warning))]" : "bg-[hsl(var(--status-success))]"
                   }`}
                   style={{ width: `${limitPct}%` }}
                 />
               </div>
               {limitPct > 80 && (
-                <div className={`mt-2 rounded-lg p-3 ${overLimit ? "border border-rose-500/30 bg-rose-500/[0.04]" : "border border-amber-500/30 bg-amber-500/[0.04]"}`}>
+                <div className={`mt-2 rounded-lg p-3 ${overLimit ? "border surface-critical" : "border surface-warning"}`}>
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <div className="flex items-start gap-2 flex-1 min-w-0">
-                      <AlertCircle className={`h-4 w-4 mt-0.5 shrink-0 ${overLimit ? "text-rose-600" : "text-amber-600"}`} />
+                      <AlertCircle className={`h-4 w-4 mt-0.5 shrink-0 ${overLimit ? "text-critical" : "text-warning"}`} />
                       <div className="text-xs">
-                        <div className={`font-semibold ${overLimit ? "text-rose-700" : "text-amber-700"}`}>
+                        <div className={`font-semibold ${overLimit ? "text-critical" : "text-warning"}`}>
                           {overLimit
                             ? "Limit überschritten — KI antwortet nur noch eingeschränkt."
                             : "Limit fast erreicht."}
@@ -182,16 +182,16 @@ const AbrechnungPage = () => {
 
           {/* Anomalie-Banner */}
           {anomaly.isAnomaly && (
-            <div className="mb-4 rounded-xl border border-amber-500/40 bg-amber-500/[0.06] p-4">
+            <div className="mb-4 rounded-xl border surface-warning p-4">
               <div className="flex items-start gap-3">
-                <Zap className="h-5 w-5 mt-0.5 shrink-0 text-amber-600" />
+                <Zap className="h-5 w-5 mt-0.5 shrink-0 text-warning" />
                 <div className="text-sm flex-1 min-w-0">
-                  <div className="font-display font-bold text-amber-700">
+                  <div className="font-display font-bold text-warning">
                     Ungewöhnlicher KI-Verbrauch heute
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     Heute: {(anomaly.todayTokens / 1000).toFixed(0)}k Tokens — das ist{" "}
-                    <span className="font-semibold text-amber-700">
+                    <span className="font-semibold text-warning">
                       {anomaly.factor.toFixed(1)}× mehr
                     </span>{" "}
                     als der Durchschnitt der letzten 7 Tage ({(anomaly.baselineMedian / 1000).toFixed(0)}k).
@@ -293,7 +293,7 @@ const DailyTrend = ({ rows }: { rows: LlmUsageDayRow[] }) => {
   const last7 = rows.slice(-7).reduce((s, r) => s + r.tokens_sum, 0);
   const prev7 = rows.slice(-14, -7).reduce((s, r) => s + r.tokens_sum, 0);
   const delta = prev7 === 0 ? 0 : ((last7 - prev7) / prev7) * 100;
-  const trendColor = delta > 30 ? "text-amber-600" : delta < -10 ? "text-emerald-600" : "text-muted-foreground";
+  const trendColor = delta > 30 ? "text-warning" : delta < -10 ? "text-success" : "text-muted-foreground";
 
   return (
     <div className="mb-5 rounded-xl border border-border/40 bg-background/40 p-4">
@@ -346,7 +346,7 @@ const Mini = ({
     </div>
     <div
       className={`text-lg font-display font-bold tabular-nums ${
-        accent === "emerald" ? "text-emerald-600" : "text-foreground"
+        accent === "emerald" ? "text-success" : "text-foreground"
       }`}
     >
       {value}
