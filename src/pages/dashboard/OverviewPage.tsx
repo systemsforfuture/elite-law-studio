@@ -33,6 +33,9 @@ import {
   TrendingUp,
   Users,
   Wallet,
+  Globe,
+  ExternalLink,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Sparkline from "@/components/dashboard/Sparkline";
@@ -51,7 +54,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useEncryption } from "@/contexts/EncryptionContext";
 import { greetingForTime } from "@/lib/date-utils";
 import { findMandant, findUser, mandantName } from "@/data/mockData";
-import type { AktenStufe } from "@/data/types";
+import type { AktenStufe, Tenant } from "@/data/types";
 import { toast } from "sonner";
 
 // ─────────────────────────────────────────────────────────────────
@@ -246,6 +249,9 @@ const OverviewPage = () => {
 
       {/* 2. Today-Briefing */}
       <TodayBriefing items={briefingItems} />
+
+      {/* 2b. Meine Webseite — was Mandanten sehen */}
+      <MyWebsiteCard tenant={tenant} />
 
       {/* 3. KPI Row */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -873,6 +879,87 @@ const EmptyTenantHero = ({
     </div>
   </div>
 );
+
+// ─────────────────────────────────────────────────────────────────
+// Meine-Webseite-Karte
+// ─────────────────────────────────────────────────────────────────
+//
+// Anwalt sieht hier prominent seine eigene Landing-Page-URL + Preview-
+// Button. Das ist DAS Produkt das Mandanten sehen, wenn sie über
+// Google/Ads/QR auf die Kanzlei stoßen. Daher gehört es ins Dashboard.
+
+const MyWebsiteCard = ({ tenant }: { tenant: Tenant }) => {
+  const url = tenant.domain
+    ? `https://${tenant.domain}`
+    : `${typeof window !== "undefined" ? window.location.origin : ""}/template/kanzlei`;
+  const previewUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/template/kanzlei`
+      : "/template/kanzlei";
+
+  return (
+    <section className="surface-elevated p-5">
+      <div className="flex items-start gap-4 flex-wrap">
+        <div className="h-11 w-11 rounded-lg border border-border bg-muted/30 flex items-center justify-center shrink-0">
+          <Globe className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-3 flex-wrap mb-1.5">
+            <h3 className="text-sm font-semibold text-foreground tracking-tight uppercase">
+              Ihre Webseite — was Mandanten sehen
+            </h3>
+            <span className="text-[11px] text-muted-foreground">
+              Live unter Ihrer Domain
+            </span>
+          </div>
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <code className="text-xs font-mono px-2.5 py-1.5 rounded border border-border/60 bg-muted/20 text-foreground/85">
+              {url}
+            </code>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("URL kopiert");
+                } catch {
+                  toast.error("Kopieren fehlgeschlagen");
+                }
+              }}
+              className="inline-flex items-center gap-1 px-2 py-1.5 rounded-md text-[11px] text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+              aria-label="URL kopieren"
+            >
+              <Copy className="h-3 w-3" />
+              kopieren
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground max-w-prose mb-3">
+            Drucken Sie diese Adresse auf Visitenkarten, Briefpapier und
+            E-Mail-Signatur. Anfragen über die Webseite landen automatisch
+            in Ihrer Inbox. Werbeanzeigen können Sie direkt darauf schalten.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-foreground text-background text-xs font-medium hover:bg-foreground/90 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Vorschau öffnen
+            </a>
+            <Link
+              to="/dashboard/branding"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs font-medium text-foreground hover:bg-muted/30 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            >
+              Inhalte bearbeiten
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 export default OverviewPage;
 
