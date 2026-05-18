@@ -142,7 +142,7 @@ const AktenPage = () => {
           Zurück zur Aktenliste
         </button>
 
-        <div className="glass-card p-6 border-border/50">
+        <div className="surface p-5">
           <div className="flex items-start justify-between mb-2 flex-wrap gap-3">
             <div>
               <h2 className="text-xl font-display font-bold text-foreground">
@@ -203,7 +203,7 @@ const AktenPage = () => {
 
         {tab === "ueberblick" && (
           <>
-            <div className="glass-card p-6 border-border/50">
+            <div className="surface p-5">
               <p className="text-sm text-foreground/80">
                 {selected.beschreibung}
               </p>
@@ -217,7 +217,7 @@ const AktenPage = () => {
               )}
             </div>
 
-            <div className="glass-card p-6 border-border/50">
+            <div className="surface p-5">
               <h3 className="font-display font-bold text-foreground mb-6">
                 Fortschritt
               </h3>
@@ -265,7 +265,7 @@ const AktenPage = () => {
         {tab === "strategie" && (
           <>
             {!strategie ? (
-              <div className="glass-card p-12 border-accent/30 bg-accent/[0.03] text-center">
+              <div className="surface p-10 border-accent/30 text-center">
                 <Brain className="h-14 w-14 text-accent mx-auto mb-4" />
                 <h3 className="text-xl font-display font-bold text-foreground mb-2">
                   Noch keine Strategie generiert
@@ -301,7 +301,7 @@ const AktenPage = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                <div className="glass-card p-6 border-accent/30 bg-accent/[0.03]">
+                <div className="surface p-5 border-accent/30">
                   <div className="flex items-start justify-between flex-wrap gap-3 mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 rounded-2xl bg-accent/15 flex items-center justify-center">
@@ -536,7 +536,7 @@ const AktenPage = () => {
 
                 </>)}
 
-                <div className="glass-card p-6 border-border/50">
+                <div className="surface p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <RefreshCw className="h-4 w-4 text-accent" />
                     <h3 className="font-display font-bold text-foreground">
@@ -585,7 +585,7 @@ const AktenPage = () => {
         )}
 
         {tab === "fristen" && (
-          <div className="glass-card p-6 border-border/50">
+          <div className="surface p-5">
             <h3 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
               <Calendar className="h-4 w-4 text-accent" />
               Fristen
@@ -635,7 +635,7 @@ const AktenPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat
           label="Aktive Akten"
           value={String(akten.filter((a) => a.status === "in_bearbeitung").length)}
@@ -644,19 +644,19 @@ const AktenPage = () => {
         <Stat
           label="Offene Fristen"
           value={String(offeneFristen.total)}
-          sub={offeneFristen.kritisch === 0 ? "Keine kritisch" : `${offeneFristen.kritisch} kritisch`}
-          accent="amber"
+          sub={offeneFristen.kritisch === 0 ? "keine kritisch" : `${offeneFristen.kritisch} kritisch`}
+          severity={offeneFristen.kritisch > 0 ? "warning" : undefined}
         />
         <Stat
           label="Streitwert gesamt"
           value={formatStreitwert(streitwertSum)}
-          sub="Aktive Akten"
+          sub="aktive Akten"
         />
         <Stat
           label="KI-Strategien"
           value={String(strategieReview)}
-          sub={strategieReview === 0 ? "Keine im Review" : "Im Review"}
-          accent="purple"
+          sub={strategieReview === 0 ? "keine im Review" : "im Review"}
+          severity={strategieReview > 0 ? "info" : undefined}
         />
       </div>
 
@@ -713,16 +713,21 @@ const AktenPage = () => {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="glass-card p-8 text-center text-sm text-muted-foreground border-border/50">
+        <div className="surface p-8 text-center text-sm text-muted-foreground">
           Keine Akten in diesem Filter.
         </div>
       ) : (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {filtered.map((a) => {
           const md = findMandant(a.mandant_id);
           const anwalt = findUser(a.zugewiesener_anwalt_id);
           const kritisch = a.fristen.some((f) => f.kritisch);
           const hasStrategy = allStrategien.some((s) => s.akte_id === a.id);
+          const stufenIndex =
+            (["fallaufnahme", "strategie", "verfahren", "abschluss"] as const).indexOf(a.stufe);
+          const updateDays = Math.floor(
+            (Date.now() - new Date(a.last_update).getTime()) / 86_400_000,
+          );
           const open = () => {
             setSelected(a);
             setTab("ueberblick");
@@ -740,50 +745,73 @@ const AktenPage = () => {
                   open();
                 }
               }}
-              className="glass-card p-5 border-border/50 hover:border-accent/30 transition-all cursor-pointer group focus:outline-none focus:ring-2 focus:ring-accent/40"
+              className="surface px-4 py-3.5 hover:border-foreground/20 transition-colors cursor-pointer group focus:outline-none focus:bg-muted/20"
             >
               <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-12 h-12 rounded-2xl bg-navy/10 flex items-center justify-center shrink-0">
-                    <FolderOpen className="h-5 w-5 text-navy" />
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-9 h-9 rounded-lg bg-muted/40 border border-border/50 flex items-center justify-center shrink-0">
+                    <FolderOpen className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="font-semibold text-foreground truncate">
+                      <h3 className="font-medium text-foreground truncate">
                         {a.titel}
                       </h3>
                       {kritisch && (
-                        <span className="text-[10px] font-bold uppercase text-warning bg-[hsl(var(--status-warning))]/15 px-2 py-0.5 rounded">
-                          Kritische Frist
+                        <span className="status-pill status-warning text-[9px]">
+                          Frist kritisch
                         </span>
                       )}
                       {hasStrategy && (
-                        <span className="text-[10px] font-bold uppercase text-accent bg-accent/15 px-2 py-0.5 rounded flex items-center gap-1">
+                        <span className="status-pill status-info text-[9px] gap-1">
                           <Brain className="h-2.5 w-2.5" />
                           KI-Strategie
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      {a.aktenzeichen} · {a.rechtsgebiet} ·{" "}
-                      {mandantName(md)} · {anwalt?.name}
+                    <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                      <span className="font-mono">{a.aktenzeichen}</span> ·{" "}
+                      {a.rechtsgebiet} · {mandantName(md)}
+                      {anwalt?.name && ` · ${anwalt.name}`}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 shrink-0">
-                  <div className="text-right">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                      Streitwert
-                    </div>
-                    <div className="text-sm font-bold text-foreground tabular-nums">
-                      {a.streitwert_eur?.toLocaleString("de-DE") ?? 0}€
-                    </div>
-                  </div>
-                  <span className="text-[10px] uppercase font-bold px-2 py-1 rounded bg-accent/10 text-accent">
+
+                {/* Stufen-Funnel: 4 Dots */}
+                <div className="hidden md:flex items-center gap-1 shrink-0" title={`Stufe: ${stufeLabel[a.stufe]}`}>
+                  {[0, 1, 2, 3].map((i) => (
+                    <span
+                      key={i}
+                      className={`h-1.5 w-4 rounded-full ${
+                        i <= stufenIndex
+                          ? "bg-foreground/70"
+                          : "bg-muted"
+                      }`}
+                    />
+                  ))}
+                  <span className="text-[10px] text-muted-foreground ml-2 tabular-nums uppercase tracking-wider w-20">
                     {stufeLabel[a.stufe]}
                   </span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
                 </div>
+
+                <div className="text-right shrink-0 min-w-[90px]">
+                  <div className="text-sm font-medium text-foreground tabular-nums">
+                    {a.streitwert_eur
+                      ? `${a.streitwert_eur.toLocaleString("de-DE")} €`
+                      : "—"}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">
+                    {updateDays <= 0
+                      ? "heute"
+                      : updateDays === 1
+                        ? "gestern"
+                        : updateDays < 30
+                          ? `vor ${updateDays} T`
+                          : `vor ${Math.floor(updateDays / 30)} Mon`}
+                  </div>
+                </div>
+
+                <ChevronRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-foreground transition-colors shrink-0" />
               </div>
             </div>
           );
@@ -807,7 +835,7 @@ const Section = ({
   highlight?: boolean;
 }) => (
   <div
-    className={`glass-card p-6 ${highlight ? "border-accent/40 bg-accent/[0.04]" : "border-border/50"}`}
+    className={`surface p-5 ${highlight ? "border-accent/40 bg-accent/[0.04]" : ""}`}
   >
     <h3
       className={`text-[10px] uppercase tracking-[0.2em] font-bold mb-3 ${
@@ -824,28 +852,35 @@ const Stat = ({
   label,
   value,
   sub,
-  accent,
+  severity,
 }: {
   label: string;
   value: string;
   sub: string;
-  accent?: "amber" | "purple";
+  severity?: "warning" | "info" | "success" | "critical";
 }) => {
-  const cls =
-    accent === "amber"
-      ? "text-warning"
-      : accent === "purple"
-      ? "text-purple-600"
-      : "text-foreground";
+  const colorVar =
+    severity === "warning"
+      ? "hsl(var(--status-warning))"
+      : severity === "info"
+        ? "hsl(var(--status-info))"
+        : severity === "success"
+          ? "hsl(var(--status-success))"
+          : severity === "critical"
+            ? "hsl(var(--status-critical))"
+            : "hsl(var(--foreground))";
   return (
-    <div className="glass-card p-5 border-border/50">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+    <div className="surface p-4">
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         {label}
       </div>
-      <div className={`text-3xl font-display font-black tabular-nums ${cls}`}>
+      <div
+        className="text-[22px] font-display font-bold tabular-nums leading-none tracking-tight"
+        style={{ color: colorVar }}
+      >
         {value}
       </div>
-      <div className="text-xs text-muted-foreground mt-1">{sub}</div>
+      <div className="text-[11px] text-muted-foreground/80 mt-1">{sub}</div>
     </div>
   );
 };

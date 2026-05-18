@@ -107,7 +107,7 @@ const TerminePage = () => {
   return (
     <div className="space-y-6">
       {termine.length === 0 && (
-        <div className="glass-card p-5 border-accent/20 bg-accent/[0.03] flex items-start gap-3 flex-wrap">
+        <div className="surface p-4 border-accent/20 flex items-start gap-3 flex-wrap">
           <CalIcon className="h-5 w-5 text-accent shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <div className="text-sm font-display font-bold text-foreground">
@@ -126,23 +126,24 @@ const TerminePage = () => {
           </a>
         </div>
       )}
-      <div className="grid sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat
           label="Termine diese Woche"
           value={stats.weekTermineCount.toString()}
           sub={stats.weekTermineCount === 0 ? "—" : `${stats.weekBestaetigt} bestätigt`}
+          severity={stats.weekTermineCount > 0 ? "success" : undefined}
         />
         <Stat
           label="Offene Wiedervorlagen"
           value={stats.wiedervorlagenCount.toString()}
-          sub={stats.wiedervorlagenHeute === 0 ? "Keine fällig heute" : `${stats.wiedervorlagenHeute} fällig heute`}
-          accent="amber"
+          sub={stats.wiedervorlagenHeute === 0 ? "keine fällig heute" : `${stats.wiedervorlagenHeute} fällig heute`}
+          severity={stats.wiedervorlagenHeute > 0 ? "warning" : undefined}
         />
         <Stat
           label="Fristen diese Woche"
           value={stats.fristenWeekCount.toString()}
-          sub={stats.fristenKritisch === 0 ? "Keine kritisch" : `${stats.fristenKritisch} kritisch`}
-          accent="rose"
+          sub={stats.fristenKritisch === 0 ? "keine kritisch" : `${stats.fristenKritisch} kritisch`}
+          severity={stats.fristenKritisch > 0 ? "critical" : undefined}
         />
         <Stat
           label="Termine gesamt"
@@ -152,7 +153,7 @@ const TerminePage = () => {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="glass-card p-6 border-border/50 lg:col-span-2">
+        <div className="surface p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <h3 className="font-display font-bold text-foreground">
               {refMonth.toLocaleDateString("de-DE", {
@@ -261,7 +262,7 @@ const TerminePage = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="glass-card p-5 border-border/50">
+          <div className="surface p-4">
             <h3 className="text-sm font-display font-bold text-foreground mb-4 flex items-center gap-2">
               <CalIcon className="h-4 w-4 text-accent" />
               Anstehend
@@ -403,7 +404,7 @@ const TerminePage = () => {
             </div>
           </div>
 
-          <div className="glass-card p-5 surface-warning">
+          <div className="surface-warning p-4">
             <h3 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
               <Bell className="h-4 w-4 text-warning" />
               Fristen-Wiedervorlage
@@ -430,7 +431,7 @@ const TerminePage = () => {
             </div>
           </div>
 
-          <div className="glass-card p-5 border-accent/20 bg-accent/[0.03]">
+          <div className="surface p-4 border-accent/20">
             <h3 className="text-sm font-display font-bold text-foreground mb-2 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-accent" />
               KI-Termin-Koordinator
@@ -452,30 +453,33 @@ const Stat = ({
   label,
   value,
   sub,
-  accent,
+  severity,
 }: {
   label: string;
   value: string;
   sub: string;
-  accent?: "emerald" | "amber" | "rose";
+  severity?: "success" | "warning" | "critical";
 }) => {
-  const cls =
-    accent === "emerald"
-      ? "text-success"
-      : accent === "amber"
-      ? "text-warning"
-      : accent === "rose"
-      ? "text-critical"
-      : "text-foreground";
+  const colorVar =
+    severity === "success"
+      ? "hsl(var(--status-success))"
+      : severity === "warning"
+        ? "hsl(var(--status-warning))"
+        : severity === "critical"
+          ? "hsl(var(--status-critical))"
+          : "hsl(var(--foreground))";
   return (
-    <div className="glass-card p-5 border-border/50">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+    <div className="surface p-4">
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         {label}
       </div>
-      <div className={`text-3xl font-display font-black tabular-nums ${cls}`}>
+      <div
+        className="text-[22px] font-display font-bold tabular-nums leading-none tracking-tight"
+        style={{ color: colorVar }}
+      >
         {value}
       </div>
-      <div className="text-xs text-muted-foreground mt-1">{sub}</div>
+      <div className="text-[11px] text-muted-foreground/80 mt-1">{sub}</div>
     </div>
   );
 };

@@ -177,7 +177,7 @@ const InboxPage = () => {
 
         <div className="grid lg:grid-cols-[1.3fr_1fr] gap-6">
           <div className="space-y-4">
-            <div className="glass-card p-6 border-border/50">
+            <div className="surface p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div
@@ -220,11 +220,11 @@ const InboxPage = () => {
             </div>
 
             <div
-              className={`glass-card p-6 ${
+              className={
                 triageEskaliert
-                  ? "surface-warning"
-                  : "border-accent/30 bg-accent/[0.04]"
-              }`}
+                  ? "surface-warning p-5"
+                  : "surface p-5 border-accent/30 bg-accent/[0.025]"
+              }
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ const InboxPage = () => {
               </div>
             </div>
 
-            <div className="glass-card p-6 border-border/50">
+            <div className="surface p-5">
               <h3 className="text-sm font-display font-bold text-foreground mb-3">
                 Antwort
               </h3>
@@ -333,7 +333,7 @@ const InboxPage = () => {
           </div>
 
           <div className="space-y-4">
-            <div className="glass-card p-5 border-border/50">
+            <div className="surface p-4">
               <h3 className="text-sm font-display font-bold text-foreground mb-3">
                 Mandant
               </h3>
@@ -356,7 +356,7 @@ const InboxPage = () => {
             </div>
 
             {selected.status === "escalated" && (
-              <div className="glass-card p-5 surface-warning">
+              <div className="surface-warning p-4">
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
                   <div>
@@ -372,7 +372,7 @@ const InboxPage = () => {
               </div>
             )}
 
-            <div className="glass-card p-5 border-border/50">
+            <div className="surface p-4">
               <h3 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
                 <Phone className="h-4 w-4 text-accent" />
                 Schnell-Aktionen
@@ -434,7 +434,7 @@ const InboxPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat
           label="Heute eingegangen"
           value={stats.todayCount.toString()}
@@ -444,35 +444,35 @@ const InboxPage = () => {
           label="WhatsApp"
           value={stats.whatsappCount.toString()}
           sub={`${stats.whatsappAi} KI · ${stats.whatsappEsc} eskaliert`}
-          accent="green"
+          severity={stats.whatsappEsc > 0 ? "warning" : "success"}
         />
         <Stat
           label="Email"
           value={stats.emailCount.toString()}
           sub={`${stats.emailAiPct}% Auto-Antwort`}
-          accent="sky"
+          severity="info"
         />
         <Stat
           label="Eskaliert offen"
           value={stats.escalatedCount.toString()}
-          sub={stats.escalatedCount === 0 ? "Alle bearbeitet" : "Anwalt-Antwort erforderlich"}
-          accent="amber"
+          sub={stats.escalatedCount === 0 ? "alle bearbeitet" : "Anwalt-Antwort erforderlich"}
+          severity={stats.escalatedCount > 0 ? "critical" : undefined}
         />
       </div>
 
-      <div className="glass-card border-border/50 overflow-hidden">
-        <div className="p-5 border-b border-border/50 flex items-center justify-between flex-wrap gap-3">
-          <h3 className="font-display font-bold text-foreground">Inbox</h3>
-          <div className="flex gap-2 items-center flex-wrap flex-1 justify-end">
+      <div className="surface overflow-hidden">
+        <div className="px-4 py-3 border-b border-border/40 flex items-center justify-between flex-wrap gap-3 bg-muted/10">
+          <h3 className="text-sm font-semibold text-foreground uppercase tracking-tight">Inbox</h3>
+          <div className="flex gap-1.5 items-center flex-wrap flex-1 justify-end">
             <div className="relative flex-1 sm:max-w-xs">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <input
                 type="search"
                 aria-label="Inbox durchsuchen"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Mandant, Betreff, Inhalt…"
-                className="w-full h-9 pl-9 pr-9 rounded-lg border border-border/50 bg-background/60 text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-accent/40"
+                className="w-full h-8 pl-9 pr-9 rounded-md border border-border/60 bg-background text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-accent/30"
               />
               {query && (
                 <button
@@ -485,7 +485,6 @@ const InboxPage = () => {
                 </button>
               )}
             </div>
-            <Filter className="h-4 w-4 text-muted-foreground" />
             {(
               [
                 { v: "all" as const, label: "Alle" },
@@ -498,10 +497,10 @@ const InboxPage = () => {
               <button
                 key={f.v}
                 onClick={() => setFilter(f.v)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   filter === f.v
-                    ? "bg-navy text-primary-foreground"
-                    : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted"
+                    ? "bg-foreground text-background"
+                    : "bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 {f.label}
@@ -541,53 +540,51 @@ const InboxPage = () => {
               <button
                 key={k.id}
                 onClick={() => setSelected(k)}
-                className={`w-full text-left p-5 hover:bg-muted/20 transition-colors ${
-                  k.ungelesen ? "bg-accent/[0.02]" : ""
+                className={`w-full text-left px-4 py-3 hover:bg-muted/15 transition-colors ${
+                  k.ungelesen ? "bg-muted/10" : ""
                 }`}
               >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                      k.kanal === "whatsapp"
-                        ? "status-success"
-                        : "status-info"
-                    }`}
-                  >
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-md border border-border/50 bg-muted/30 flex items-center justify-center shrink-0">
                     {k.kanal === "whatsapp" ? (
-                      <MessageCircle className="h-4 w-4" />
+                      <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" />
                     ) : (
-                      <Mail className="h-4 w-4" />
+                      <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-sm font-semibold text-foreground">
+                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                      <span className="text-sm font-medium text-foreground">
                         {md ? mandantName(md) : "Unbekannt"}
                       </span>
                       {k.ungelesen && (
-                        <span className="w-2 h-2 rounded-full bg-accent shrink-0" />
+                        <span
+                          className="status-dot"
+                          style={{ background: "hsl(var(--foreground))" }}
+                          aria-label="ungelesen"
+                        />
                       )}
                       {k.status === "escalated" && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-warning bg-[hsl(var(--status-warning))]/15 px-2 py-0.5 rounded">
+                        <span className="status-pill status-warning text-[9px]">
                           eskaliert
                         </span>
                       )}
                       {k.ai_handled && k.status !== "escalated" && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-success bg-[hsl(var(--status-success))]/15 px-2 py-0.5 rounded">
+                        <span className="status-pill status-success text-[9px]">
                           KI
                         </span>
                       )}
                     </div>
                     {k.betreff && (
-                      <div className="text-sm font-medium text-foreground/90 truncate">
+                      <div className="text-sm text-foreground/90 truncate">
                         {k.betreff}
                       </div>
                     )}
-                    <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
+                    <p className="text-[12px] text-muted-foreground line-clamp-1 mt-0.5">
                       {k.preview}
                     </p>
                   </div>
-                  <div className="text-[10px] text-muted-foreground shrink-0">
+                  <div className="text-[10px] text-muted-foreground shrink-0 font-mono">
                     {new Date(k.zeitpunkt).toLocaleString("de-DE", {
                       day: "2-digit",
                       month: "2-digit",
@@ -609,30 +606,35 @@ const Stat = ({
   label,
   value,
   sub,
-  accent,
+  severity,
 }: {
   label: string;
   value: string;
   sub: string;
-  accent?: "green" | "sky" | "amber";
+  severity?: "success" | "info" | "warning" | "critical";
 }) => {
-  const cls =
-    accent === "green"
-      ? "text-success"
-      : accent === "sky"
-      ? "text-info"
-      : accent === "amber"
-      ? "text-warning"
-      : "text-foreground";
+  const colorVar =
+    severity === "success"
+      ? "hsl(var(--status-success))"
+      : severity === "info"
+        ? "hsl(var(--status-info))"
+        : severity === "warning"
+          ? "hsl(var(--status-warning))"
+          : severity === "critical"
+            ? "hsl(var(--status-critical))"
+            : "hsl(var(--foreground))";
   return (
-    <div className="glass-card p-5 border-border/50">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
+    <div className="surface p-4">
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         {label}
       </div>
-      <div className={`text-3xl font-display font-black tabular-nums ${cls}`}>
+      <div
+        className="text-[22px] font-display font-bold tabular-nums leading-none tracking-tight"
+        style={{ color: colorVar }}
+      >
         {value}
       </div>
-      <div className="text-xs text-muted-foreground mt-1">{sub}</div>
+      <div className="text-[11px] text-muted-foreground/80 mt-1">{sub}</div>
     </div>
   );
 };
