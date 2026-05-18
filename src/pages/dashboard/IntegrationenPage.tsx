@@ -18,6 +18,7 @@ import { useAuditLog } from "@/lib/queries/use-audit";
 import {
   useProviderConfig,
   useProvisionVoice,
+  useUpdateVoiceAssistant,
   useLinkWhatsapp,
   useVerifyEmailDomain,
   useConnectStripe,
@@ -224,6 +225,7 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
   const provision = useProvisionVoice();
   const patch = usePatchProviderConfig();
   const testCall = useVoiceTestCall();
+  const resync = useUpdateVoiceAssistant();
   const { data: konversationen = [] } = useKonversationenQuery();
   const [areaCode, setAreaCode] = useState("030");
   const [greeting, setGreeting] = useState(config.greeting ?? "");
@@ -273,18 +275,53 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
   const handleSaveGreeting = async () => {
     const t = toast.loading("Begrüßung wird gespeichert…");
     try {
+      // 1) Lokales DB-Update — sofort sichtbar in UI
       await patch.mutateAsync({
         tenant_id: tenantId,
         patch: {
           voice: { ...config, greeting: greeting.trim() || null },
         },
       });
-      toast.success("Gespeichert", {
-        id: t,
-        description: "Beim nächsten Anruf nutzt die KI den neuen Begrüßungstext.",
+      // 2) Vapi-Assistant resyncen — sonst sagt KI weiterhin den alten Text
+      const res = await resync.mutateAsync({
+        greeting: greeting.trim() || undefined,
       });
+      if (res.ok) {
+        toast.success("Gespeichert + Voice-KI aktualisiert", {
+          id: t,
+          description: "Beim nächsten Anruf nutzt Anna den neuen Begrüßungstext.",
+        });
+      } else {
+        toast.warning("Gespeichert, aber Voice-Resync fehlgeschlagen", {
+          id: t,
+          description: res.message ?? "Bitte 'Voice neu konfigurieren' nochmal versuchen.",
+        });
+      }
     } catch (e) {
       toast.error("Speichern fehlgeschlagen", {
+        id: t,
+        description: e instanceof Error ? e.message : "Unbekannt",
+      });
+    }
+  };
+
+  const handleResync = async () => {
+    const t = toast.loading("Voice-KI wird neu konfiguriert…");
+    try {
+      const res = await resync.mutateAsync({});
+      if (res.ok) {
+        toast.success("Voice-KI aktualisiert", {
+          id: t,
+          description: res.message ?? "Beim nächsten Anruf gelten die neuen Einstellungen.",
+        });
+      } else {
+        toast.error("Konfiguration fehlgeschlagen", {
+          id: t,
+          description: res.message,
+        });
+      }
+    } catch (e) {
+      toast.error("Fehler", {
         id: t,
         description: e instanceof Error ? e.message : "Unbekannt",
       });
@@ -446,6 +483,31 @@ const VoiceCard = ({ config, tenantId }: { config: VoiceIntegration; tenantId: s
                 )}
               </Button>
             </div>
+          </div>
+
+          <div className="border-t border-border/50 pt-4 mt-4">
+            <h4 className="text-xs font-semibold text-foreground mb-2 uppercase tracking-wider">
+              Voice-KI neu konfigurieren
+            </h4>
+            <p className="text-xs text-muted-foreground mb-3">
+              Synchronisiert Tonalität, Rechtsgebiete und Inhaber-Name aus
+              Branding mit der Voice-KI. Nutzen wenn Sie in Branding etwas
+              geändert haben und die KI das beim nächsten Anruf wissen soll.
+            </p>
+            <Button
+              variant="outline"
+              onClick={handleResync}
+              disabled={resync.isPending}
+            >
+              {resync.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                  Synct…
+                </>
+              ) : (
+                "Voice-KI neu konfigurieren"
+              )}
+            </Button>
           </div>
         </div>
       ) : (

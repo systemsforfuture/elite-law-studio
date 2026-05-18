@@ -4,11 +4,8 @@ import {
   PhoneIncoming,
   PhoneOutgoing,
   PhoneOff,
-  PlayCircle,
-  PauseCircle,
   ArrowLeft,
   Mic,
-  Volume2,
   AlertTriangle,
   Check,
   Settings as SettingsIcon,
@@ -22,6 +19,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { Button } from "@/components/ui/button";
 import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
 import VoiceTestDialog from "@/components/dashboard/VoiceTestDialog";
+import VoiceRecordingPlayer from "@/components/dashboard/VoiceRecordingPlayer";
 import { isSameDay, isWithinLastDays } from "@/lib/date-utils";
 
 type CallFilter = "all" | "ai" | "escalated" | "spam";
@@ -37,7 +35,6 @@ const VoicePage = () => {
   const { tenant } = useTenant();
   const [tab, setTab] = useState<"calls" | "config">("calls");
   const [selected, setSelected] = useState<Konversation | null>(null);
-  const [playing, setPlaying] = useState(false);
   const [callFilter, setCallFilter] = useState<CallFilter>("all");
   const voiceAgent = kiAgents.find((a) => a.slug === "voice_receptionist")!;
   const { data: konversationen = [], isLoading } = useKonversationenQuery();
@@ -153,31 +150,85 @@ const VoicePage = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-navy/[0.04] border border-navy/10">
-                <button
-                  onClick={() => setPlaying(!playing)}
-                  className="text-accent hover:text-gold-dark transition-colors"
-                >
-                  {playing ? (
-                    <PauseCircle className="h-10 w-10" />
-                  ) : (
-                    <PlayCircle className="h-10 w-10" />
+              <VoiceRecordingPlayer
+                url={selected.recording_url ?? null}
+                durationSec={selected.dauer_sek ?? null}
+              />
+
+              {/* Cost + Structured-Data (kommt aus Vapi analysisPlan) */}
+              {(selected.cost_eur != null || selected.structured_data) && (
+                <div className="mt-4 grid sm:grid-cols-3 gap-3">
+                  {selected.cost_eur != null && (
+                    <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                        Anruf-Kosten
+                      </div>
+                      <div className="text-base font-display font-bold text-foreground tabular-nums mt-1">
+                        {selected.cost_eur.toLocaleString("de-DE", {
+                          style: "currency",
+                          currency: "EUR",
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 4,
+                        })}
+                      </div>
+                    </div>
                   )}
-                </button>
-                <div className="flex-1">
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-accent transition-all"
-                      style={{ width: playing ? "65%" : "0%" }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5 font-mono">
-                    <span>{playing ? "0:42" : "0:00"}</span>
-                    <span>{Math.floor((selected.dauer_sek ?? 0) / 60)}:{String((selected.dauer_sek ?? 0) % 60).padStart(2, "0")}</span>
-                  </div>
+                  {selected.structured_data?.urgency && (
+                    <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                        Dringlichkeit
+                      </div>
+                      <div
+                        className={`text-base font-display font-bold tabular-nums mt-1 ${
+                          selected.structured_data.urgency === "critical"
+                            ? "text-rose-700"
+                            : selected.structured_data.urgency === "high"
+                              ? "text-amber-700"
+                              : selected.structured_data.urgency === "medium"
+                                ? "text-foreground"
+                                : "text-emerald-700"
+                        }`}
+                      >
+                        {selected.structured_data.urgency}
+                      </div>
+                    </div>
+                  )}
+                  {selected.structured_data?.lead_quality &&
+                    selected.structured_data.lead_quality !== "n/a" && (
+                      <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                          Lead-Qualität
+                        </div>
+                        <div className="text-base font-display font-bold text-foreground tabular-nums mt-1 capitalize">
+                          {selected.structured_data.lead_quality}
+                        </div>
+                      </div>
+                    )}
                 </div>
-                <Volume2 className="h-4 w-4 text-muted-foreground" />
-              </div>
+              )}
+
+              {selected.structured_data?.next_step && (
+                <div className="mt-4 p-4 rounded-xl bg-accent/[0.05] border border-accent/20">
+                  <div className="text-[10px] uppercase tracking-wider text-accent font-semibold mb-1">
+                    Nächster Schritt (KI-Empfehlung)
+                  </div>
+                  <p className="text-sm text-foreground">
+                    {selected.structured_data.next_step}
+                  </p>
+                </div>
+              )}
+
+              {selected.escalation_reason && (
+                <div className="mt-4 p-4 rounded-xl bg-rose-500/[0.05] border border-rose-500/30">
+                  <div className="text-[10px] uppercase tracking-wider text-rose-700 font-semibold mb-1 flex items-center gap-1.5">
+                    <AlertTriangle className="h-3 w-3" />
+                    Eskaliert · {selected.escalation_urgency ?? "—"}
+                  </div>
+                  <p className="text-sm text-foreground">
+                    {selected.escalation_reason}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="glass-card p-6 border-border/50">
@@ -447,6 +498,15 @@ const VoicePage = () => {
                               eskaliert
                             </span>
                           )}
+                          {c.status === "pending" && !c.ended_at && (
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700 bg-rose-500/15 px-2 py-0.5 rounded flex items-center gap-1">
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500/60" />
+                                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500" />
+                              </span>
+                              live
+                            </span>
+                          )}
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-1">
                           {c.preview}
@@ -456,7 +516,9 @@ const VoicePage = () => {
                         <div className="font-mono">
                           {c.dauer_sek
                             ? `${Math.floor(c.dauer_sek / 60)}:${String(c.dauer_sek % 60).padStart(2, "0")}`
-                            : "—"}
+                            : c.status === "pending" && !c.ended_at
+                              ? "live"
+                              : "—"}
                         </div>
                         <div className="text-[10px] mt-0.5">
                           {new Date(c.zeitpunkt).toLocaleString("de-DE", {

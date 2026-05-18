@@ -98,6 +98,26 @@ export type Kanal = "voice" | "whatsapp" | "email" | "sms";
 export type Richtung = "inbound" | "outbound";
 export type KonvStatus = "automated" | "escalated" | "handled" | "pending";
 
+export type EscalationUrgency =
+  | "sofort_durchstellen"
+  | "rueckruf_heute"
+  | "rueckruf_naechster_werktag";
+
+export interface VoiceStructuredData {
+  urgency?: "low" | "medium" | "high" | "critical";
+  area?: string;
+  action?:
+    | "termin_gebucht"
+    | "lead_erfasst"
+    | "eskaliert"
+    | "info_gegeben"
+    | "spam"
+    | "kein_ergebnis";
+  sentiment?: "ruhig" | "verärgert" | "verzweifelt" | "neutral";
+  lead_quality?: "hot" | "warm" | "cold" | "n/a";
+  next_step?: string;
+}
+
 export interface Konversation {
   id: string;
   tenant_id: string;
@@ -115,6 +135,22 @@ export interface Konversation {
   dauer_sek?: number;
   ungelesen?: boolean;
   transcript?: { speaker: "ai" | "mandant" | "anwalt"; text: string; ts: string }[];
+  /** Voice-only: Audio-Aufzeichnungs-URL (Vapi signed S3) */
+  recording_url?: string | null;
+  /** Voice-only: Anruf-Kosten in EUR */
+  cost_eur?: number | null;
+  /** Voice-only: KI-extrahierte strukturierte Daten */
+  structured_data?: VoiceStructuredData | null;
+  /** Voice-only: Eskalations-Grund vom KI-Tool */
+  escalation_reason?: string | null;
+  /** Voice-only: Eskalations-Dringlichkeit */
+  escalation_urgency?: EscalationUrgency | null;
+  /** Voice-only: externe Vapi-Call-ID */
+  vapi_call_id?: string | null;
+  /** Voice-only: Anruf-Start (zeitpunkt = end-of-call) */
+  started_at?: string | null;
+  /** Voice-only: Anruf-Ende */
+  ended_at?: string | null;
 }
 
 export type TerminTyp = "erstgespraech" | "gerichtstermin" | "wiedervorlage" | "intern" | "telefon";
