@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 
 const navItems = [
+  { label: "Live-Demo", href: "#live-demo" },
   { label: "Plattform", href: "#plattform" },
   { label: "Module", href: "#module" },
-  { label: "KI-Agenten", href: "#agenten" },
   { label: "Preise", href: "#preise" },
   { label: "Onboarding", href: "#onboarding" },
 ];

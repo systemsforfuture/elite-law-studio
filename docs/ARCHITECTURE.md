@@ -78,7 +78,7 @@ Wirtschaftlich validiert in Spec §3:
 
 Spec sieht Next.js 15 vor. Wir bleiben bewusst beim Vite-Setup für v1 weil:
 
-- Existierendes Template mit Lovable-Integration funktioniert
+- Existierendes Vite-Template funktioniert produktiv und ist gut wartbar
 - Frontend ist überwiegend Marketing + Authenticated SPA — SSR nicht zwingend
 - Bei Skalierungsbedarf Migration in Sprint 4 möglich (Next.js App-Router ist API-kompatibel mit React-Router-Patterns)
 

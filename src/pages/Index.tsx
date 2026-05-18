@@ -1,6 +1,8 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import WebsitePreviewSection from "@/components/sections/WebsitePreviewSection";
+import WhatYouGetSection from "@/components/sections/WhatYouGetSection";
+import TryItYourselfSection from "@/components/sections/TryItYourselfSection";
 import PainPointsSection from "@/components/PainPointsSection";
 import ModulesSection from "@/components/sections/ModulesSection";
 import AgentsSection from "@/components/sections/AgentsSection";
@@ -30,6 +32,8 @@ const Index = () => (
     <Navbar />
     <main id="main-content" tabIndex={-1}>
     <HeroSection />
+    <TryItYourselfSection />
+    <WhatYouGetSection />
     <WebsitePreviewSection />
     <PainPointsSection />
     <ModulesSection />
