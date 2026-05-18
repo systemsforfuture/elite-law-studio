@@ -167,7 +167,7 @@ const ImportPage = () => {
                 i === step
                   ? "bg-accent/15 text-accent ring-2 ring-accent/20"
                   : i < step
-                    ? "bg-emerald-500/15 text-emerald-700"
+                    ? "status-success"
                     : "bg-muted/40 text-muted-foreground"
               }`}
             >
@@ -180,7 +180,7 @@ const ImportPage = () => {
             </div>
             {i < 4 && (
               <div
-                className={`flex-1 h-px ${i < step ? "bg-emerald-500/40" : "bg-border"}`}
+                className={`flex-1 h-px ${i < step ? "bg-[hsl(var(--status-success))]/40" : "bg-border"}`}
               />
             )}
           </div>
@@ -384,12 +384,12 @@ const ImportPage = () => {
       {/* STEP 4 — Resultat */}
       {step === 4 && result && (
         <div className="space-y-4">
-          <div className="glass-card p-12 border-emerald-500/30 bg-emerald-500/[0.04] text-center">
-            <CheckCircle2 className="h-16 w-16 text-emerald-600 mx-auto mb-4" />
+          <div className="glass-card p-12 surface-success text-center">
+            <CheckCircle2 className="h-16 w-16 text-success mx-auto mb-4" />
             <h3 className="text-2xl font-display font-bold text-foreground mb-2">
               Import abgeschlossen
             </h3>
-            <p className="text-3xl font-display font-black text-emerald-700 tabular-nums my-4">
+            <p className="text-3xl font-display font-black text-success tabular-nums my-4">
               {result.inserted} <span className="text-lg text-muted-foreground">/ {result.total}</span>
             </p>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
@@ -399,9 +399,9 @@ const ImportPage = () => {
           </div>
 
           {result.errors.length > 0 && (
-            <div className="glass-card p-6 border-amber-500/30 bg-amber-500/[0.04]">
+            <div className="glass-card p-6 surface-warning">
               <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="h-4 w-4 text-amber-600" />
+                <AlertTriangle className="h-4 w-4 text-warning" />
                 <h3 className="font-display font-bold text-foreground">
                   {result.errors.length} Zeilen mit Fehlern
                 </h3>
@@ -410,7 +410,7 @@ const ImportPage = () => {
                 {result.errors.slice(0, 20).map((e, i) => (
                   <div
                     key={i}
-                    className="flex justify-between p-2 rounded bg-background/40 border border-amber-500/15"
+                    className="flex justify-between p-2 rounded bg-background/40 border border-[hsl(var(--status-warning))]/30"
                   >
                     <span className="text-muted-foreground">Zeile {e.row}</span>
                     <span className="text-foreground">{e.reason}</span>
@@ -506,9 +506,9 @@ const Stat = ({
 }) => {
   const cls =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : accent === "amber"
-        ? "text-amber-600"
+        ? "text-warning"
         : "text-foreground";
   return (
     <div className="glass-card p-5 border-border/50">

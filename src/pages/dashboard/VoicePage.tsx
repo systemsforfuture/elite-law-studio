@@ -107,8 +107,8 @@ const VoicePage = () => {
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center ${
                         selected.richtung === "inbound"
-                          ? "bg-emerald-500/15 text-emerald-600"
-                          : "bg-sky-500/15 text-sky-600"
+                          ? "status-success"
+                          : "status-info"
                       }`}
                     >
                       {selected.richtung === "inbound" ? (
@@ -133,8 +133,8 @@ const VoicePage = () => {
                 <span
                   className={`px-3 py-1 rounded-lg text-xs font-medium ${
                     selected.status === "automated"
-                      ? "bg-emerald-500/15 text-emerald-700"
-                      : "bg-amber-500/15 text-amber-700"
+                      ? "status-success"
+                      : "status-warning"
                   }`}
                 >
                   {selected.status === "automated" ? "KI gelöst" : "Eskaliert"}
@@ -284,23 +284,23 @@ const VoicePage = () => {
               </h3>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
                   <span className="text-foreground">
                     Mandant qualifiziert
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
                   <span className="text-foreground">Termin gebucht</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
                   <span className="text-foreground">
                     Bestätigungsmail gesendet
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
                   <span className="text-foreground">
                     Mandanten-Datensatz angelegt
                   </span>
@@ -473,8 +473,8 @@ const VoicePage = () => {
                           c.intent === "spam_robocall"
                             ? "bg-muted text-muted-foreground"
                             : c.richtung === "inbound"
-                            ? "bg-emerald-500/15 text-emerald-600"
-                            : "bg-sky-500/15 text-sky-600"
+                            ? "status-success"
+                            : "status-info"
                         }`}
                       >
                         {c.intent === "spam_robocall" ? (
@@ -494,7 +494,7 @@ const VoicePage = () => {
                             {c.intent}
                           </span>
                           {c.status === "escalated" && (
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-500/15 px-2 py-0.5 rounded">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-warning bg-[hsl(var(--status-warning))]/15 px-2 py-0.5 rounded">
                               eskaliert
                             </span>
                           )}
@@ -629,9 +629,9 @@ const VoicePage = () => {
               ))}
             </div>
 
-            <div className="p-4 rounded-xl bg-amber-500/[0.04] border border-amber-500/20">
+            <div className="p-4 rounded-xl bg-[hsl(var(--status-warning))]/[0.04] border border-[hsl(var(--status-warning))]/30">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                <AlertTriangle className="h-4 w-4 text-warning shrink-0 mt-0.5" />
                 <div className="text-xs text-foreground">
                   <strong>Notfall-Hotline:</strong> {tenant.notfall_nummer}
                   <div className="text-muted-foreground mt-1">
@@ -667,9 +667,9 @@ const Stat = ({
 }) => {
   const accentClass =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : "text-foreground";
   return (
     <div className="glass-card p-5 border-border/50">

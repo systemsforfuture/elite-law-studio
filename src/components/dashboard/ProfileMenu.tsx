@@ -130,7 +130,7 @@ const ProfileMenu = () => {
 
         <DropdownMenuItem
           onSelect={handleLogout}
-          className="text-rose-600 focus:text-rose-700 focus:bg-rose-500/10"
+          className="text-critical focus:text-critical focus:bg-[hsl(var(--status-critical))]/10"
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Abmelden</span>

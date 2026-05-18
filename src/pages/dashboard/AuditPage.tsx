@@ -24,10 +24,10 @@ const actionMeta: Record<
   AuditEvent["action"],
   { label: string; icon: typeof Eye; cls: string }
 > = {
-  read: { label: "Read", icon: Eye, cls: "bg-sky-500/15 text-sky-700" },
-  create: { label: "Create", icon: Plus, cls: "bg-emerald-500/15 text-emerald-700" },
-  update: { label: "Update", icon: Pencil, cls: "bg-amber-500/15 text-amber-700" },
-  delete: { label: "Delete", icon: Trash2, cls: "bg-rose-500/15 text-rose-700" },
+  read: { label: "Read", icon: Eye, cls: "status-info" },
+  create: { label: "Create", icon: Plus, cls: "status-success" },
+  update: { label: "Update", icon: Pencil, cls: "status-warning" },
+  delete: { label: "Delete", icon: Trash2, cls: "status-critical" },
   export: {
     label: "Export",
     icon: ArrowDownToLine,
@@ -120,10 +120,10 @@ const AuditPage = () => {
   return (
     <div className="space-y-6">
       <div className="grid sm:grid-cols-3 gap-4">
-        <div className="glass-card p-5 border-emerald-500/30 bg-emerald-500/[0.04]">
+        <div className="glass-card p-5 surface-success">
           <div className="flex items-center gap-2 mb-2">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
-            <span className="text-xs uppercase tracking-wider font-semibold text-emerald-700">
+            <ShieldCheck className="h-4 w-4 text-success" />
+            <span className="text-xs uppercase tracking-wider font-semibold text-success">
               DSGVO-Status
             </span>
           </div>
@@ -153,7 +153,7 @@ const AuditPage = () => {
           </div>
           <div
             className={`text-3xl font-display font-black tabular-nums ${
-              stats.securityRelevant === 0 ? "text-emerald-600" : "text-amber-600"
+              stats.securityRelevant === 0 ? "text-success" : "text-warning"
             }`}
           >
             {stats.securityRelevant}
@@ -315,19 +315,19 @@ const AuditPage = () => {
               key={c.label}
               className={`p-3 rounded-xl border text-xs flex items-center gap-2 ${
                 c.status === "ok"
-                  ? "border-emerald-500/30 bg-emerald-500/[0.03] text-foreground"
-                  : "border-amber-500/30 bg-amber-500/[0.03] text-foreground"
+                  ? "surface-success text-foreground"
+                  : "surface-warning text-foreground"
               }`}
             >
               <span
                 className={`w-2 h-2 rounded-full ${
-                  c.status === "ok" ? "bg-emerald-500" : "bg-amber-500"
+                  c.status === "ok" ? "bg-[hsl(var(--status-success))]" : "bg-[hsl(var(--status-warning))]"
                 }`}
               />
               <span className="flex-1 font-medium">{c.label}</span>
               <span
                 className={`text-[10px] uppercase font-bold ${
-                  c.status === "ok" ? "text-emerald-700" : "text-amber-700"
+                  c.status === "ok" ? "text-success" : "text-warning"
                 }`}
               >
                 {c.status === "ok" ? "OK" : "WIP"}

@@ -28,10 +28,10 @@ const typLabel: Record<TerminTyp, string> = {
   telefon: "Telefon",
 };
 const typColor: Record<TerminTyp, string> = {
-  erstgespraech: "bg-emerald-500/15 text-emerald-700",
-  gerichtstermin: "bg-rose-500/15 text-rose-700",
-  wiedervorlage: "bg-amber-500/15 text-amber-700",
-  intern: "bg-sky-500/15 text-sky-700",
+  erstgespraech: "status-success",
+  gerichtstermin: "status-critical",
+  wiedervorlage: "status-warning",
+  intern: "status-info",
   telefon: "bg-purple-500/15 text-purple-700",
 };
 
@@ -304,7 +304,7 @@ const TerminePage = () => {
                         isImminent
                           ? "border-accent/40 bg-accent/[0.05]"
                           : isHeute
-                          ? "border-amber-500/30 bg-amber-500/[0.04]"
+                          ? "surface-warning"
                           : "border-border/50 bg-muted/20"
                       }`}
                     >
@@ -320,7 +320,7 @@ const TerminePage = () => {
                           </span>
                         )}
                         {isHeute && !isImminent && (
-                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-700">
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded status-warning">
                             heute
                           </span>
                         )}
@@ -390,7 +390,7 @@ const TerminePage = () => {
                               }
                             }}
                             disabled={confirmTermin.isPending}
-                            className="text-[10px] text-amber-700 hover:text-amber-800 disabled:opacity-50 flex items-center gap-1"
+                            className="text-[10px] text-warning hover:text-warning disabled:opacity-50 flex items-center gap-1"
                           >
                             <CheckCircle2 className="h-3 w-3" /> Bestätigen
                           </button>
@@ -403,16 +403,16 @@ const TerminePage = () => {
             </div>
           </div>
 
-          <div className="glass-card p-5 border-amber-500/30 bg-amber-500/[0.03]">
+          <div className="glass-card p-5 surface-warning">
             <h3 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
-              <Bell className="h-4 w-4 text-amber-600" />
+              <Bell className="h-4 w-4 text-warning" />
               Fristen-Wiedervorlage
             </h3>
             <div className="space-y-2">
               {upcomingFristen.slice(0, 4).map((f, i) => (
                 <div
                   key={i}
-                  className="p-2.5 rounded-lg border border-amber-500/15 bg-background/40"
+                  className="p-2.5 rounded-lg border border-[hsl(var(--status-warning))]/30 bg-background/40"
                 >
                   <div className="text-xs font-semibold text-foreground">
                     {f.titel}
@@ -420,7 +420,7 @@ const TerminePage = () => {
                   <div className="text-[10px] text-muted-foreground mt-0.5 flex justify-between">
                     <span>{f.akte.aktenzeichen}</span>
                     <span
-                      className={`tabular-nums font-bold ${f.kritisch ? "text-amber-700" : "text-foreground"}`}
+                      className={`tabular-nums font-bold ${f.kritisch ? "text-warning" : "text-foreground"}`}
                     >
                       {new Date(f.datum).toLocaleDateString("de-DE")}
                     </span>
@@ -461,11 +461,11 @@ const Stat = ({
 }) => {
   const cls =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : accent === "rose"
-      ? "text-rose-600"
+      ? "text-critical"
       : "text-foreground";
   return (
     <div className="glass-card p-5 border-border/50">

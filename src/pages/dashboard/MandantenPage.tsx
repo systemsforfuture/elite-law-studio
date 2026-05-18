@@ -33,10 +33,10 @@ import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
 import { useActivitiesForMandant } from "@/lib/queries/use-activities";
 
 const statusBadge: Record<MandantStatus, { label: string; cls: string }> = {
-  aktiv: { label: "Aktiv", cls: "bg-emerald-500/15 text-emerald-700" },
-  interessent: { label: "Interessent", cls: "bg-accent/15 text-accent" },
-  abgeschlossen: { label: "Abgeschlossen", cls: "bg-muted text-muted-foreground" },
-  archiviert: { label: "Archiviert", cls: "bg-muted text-muted-foreground/60" },
+  aktiv: { label: "Aktiv", cls: "status-success" },
+  interessent: { label: "Interessent", cls: "status-info" },
+  abgeschlossen: { label: "Abgeschlossen", cls: "status-neutral" },
+  archiviert: { label: "Archiviert", cls: "status-neutral" },
 };
 
 const herkunftLabel: Record<Mandant["herkunft"], string> = {
@@ -94,9 +94,7 @@ const MandantDetail = ({
                 {mandantName(mandant)}
               </h2>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
-                <span
-                  className={`px-2 py-0.5 rounded text-[10px] font-medium ${statusBadge[mandant.status].cls}`}
-                >
+                <span className={`status-pill ${statusBadge[mandant.status].cls}`}>
                   {statusBadge[mandant.status].label}
                 </span>
                 <span className="text-xs text-muted-foreground">
@@ -288,12 +286,12 @@ const MandantDetail = ({
                       </td>
                       <td className="py-3 text-right">
                         <span
-                          className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
+                          className={`status-pill ${
                             r.status === "bezahlt"
-                              ? "bg-emerald-500/15 text-emerald-700"
+                              ? "status-success"
                               : r.status.startsWith("mahnung")
-                              ? "bg-amber-500/15 text-amber-700"
-                              : "bg-muted text-muted-foreground"
+                                ? "status-warning"
+                                : "status-neutral"
                           }`}
                         >
                           {r.status.replace("_", " ")}
@@ -498,15 +496,16 @@ const MandantenPage = () => {
                     {herkunftLabel[m.herkunft]}
                   </td>
                   <td className="p-4">
-                    <span
-                      className={`text-[10px] uppercase font-bold px-2 py-1 rounded ${statusBadge[m.status].cls}`}
-                    >
+                    <span className={`status-pill ${statusBadge[m.status].cls}`}>
                       {statusBadge[m.status].label}
                     </span>
                   </td>
                   <td className="p-4 text-right tabular-nums">
                     {m.open_invoices_eur ? (
-                      <span className="font-semibold text-amber-700">
+                      <span
+                        className="font-semibold"
+                        style={{ color: "hsl(var(--status-warning))" }}
+                      >
                         {m.open_invoices_eur.toLocaleString("de-DE")}€
                       </span>
                     ) : (
@@ -566,7 +565,7 @@ const Mini = ({
     </div>
     <div
       className={`text-3xl font-display font-black tabular-nums ${
-        accent === "amber" ? "text-amber-600" : "text-foreground"
+        accent === "amber" ? "text-warning" : "text-foreground"
       }`}
     >
       {value}
@@ -586,11 +585,11 @@ const MStat = ({
 }) => {
   const cls =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : accent === "rose"
-      ? "text-rose-600"
+      ? "text-critical"
       : "text-foreground";
   return (
     <div className="glass-card p-4 border-border/50">

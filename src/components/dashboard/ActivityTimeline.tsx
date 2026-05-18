@@ -27,20 +27,20 @@ const meta: Record<
 > = {
   voice_call: {
     icon: Phone,
-    cls: "text-emerald-600",
-    bg: "bg-emerald-500/10",
+    cls: "text-success",
+    bg: "bg-[hsl(var(--status-success))]/10",
   },
-  email_in: { icon: Mail, cls: "text-sky-600", bg: "bg-sky-500/10" },
-  email_out: { icon: Mail, cls: "text-sky-700", bg: "bg-sky-500/15" },
+  email_in: { icon: Mail, cls: "text-info", bg: "bg-[hsl(var(--status-info))]/10" },
+  email_out: { icon: Mail, cls: "text-info", bg: "bg-[hsl(var(--status-info))]/15" },
   whatsapp: {
     icon: MessageCircle,
-    cls: "text-green-600",
+    cls: "text-success",
     bg: "bg-green-500/10",
   },
   document_upload: {
     icon: FileText,
-    cls: "text-rose-600",
-    bg: "bg-rose-500/10",
+    cls: "text-critical",
+    bg: "bg-[hsl(var(--status-critical))]/10",
   },
   document_analyzed: {
     icon: ScanLine,
@@ -49,27 +49,27 @@ const meta: Record<
   },
   termin_created: {
     icon: Calendar,
-    cls: "text-amber-600",
-    bg: "bg-amber-500/10",
+    cls: "text-warning",
+    bg: "bg-[hsl(var(--status-warning))]/10",
   },
   termin_completed: {
     icon: CheckCircle2,
-    cls: "text-emerald-700",
-    bg: "bg-emerald-500/15",
+    cls: "text-success",
+    bg: "bg-[hsl(var(--status-success))]/15",
   },
   rechnung_sent: {
     icon: Receipt,
-    cls: "text-sky-700",
-    bg: "bg-sky-500/15",
+    cls: "text-info",
+    bg: "bg-[hsl(var(--status-info))]/15",
   },
   rechnung_paid: {
     icon: CreditCard,
-    cls: "text-emerald-700",
-    bg: "bg-emerald-500/15",
+    cls: "text-success",
+    bg: "bg-[hsl(var(--status-success))]/15",
   },
   mahnung_sent: {
     icon: AlertOctagon,
-    cls: "text-orange-600",
+    cls: "text-warning",
     bg: "bg-orange-500/10",
   },
   akte_status_change: {
@@ -84,8 +84,8 @@ const meta: Record<
   },
   anwalt_note: {
     icon: StickyNote,
-    cls: "text-amber-700",
-    bg: "bg-amber-500/15",
+    cls: "text-warning",
+    bg: "bg-[hsl(var(--status-warning))]/15",
   },
   mandant_status_change: {
     icon: Cog,

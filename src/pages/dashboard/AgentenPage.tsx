@@ -37,15 +37,15 @@ const iconMap: Record<AgentSlug, typeof Mic> = {
 };
 
 const colorMap: Record<AgentSlug, { color: string; bg: string }> = {
-  voice_receptionist: { color: "text-emerald-600", bg: "bg-emerald-500/10" },
-  email_triagist: { color: "text-sky-600", bg: "bg-sky-500/10" },
+  voice_receptionist: { color: "text-success", bg: "bg-[hsl(var(--status-success))]/10" },
+  email_triagist: { color: "text-info", bg: "bg-[hsl(var(--status-info))]/10" },
   whatsapp_conversationalist: {
     color: "text-purple-600",
     bg: "bg-purple-500/10",
   },
-  dokumenten_analyst: { color: "text-amber-600", bg: "bg-amber-500/10" },
-  termin_koordinator: { color: "text-rose-600", bg: "bg-rose-500/10" },
-  mahnungs_eskalator: { color: "text-orange-600", bg: "bg-orange-500/10" },
+  dokumenten_analyst: { color: "text-warning", bg: "bg-[hsl(var(--status-warning))]/10" },
+  termin_koordinator: { color: "text-critical", bg: "bg-[hsl(var(--status-critical))]/10" },
+  mahnungs_eskalator: { color: "text-warning", bg: "bg-[hsl(var(--status-warning))]/10" },
 };
 
 const AgentenPage = () => {
@@ -199,7 +199,7 @@ const AgentenPage = () => {
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
             Auto-Quote
           </div>
-          <div className="text-3xl font-display font-black text-emerald-600 tabular-nums">
+          <div className="text-3xl font-display font-black text-success tabular-nums">
             {autoQuotePct === null ? "—" : `${autoQuotePct.toFixed(0)}%`}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
@@ -241,7 +241,7 @@ const AgentenPage = () => {
                   <span
                     className={`w-2 h-2 rounded-full shrink-0 ${
                       a.status === "aktiv"
-                        ? "bg-emerald-500 animate-pulse"
+                        ? "bg-[hsl(var(--status-success))] animate-pulse"
                         : "bg-muted"
                     }`}
                   />
@@ -449,9 +449,9 @@ const Big = ({
 }) => {
   const cls =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : "text-foreground";
   return (
     <div className="text-center p-4 rounded-xl bg-muted/20 border border-border/40">

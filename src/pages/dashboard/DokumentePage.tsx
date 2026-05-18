@@ -21,15 +21,15 @@ import { Button } from "@/components/ui/button";
 import { SkeletonRow } from "@/components/dashboard/SkeletonLoaders";
 
 const statusBadge: Record<DokumentStatus, { label: string; cls: string }> = {
-  neu: { label: "Neu", cls: "bg-sky-500/15 text-sky-700" },
+  neu: { label: "Neu", cls: "status-info" },
   ki_analysiert: {
     label: "KI-analysiert",
     cls: "bg-purple-500/15 text-purple-700",
   },
-  geprueft: { label: "Geprüft", cls: "bg-emerald-500/15 text-emerald-700" },
+  geprueft: { label: "Geprüft", cls: "status-success" },
   freigegeben: {
     label: "Freigegeben",
-    cls: "bg-emerald-500/15 text-emerald-700",
+    cls: "status-success",
   },
   veraltet: { label: "Veraltet", cls: "bg-muted text-muted-foreground" },
 };
@@ -89,8 +89,8 @@ const DokumentePage = () => {
         <div className="grid lg:grid-cols-[1fr_1.3fr] gap-6">
           <div className="glass-card p-6 border-border/50">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center shrink-0">
-                <FileText className="h-5 w-5 text-rose-600" />
+              <div className="w-12 h-12 rounded-2xl bg-[hsl(var(--status-critical))]/10 flex items-center justify-center shrink-0">
+                <FileText className="h-5 w-5 text-critical" />
               </div>
               <div className="min-w-0">
                 <h2 className="font-display font-bold text-foreground truncate">
@@ -225,25 +225,25 @@ const DokumentePage = () => {
                 </div>
 
                 {ai.kritische_klauseln && ai.kritische_klauseln.length > 0 && (
-                  <div className="glass-card p-6 border-amber-500/30 bg-amber-500/[0.03]">
+                  <div className="glass-card p-6 surface-warning">
                     <h3 className="text-sm font-display font-bold text-foreground mb-3 flex items-center gap-2">
-                      <AlertOctagon className="h-4 w-4 text-amber-600" />
+                      <AlertOctagon className="h-4 w-4 text-warning" />
                       Kritische Klauseln
                     </h3>
                     <div className="space-y-2">
                       {ai.kritische_klauseln.map((k, i) => (
                         <div
                           key={i}
-                          className="p-3 rounded-xl border border-amber-500/20 bg-background/40"
+                          className="p-3 rounded-xl border border-[hsl(var(--status-warning))]/30 bg-background/40"
                         >
                           <div className="flex items-start gap-3">
                             <span
                               className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded shrink-0 mt-0.5 ${
                                 k.risiko === "high"
-                                  ? "bg-rose-500/15 text-rose-700"
+                                  ? "status-critical"
                                   : k.risiko === "medium"
-                                  ? "bg-amber-500/15 text-amber-700"
-                                  : "bg-sky-500/15 text-sky-700"
+                                  ? "status-warning"
+                                  : "status-info"
                               }`}
                             >
                               {k.risiko}
@@ -426,11 +426,11 @@ const DokumentePage = () => {
               KI-Auto-Tagging
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <FileCheck2 className="h-3 w-3 text-emerald-600" />
+              <FileCheck2 className="h-3 w-3 text-success" />
               Akten-Zuordnung
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <ShieldCheck className="h-3 w-3 text-sky-600" />
+              <ShieldCheck className="h-3 w-3 text-info" />
               Pro-Tenant verschlüsselt
             </div>
           </div>
@@ -487,8 +487,8 @@ const DokumentePage = () => {
                     className="w-full text-left p-4 hover:bg-muted/20 transition-colors"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center shrink-0">
-                        <FileText className="h-4 w-4 text-rose-600" />
+                      <div className="w-10 h-10 rounded-xl bg-[hsl(var(--status-critical))]/10 flex items-center justify-center shrink-0">
+                        <FileText className="h-4 w-4 text-critical" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -537,11 +537,11 @@ const Stat = ({
 }) => {
   const cls =
     accent === "emerald"
-      ? "text-emerald-600"
+      ? "text-success"
       : accent === "purple"
       ? "text-purple-600"
       : accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : "text-foreground";
   return (
     <div className="glass-card p-5 border-border/50">

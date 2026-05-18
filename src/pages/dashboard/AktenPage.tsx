@@ -310,9 +310,9 @@ const AktenPage = () => {
                           <span
                             className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded ${
                               strategie.status === "freigegeben"
-                                ? "bg-emerald-500/15 text-emerald-700"
+                                ? "status-success"
                                 : strategie.status === "review"
-                                ? "bg-amber-500/15 text-amber-700"
+                                ? "status-warning"
                                 : "bg-muted text-muted-foreground"
                             }`}
                           >
@@ -376,10 +376,10 @@ const AktenPage = () => {
                           <span
                             className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded shrink-0 mt-0.5 ${
                               r.risiko === "high"
-                                ? "bg-rose-500/15 text-rose-700"
+                                ? "status-critical"
                                 : r.risiko === "medium"
-                                ? "bg-amber-500/15 text-amber-700"
-                                : "bg-sky-500/15 text-sky-700"
+                                ? "status-warning"
+                                : "status-info"
                             }`}
                           >
                             {r.risiko}
@@ -421,26 +421,26 @@ const AktenPage = () => {
                         </div>
                         <div className="grid sm:grid-cols-2 gap-3">
                           <div>
-                            <div className="text-[10px] uppercase tracking-wider font-semibold text-emerald-700 mb-1.5">
+                            <div className="text-[10px] uppercase tracking-wider font-semibold text-success mb-1.5">
                               Pro
                             </div>
                             <ul className="space-y-1 text-xs text-foreground">
                               {o.pros.map((p) => (
                                 <li key={p} className="flex gap-2">
-                                  <span className="text-emerald-600">+</span>
+                                  <span className="text-success">+</span>
                                   {p}
                                 </li>
                               ))}
                             </ul>
                           </div>
                           <div>
-                            <div className="text-[10px] uppercase tracking-wider font-semibold text-rose-700 mb-1.5">
+                            <div className="text-[10px] uppercase tracking-wider font-semibold text-critical mb-1.5">
                               Contra
                             </div>
                             <ul className="space-y-1 text-xs text-foreground">
                               {o.cons.map((c) => (
                                 <li key={c} className="flex gap-2">
-                                  <span className="text-rose-600">−</span>
+                                  <span className="text-critical">−</span>
                                   {c}
                                 </li>
                               ))}
@@ -547,13 +547,13 @@ const AktenPage = () => {
                   key={i}
                   className={`flex items-center justify-between p-4 rounded-xl border ${
                     f.kritisch
-                      ? "border-amber-500/30 bg-amber-500/[0.03]"
+                      ? "surface-warning"
                       : "border-border/50 bg-muted/20"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     {f.kritisch && (
-                      <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      <AlertTriangle className="h-4 w-4 text-warning" />
                     )}
                     <div>
                       <div className="text-sm font-semibold text-foreground">
@@ -566,7 +566,7 @@ const AktenPage = () => {
                   </div>
                   <div
                     className={`text-sm font-bold tabular-nums ${
-                      f.kritisch ? "text-amber-700" : "text-foreground"
+                      f.kritisch ? "text-warning" : "text-foreground"
                     }`}
                   >
                     {new Date(f.datum).toLocaleDateString("de-DE")}
@@ -704,7 +704,7 @@ const AktenPage = () => {
                         {a.titel}
                       </h3>
                       {kritisch && (
-                        <span className="text-[10px] font-bold uppercase text-amber-700 bg-amber-500/15 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold uppercase text-warning bg-[hsl(var(--status-warning))]/15 px-2 py-0.5 rounded">
                           Kritische Frist
                         </span>
                       )}
@@ -783,7 +783,7 @@ const Stat = ({
 }) => {
   const cls =
     accent === "amber"
-      ? "text-amber-600"
+      ? "text-warning"
       : accent === "purple"
       ? "text-purple-600"
       : "text-foreground";
