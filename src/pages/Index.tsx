@@ -21,7 +21,14 @@ import ExitIntentPopup from "@/components/ExitIntentPopup";
 
 const Index = () => (
   <div className="min-h-screen">
+    <a
+      href="#main-content"
+      className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-accent focus:text-navy-dark focus:shadow-xl focus:font-medium focus:text-sm"
+    >
+      Zum Hauptinhalt springen
+    </a>
     <Navbar />
+    <main id="main-content" tabIndex={-1}>
     <HeroSection />
     <WebsitePreviewSection />
     <PainPointsSection />
@@ -39,6 +46,7 @@ const Index = () => (
     <FaqSection />
     <SalesCTASection />
     <Footer />
+    </main>
     <StickyCta />
     <ExitIntentPopup />
   </div>
