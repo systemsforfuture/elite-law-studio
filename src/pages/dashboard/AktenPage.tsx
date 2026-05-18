@@ -29,10 +29,13 @@ import {
   useStrategienQuery,
 } from "@/lib/queries/use-akten";
 import { useActivitiesForAkte } from "@/lib/queries/use-activities";
+import { useDecryptedSections } from "@/lib/queries/use-encrypted-strategie";
 import type { Akte, AktenStufe, AktenStatus } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
 import EmptyState from "@/components/dashboard/EmptyState";
+import EncryptionUnlockDialog from "@/components/dashboard/EncryptionUnlockDialog";
+import { Lock } from "lucide-react";
 import { toast } from "sonner";
 
 const stufenSeq: AktenStufe[] = [
@@ -63,8 +66,10 @@ const AktenPage = () => {
   const [iterationPrompt, setIterationPrompt] = useState("");
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<AktenStatus | "all">("all");
+  const [unlockOpen, setUnlockOpen] = useState(false);
   const { data: akten = [] } = useAktenQuery();
   const { data: strategie } = useStrategieQuery(selected?.id);
+  const decryption = useDecryptedSections(strategie ?? null);
   const { data: allStrategien = [] } = useStrategienQuery();
   const { data: acts = [] } = useActivitiesForAkte(selected?.id);
   const generateStrategie = useGenerateStrategie();
@@ -353,21 +358,63 @@ const AktenPage = () => {
                   </div>
                 </div>
 
+                {decryption.encrypted && (
+                  <div className="surface-info p-3 flex items-center gap-2 text-xs">
+                    <Lock className="h-3.5 w-3.5 text-info shrink-0" />
+                    <span className="text-foreground/85">
+                      Diese Strategie ist Mandatsgeheimnis-verschlüsselt.
+                      {decryption.sections ? " Sichtbar nur in dieser Session." : null}
+                    </span>
+                  </div>
+                )}
+
+                {decryption.locked && (
+                  <div className="surface-warning p-5 text-center space-y-3">
+                    <Lock className="h-6 w-6 text-warning mx-auto" />
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">
+                        Strategie ist verschlüsselt
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Bitte entsperren Sie die Verschlüsselung mit Ihrer
+                        Passphrase, um den Inhalt zu sehen.
+                      </p>
+                    </div>
+                    <Button size="sm" onClick={() => setUnlockOpen(true)}>
+                      Entsperren
+                    </Button>
+                  </div>
+                )}
+
+                {decryption.failed && (
+                  <div className="surface-critical p-5 text-center">
+                    <div className="text-sm font-semibold text-foreground mb-1">
+                      Entschlüsselung fehlgeschlagen
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Der DEK passt nicht zu dieser Strategie. Eventuell mit
+                      einem anderen Tenant verschlüsselt, oder Daten korrumpiert.
+                    </p>
+                  </div>
+                )}
+
+                {decryption.sections && (<>
+
                 <Section title="Sachverhalt">
                   <p className="text-sm text-foreground/85 leading-relaxed">
-                    {strategie.sections.sachverhalt}
+                    {decryption.sections.sachverhalt}
                   </p>
                 </Section>
 
                 <Section title="Rechtliche Einordnung">
                   <p className="text-sm text-foreground/85 leading-relaxed">
-                    {strategie.sections.rechtliche_einordnung}
+                    {decryption.sections.rechtliche_einordnung}
                   </p>
                 </Section>
 
                 <Section title="Risiken">
                   <div className="space-y-2">
-                    {strategie.sections.risiken.map((r, i) => (
+                    {decryption.sections.risiken.map((r, i) => (
                       <div
                         key={i}
                         className="p-4 rounded-xl border border-border/50 bg-muted/20"
@@ -400,7 +447,7 @@ const AktenPage = () => {
 
                 <Section title="Handlungsoptionen">
                   <div className="space-y-3">
-                    {strategie.sections.handlungsoptionen.map((o, i) => (
+                    {decryption.sections.handlungsoptionen.map((o, i) => (
                       <div
                         key={i}
                         className={`p-5 rounded-2xl border ${
@@ -454,21 +501,21 @@ const AktenPage = () => {
 
                 <Section title="Empfohlene Strategie" highlight>
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
-                    {strategie.sections.empfohlene_strategie}
+                    {decryption.sections.empfohlene_strategie}
                   </p>
                 </Section>
 
-                {strategie.sections.schriftsatz_skizze && (
+                {decryption.sections.schriftsatz_skizze && (
                   <Section title="Schriftsatz-Skizze">
                     <pre className="text-xs text-foreground/85 leading-relaxed whitespace-pre-wrap font-sans">
-                      {strategie.sections.schriftsatz_skizze}
+                      {decryption.sections.schriftsatz_skizze}
                     </pre>
                   </Section>
                 )}
 
                 <Section title="Nächste Schritte">
                   <div className="space-y-2">
-                    {strategie.sections.naechste_schritte.map((s, i) => (
+                    {decryption.sections.naechste_schritte.map((s, i) => (
                       <div
                         key={i}
                         className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-muted/20"
@@ -486,6 +533,8 @@ const AktenPage = () => {
                     ))}
                   </div>
                 </Section>
+
+                </>)}
 
                 <div className="glass-card p-6 border-border/50">
                   <div className="flex items-center gap-2 mb-3">
@@ -743,6 +792,7 @@ const AktenPage = () => {
       )}
       </>
       )}
+      <EncryptionUnlockDialog open={unlockOpen} onOpenChange={setUnlockOpen} />
     </div>
   );
 };
