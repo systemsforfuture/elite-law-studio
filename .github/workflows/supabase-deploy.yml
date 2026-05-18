@@ -86,6 +86,15 @@ jobs:
           supabase functions deploy import-data
           supabase functions deploy send-message
           supabase functions deploy stripe-checkout
+          supabase functions deploy assistant-chat
+          # Setup/Integrationen (User-JWT, Owner-only)
+          supabase functions deploy provision-voice-number
+          supabase functions deploy update-voice-assistant
+          supabase functions deploy voice-test-call
+          supabase functions deploy link-whatsapp-number
+          supabase functions deploy verify-email-domain
+          supabase functions deploy connect-stripe
+          supabase functions deploy seed-demo-data
           # öffentlich (Marketing-Forms / Onboarding ohne Login)
           supabase functions deploy capture-lead --no-verify-jwt
           supabase functions deploy create-tenant --no-verify-jwt

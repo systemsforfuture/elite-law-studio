@@ -23,6 +23,7 @@
 import { handleCors, corsHeaders } from "../_shared/cors.ts";
 import { supabaseAdmin } from "../_shared/supabase-admin.ts";
 import { normalizePhone, requireSignature } from "../_shared/webhook-utils.ts";
+import { notifyEscalation } from "../_shared/notifications.ts";
 
 // ─────────────────────────────────────────────────────────────────
 // Typen
@@ -409,9 +410,34 @@ const toolEscalateToLawyer = async (ctx: ToolCtx, params: Record<string, unknown
     link_to: konv ? { module: "voice", id: konv.id } : undefined,
   });
 
-  // 3) Out-of-band Notification (Email + SMS) wird in PR2 implementiert.
-  //    Hier bereits der TODO-Marker damit klar wird wo der Hook hinkommt.
-  // TODO(PR2): await notifyOwnerOfEscalation(ctx, { grund, dringlichkeit, konv })
+  // 3) Out-of-band Notification (Email + SMS) — fire-and-forget damit der
+  //    Tool-Call innerhalb der Vapi-Latenz-Grenze (< 5s) bleibt. Channel-
+  //    Fehler werden geloggt, brechen aber den Anruf-Flow nie.
+  //
+  //    Anrufer-Nummer + Mandant-Name werden für den Mail-Body geladen.
+  let anrufer_nummer: string | null = null;
+  let mandant_name: string | null = null;
+  if (ctx.mandant_id) {
+    const { data: m } = await ctx.admin
+      .from("mandanten")
+      .select("vorname, nachname, firmenname, telefon")
+      .eq("id", ctx.mandant_id)
+      .maybeSingle();
+    if (m) {
+      mandant_name =
+        m.firmenname ?? `${m.vorname ?? ""} ${m.nachname ?? ""}`.trim() || null;
+      anrufer_nummer = m.telefon ?? null;
+    }
+  }
+  notifyEscalation({
+    tenant_id: ctx.tenant_id,
+    konversation_id: konv?.id ?? null,
+    grund,
+    dringlichkeit,
+    anrufer_nummer,
+    mandant_name,
+    vapi_call_id: ctx.vapi_call_id,
+  }).catch((e) => console.error("[notifyEscalation] failed:", e));
 
   const message =
     dringlichkeit === "sofort_durchstellen"
