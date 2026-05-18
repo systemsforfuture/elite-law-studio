@@ -1,0 +1,1 @@
+const s=(e,t=new Date)=>{const n=new Date(e);return n.getFullYear()===t.getFullYear()&&n.getMonth()===t.getMonth()&&n.getDate()===t.getDate()},a=(e,t)=>{const n=new Date(e).getTime();return Date.now()-n<=t*36e5},r=(e,t)=>a(e,t*24),o=(e=new Date)=>{const t=e.getHours();return t<5?"Noch wach":t<11?"Guten Morgen":t<18?"Guten Tag":"Guten Abend"};export{a,r as b,o as g,s as i};
