@@ -176,9 +176,15 @@ const DEFAULT_TESTIMONIALS: KanzleiTestimonial[] = [
 ];
 
 const DEFAULT_CONFIG: KanzleiConfig = {
-  firma: "Ihre Kanzlei",
-  ort: "Deutschland",
-  rechtsgebiet: "Wirtschaftsrecht",
+  // NOTE (Jarvis 2026-05-18): Diese Defaults sind im Master-Repo intentional die
+  // gleichen "Bergmann"-Strings wie in den swap_fields der DB. Der per-Lead-Build
+  // (apps/core/src/skills/systems-lead-template-build) macht Mass-Search-Replace
+  // — d.h. die Defaults werden zu Lead-spezifischen Werten umgeschrieben BEFORE
+  // vite build. Wer das Master-Repo standalone betreibt, sieht weiterhin die
+  // generische "Kanzlei Bergmann"-Demo.
+  firma: "Kanzlei Bergmann",
+  ort: "Berlin",
+  rechtsgebiet: "Familienrecht",
   anwaelte: 15,
   domain: null,
   leadId: null,

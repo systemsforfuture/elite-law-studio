@@ -34,7 +34,13 @@ const ErrorFallback = () => (
   </div>
 );
 
-// Eager: critical landing routes (first paint matters)
+// Eager: critical landing routes (first paint matters).
+// `/` ist die per-Lead Kanzlei-Vorschau (Jarvis systems-lead-template-build
+// klont das Repo + macht Search-Replace auf VorschauPage's DEFAULT_CONFIG +
+// deployed nach systemsforfuture.github.io/<lead-slug>/). Der Lead sieht
+// damit auf der Root-URL DIREKT seine personalisierte Kanzlei-Seite.
+// Die alte SYSTEMS-SaaS-Sales-Page bleibt auf `/sales` erreichbar.
+import VorschauPage from "./pages/VorschauPage.tsx";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -99,7 +105,8 @@ const App = () => (
           <BrowserRouter>
             <Suspense fallback={<RouteFallback />}>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<VorschauPage />} />
+                <Route path="/sales" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/onboarding" element={<Onboarding />} />
