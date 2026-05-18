@@ -22,6 +22,8 @@ import {
   Plug,
   HeartPulse,
   Search,
+  Globe,
+  ExternalLink,
 } from "lucide-react";
 import { useTenant } from "@/contexts/TenantContext";
 import { useRealtimeSubscriptions, useRealtimeToasts } from "@/lib/queries/use-realtime";
@@ -43,7 +45,14 @@ import { useDocumentTitle } from "@/hooks/use-document-title";
 
 interface NavGroup {
   label: string;
-  items: { to: string; icon: typeof Phone; label: string; badge?: string | number }[];
+  items: {
+    to: string;
+    icon: typeof Phone;
+    label: string;
+    badge?: string | number;
+    /** Wenn true: external link in new tab, kein Router-NavLink */
+    external?: boolean;
+  }[];
 }
 
 const buildNavGroups = (badges: {
@@ -54,7 +63,15 @@ const buildNavGroups = (badges: {
 }): NavGroup[] => [
   {
     label: "Übersicht",
-    items: [{ to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" }],
+    items: [
+      { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+      {
+        to: "/template/kanzlei",
+        icon: Globe,
+        label: "Meine Webseite",
+        external: true,
+      },
+    ],
   },
   {
     label: "KI-Operations",
@@ -240,42 +257,60 @@ const DashboardLayout = () => {
                 {g.label}
               </div>
               <div className="space-y-1">
-                {g.items.map(({ to, icon: Icon, label, badge }) => (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    end={to === "/dashboard"}
-                    onClick={() => setSidebarOpen(false)}
-                    className={({ isActive }) =>
-                      `w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
-                        isActive
-                          ? "bg-accent/10 text-accent"
-                          : "text-primary-foreground/40 hover:text-primary-foreground/70 hover:bg-white/[0.03]"
-                      }`
-                    }
-                  >
-                    {({ isActive }) => (
-                      <>
+                {g.items.map(({ to, icon: Icon, label, badge, external }) => {
+                  if (external) {
+                    return (
+                      <a
+                        key={to}
+                        href={to}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setSidebarOpen(false)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 text-primary-foreground/40 hover:text-primary-foreground/70 hover:bg-white/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+                      >
                         <Icon className="h-4 w-4" />
                         <span className="flex-1 text-left">{label}</span>
-                        {badge && (
-                          <span
-                            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                              isActive
-                                ? "bg-accent/20 text-accent"
-                                : "bg-white/[0.04] text-primary-foreground/40"
-                            }`}
-                          >
-                            {badge}
-                          </span>
-                        )}
-                        {isActive && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                        )}
-                      </>
-                    )}
-                  </NavLink>
-                ))}
+                        <ExternalLink className="h-3 w-3 text-primary-foreground/30" />
+                      </a>
+                    );
+                  }
+                  return (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      end={to === "/dashboard"}
+                      onClick={() => setSidebarOpen(false)}
+                      className={({ isActive }) =>
+                        `w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 ${
+                          isActive
+                            ? "bg-accent/10 text-accent"
+                            : "text-primary-foreground/40 hover:text-primary-foreground/70 hover:bg-white/[0.03]"
+                        }`
+                      }
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <Icon className="h-4 w-4" />
+                          <span className="flex-1 text-left">{label}</span>
+                          {badge && (
+                            <span
+                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                isActive
+                                  ? "bg-accent/20 text-accent"
+                                  : "bg-white/[0.04] text-primary-foreground/40"
+                              }`}
+                            >
+                              {badge}
+                            </span>
+                          )}
+                          {isActive && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                          )}
+                        </>
+                      )}
+                    </NavLink>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -312,7 +347,7 @@ const DashboardLayout = () => {
       )}
 
       <div className="flex-1 lg:ml-72 min-w-0">
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-2xl border-b border-border/50 h-16 flex items-center px-3 sm:px-6 justify-between gap-2">
+        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/60 h-16 flex items-center px-3 sm:px-6 justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             <button
               className="lg:hidden text-foreground p-2 rounded-xl hover:bg-muted transition-colors shrink-0"

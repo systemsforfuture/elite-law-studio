@@ -105,8 +105,18 @@ const App = () => (
           <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
             <Suspense fallback={<RouteFallback />}>
               <Routes>
-                <Route path="/" element={<VorschauPage />} />
+                {/*
+                 * Routing-Klarheit:
+                 *   /            → SYSTEMS Sales (für Anwälte, die SYSTEMS kaufen sollen)
+                 *   /vorschau    → personalisierte Kanzlei-Demo aus Cold-Outreach
+                 *                  (URL-Params füllen firma/ort/etc. → Anwalt sieht
+                 *                  seine eigene zukünftige Webseite mit echten Daten)
+                 *   /template/kanzlei → generische Kanzlei-Template-Demo zum Anschauen
+                 *   /sales       → Alias auf Index für externe Links
+                 */}
+                <Route path="/" element={<Index />} />
                 <Route path="/sales" element={<Index />} />
+                <Route path="/vorschau" element={<VorschauPage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/onboarding" element={<Onboarding />} />
