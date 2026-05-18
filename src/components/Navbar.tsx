@@ -74,16 +74,18 @@ const Navbar = () => {
         </div>
 
         <button
-          className="md:hidden text-primary-foreground p-2 rounded-xl hover:bg-white/10 transition-colors"
+          className="md:hidden text-primary-foreground p-2 rounded-xl hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Menü"
+          aria-label={mobileOpen ? "Menü schließen" : "Menü öffnen"}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav-menu"
         >
           {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden glass-nav border-t border-white/[0.08]">
+        <div id="mobile-nav-menu" className="md:hidden glass-nav border-t border-white/[0.08]">
           <div className="container mx-auto px-6 py-6 flex flex-col gap-2">
             {navItems.map(({ label, href }) => (
               <a

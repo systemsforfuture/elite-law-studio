@@ -76,14 +76,19 @@ const HeroSection = () => {
             <Link to="/onboarding">
               <Button variant="hero" className="rounded-2xl glow-gold group">
                 <Sparkles className="mr-2 h-5 w-5" />
-                Live-Demo in 30 Sekunden
+                In 24h Ihre Kanzlei live
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
             </Link>
-            <a href="#preise">
+            <a
+              href="/template/kanzlei"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Demo-Webseite einer Beispiel-Kanzlei in neuem Tab öffnen"
+            >
               <Button variant="hero-outline" className="rounded-2xl group">
                 <Phone className="mr-2 h-4 w-4" />
-                Preise ansehen
+                Demo-Webseite ansehen
               </Button>
             </a>
           </div>
