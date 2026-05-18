@@ -1,4 +1,5 @@
 import { Scale } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const Footer = () => {
@@ -50,9 +51,9 @@ const Footer = () => {
           © {new Date().getFullYear()} {copyright_name}. Alle Rechte vorbehalten.
         </p>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-primary-foreground/30">
-          <span title="Demo-Vorschau – im Live-Betrieb durch die Kanzlei zu pflegen" className="cursor-help">Datenschutzerklärung</span>
-          <span title="Demo-Vorschau – im Live-Betrieb durch die Kanzlei zu pflegen" className="cursor-help">Impressum</span>
-          <span title="Demo-Vorschau – im Live-Betrieb durch die Kanzlei zu pflegen" className="cursor-help">AGB</span>
+          <Link to="/datenschutz" className="hover:text-primary-foreground/70 transition">Datenschutzerklärung</Link>
+          <Link to="/impressum" className="hover:text-primary-foreground/70 transition">Impressum</Link>
+          <Link to="/agb" className="hover:text-primary-foreground/70 transition">AGB</Link>
         </div>
       </div>
     </div>
