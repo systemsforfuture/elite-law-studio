@@ -4,40 +4,16 @@ import teamBergmann from "@/assets/team-bergmann.jpg";
 import teamWeber from "@/assets/team-weber.jpg";
 import teamRichter from "@/assets/team-richter.jpg";
 import teamMueller from "@/assets/team-mueller.jpg";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
-const team = [
-  {
-    name: "Dr. Alexander Bergmann",
-    role: "Gründungspartner · Fachanwalt für Handelsrecht",
-    image: teamBergmann,
-    specialties: ["Unternehmensrecht", "M&A", "Gesellschaftsrecht"],
-    quote: "Ihr Recht ist keine Verhandlungssache.",
-  },
-  {
-    name: "Dr. Katharina Weber",
-    role: "Partnerin · Fachanwältin für Familienrecht",
-    image: teamWeber,
-    specialties: ["Familienrecht", "Erbrecht", "Mediation"],
-    quote: "Familien verdienen Lösungen, keine Schlachtfelder.",
-  },
-  {
-    name: "Maximilian Richter",
-    role: "Senior Associate · Fachanwalt für Arbeitsrecht",
-    image: teamRichter,
-    specialties: ["Arbeitsrecht", "Kündigungsschutz", "Abfindungen"],
-    quote: "Kein Arbeitnehmer sollte Unrecht hinnehmen.",
-  },
-  {
-    name: "Dr. Sophie Müller",
-    role: "Partnerin · Fachanwältin für Strafrecht",
-    image: teamMueller,
-    specialties: ["Strafrecht", "Wirtschaftsstrafrecht", "Compliance"],
-    quote: "Jeder verdient eine Verteidigung auf Augenhöhe.",
-  },
-];
+// Fallback-Asset-Mapping nach Position (Dev-Mode ohne übergebene Images).
+// Bei Lead-Generierung können stattdessen über config.team[i].image
+// externe URLs (z.B. /lawyer-X.jpg im Lead-Repo) gesetzt werden.
+const FALLBACK_IMAGES = [teamBergmann, teamWeber, teamRichter, teamMueller];
 
 const TeamSection = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const { team } = useKanzleiConfig();
 
   return (
     <section id="team" className="py-32 bg-background relative overflow-hidden">
@@ -69,7 +45,7 @@ const TeamSection = () => {
             >
               <div className="aspect-[3/4] overflow-hidden">
                 <img
-                  src={member.image}
+                  src={member.image ?? FALLBACK_IMAGES[i % FALLBACK_IMAGES.length]}
                   alt={member.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"

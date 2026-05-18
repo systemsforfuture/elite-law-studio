@@ -1,9 +1,11 @@
 import { Cpu, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const SystemsBadge = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const { brand_with } = useKanzleiConfig();
 
   useEffect(() => {
     const t = setTimeout(() => setCollapsed(true), 8000);
@@ -30,7 +32,7 @@ const SystemsBadge = () => {
             SYSTEMS-Demo
           </span>
           <span className="text-xs text-primary-foreground/80">
-            White-Label-Funnel für Kanzlei Bergmann
+            White-Label-Funnel für {brand_with}
           </span>
         </span>
         <ArrowLeft

@@ -1,25 +1,29 @@
 import { Scale } from "lucide-react";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
-const Footer = () => (
+const Footer = () => {
+  const config = useKanzleiConfig();
+  const { display_name, copyright_name, footer_tagline, rechtsgebiete, contact } = config;
+  return (
   <footer className="bg-navy-dark text-primary-foreground relative overflow-hidden">
     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-    
+
     <div className="container mx-auto px-6 py-20">
       <div className="grid md:grid-cols-4 gap-12">
         <div className="md:col-span-1">
           <div className="flex items-center gap-3 mb-5">
             <Scale className="h-7 w-7 text-accent" />
-            <span className="text-lg font-display font-bold tracking-wide">KANZLEI BERGMANN</span>
+            <span className="text-lg font-display font-bold tracking-wide">{display_name}</span>
           </div>
           <p className="text-sm text-primary-foreground/40 leading-relaxed">
-            Ihre vertrauenswürdige Kanzlei für Familienrecht, Arbeitsrecht und Vertragsrecht seit 1998.
+            {footer_tagline}
           </p>
         </div>
 
         {[
           {
             title: "Rechtsgebiete",
-            items: ["Familienrecht", "Arbeitsrecht", "Vertragsrecht", "Erbrecht"],
+            items: rechtsgebiete,
           },
           {
             title: "Kanzlei",
@@ -27,7 +31,7 @@ const Footer = () => (
           },
           {
             title: "Kontakt",
-            items: ["Friedrichstraße 123", "10117 Berlin", "+49 30 123 456 78", "info@kanzlei-bergmann.de"],
+            items: [contact.address_line, contact.city_line, contact.phone, contact.email],
           },
         ].map(({ title, items }) => (
           <div key={title}>
@@ -43,7 +47,7 @@ const Footer = () => (
 
       <div className="mt-16 pt-8 border-t border-white/[0.06] flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-xs text-primary-foreground/30">
-          © {new Date().getFullYear()} Kanzlei Bergmann. Alle Rechte vorbehalten.
+          © {new Date().getFullYear()} {copyright_name}. Alle Rechte vorbehalten.
         </p>
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-primary-foreground/30">
           <span title="Demo-Vorschau – im Live-Betrieb durch die Kanzlei zu pflegen" className="cursor-help">Datenschutzerklärung</span>
@@ -53,6 +57,7 @@ const Footer = () => (
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;

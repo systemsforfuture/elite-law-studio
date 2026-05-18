@@ -1,6 +1,7 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { X, Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const without = [
   "Unsicherheit über Ihre Erfolgschancen",
@@ -22,6 +23,7 @@ const with_lawyer = [
 
 const ComparisonSection = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const { brand_with } = useKanzleiConfig();
 
   return (
     <section className="py-32 bg-background relative overflow-hidden">
@@ -80,7 +82,7 @@ const ComparisonSection = () => {
               <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center">
                 <Check className="h-5 w-5 text-accent" />
               </div>
-              <h3 className="text-lg font-display font-bold text-foreground">Mit Kanzlei Bergmann</h3>
+              <h3 className="text-lg font-display font-bold text-foreground">Mit {brand_with}</h3>
             </div>
             <ul className="space-y-4">
               {with_lawyer.map((item) => (

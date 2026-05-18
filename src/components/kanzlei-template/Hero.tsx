@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Award, Users, Star, Phone } from "lucide-react";
 import { useCountUp, useScrollAnimation } from "@/hooks/use-scroll-animation";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const HeroSection = () => {
+  const config = useKanzleiConfig();
   const { ref, isVisible } = useScrollAnimation(0.1);
   const clients = useCountUp(5000, 2500, true);
   const rate = useCountUp(97, 2000, true);
@@ -36,7 +38,7 @@ const HeroSection = () => {
               ))}
             </div>
             <span className="text-xs font-medium text-accent/90 tracking-wide">
-              4.9/5 · 247 Google Bewertungen
+              {config.isPreview ? "Beispiel-Bewertungen · Ihre echten Daten kommen hier" : "4.9/5 · 247 Google Bewertungen"}
             </span>
           </div>
 
@@ -45,8 +47,8 @@ const HeroSection = () => {
             className="text-[2.75rem] sm:text-5xl md:text-7xl lg:text-[5.5rem] font-display font-black text-primary-foreground leading-[1.05] tracking-[-0.04em] mb-8 opacity-0 break-words hyphens-auto"
             style={{ animation: 'blur-in 1s ease-out 0.4s forwards' }}
           >
-            Ihr Recht.{" "}
-            <span className="text-gradient-gold">Unsere Mission.</span>
+            {config.isPreview ? `${config.firma}` : "Ihr Recht."}{" "}
+            <span className="text-gradient-gold">{config.isPreview ? "— Ihre neue Website." : "Unsere Mission."}</span>
           </h1>
 
           {/* Subheading — problem-focused, not generic */}
@@ -54,8 +56,10 @@ const HeroSection = () => {
             className="text-lg md:text-xl text-primary-foreground/50 leading-relaxed mb-12 max-w-xl font-light opacity-0"
             style={{ animation: 'blur-in 0.8s ease-out 0.6s forwards' }}
           >
-            Ob Kündigung, Erbstreit oder Vertragsproblem — wir setzen Ihr Recht durch. 
-            Über 5.000 Mandanten vertrauen uns bereits.
+            {config.rechtsgebiet !== "Wirtschaftsrecht"
+              ? `Ihre Kanzlei für ${config.rechtsgebiet} in ${config.ort} — jetzt digital und mandantenfreundlich.`
+              : "Ob Kündigung, Erbstreit oder Vertragsproblem — wir setzen Ihr Recht durch."
+            }
           </p>
 
           {/* Dual CTA — primary + secondary */}
@@ -69,7 +73,7 @@ const HeroSection = () => {
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
             </a>
-            <a href="tel:+493012345678" className="w-full sm:w-auto">
+            <a href="mailto:systems.future@pm.me" className="w-full sm:w-auto">
               <Button variant="hero-outline" className="rounded-2xl group w-full sm:w-auto">
                 <Phone className="mr-2 h-4 w-4" />
                 Sofort anrufen

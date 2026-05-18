@@ -34,7 +34,7 @@ const StickyCta = () => {
           </div>
 
           <div className="flex items-center gap-3 flex-1 sm:flex-none justify-end">
-            <a href="tel:+493012345678" className="hidden md:block">
+            <a href="mailto:systems.future@pm.me" className="hidden md:block">
               <Button variant="hero-outline" size="sm" className="rounded-xl text-xs">
                 <Phone className="mr-1.5 h-3 w-3" />
                 Sofort anrufen

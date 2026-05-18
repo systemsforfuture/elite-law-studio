@@ -4,10 +4,12 @@ import { Phone, Mail, MapPin, Clock, ArrowRight, CheckCircle, Shield, Star } fro
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCaptureLead } from "@/lib/queries/use-capture-lead";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const ContactSection = () => {
   const { ref, isVisible } = useScrollAnimation();
   const captureLead = useCaptureLead();
+  const { contact } = useKanzleiConfig();
   const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", phone: "", message: "", rechtsgebiet: "" });
   const sending = captureLead.isPending;
 
@@ -80,10 +82,10 @@ const ContactSection = () => {
 
             <div className="space-y-4">
               {[
-                { icon: Phone, label: "+49 30 123 456 78", href: "tel:+493012345678" },
-                { icon: Mail, label: "info@kanzlei-bergmann.de", href: "mailto:info@kanzlei-bergmann.de" },
-                { icon: MapPin, label: "Friedrichstraße 123, 10117 Berlin" },
-                { icon: Clock, label: "Mo–Fr: 09:00 – 18:00 Uhr" },
+                { icon: Phone, label: contact.phone, href: `tel:${contact.phone.replace(/[^+\d]/g, "")}` },
+                { icon: Mail, label: contact.email, href: `mailto:${contact.email}` },
+                { icon: MapPin, label: `${contact.address_line}, ${contact.city_line}` },
+                { icon: Clock, label: contact.hours },
               ].map(({ icon: Icon, label, href }, i) => (
                 <a
                   key={label}

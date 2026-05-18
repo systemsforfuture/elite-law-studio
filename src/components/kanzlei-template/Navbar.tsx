@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import { Scale, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { firma, rechtsgebiet, isPreview } = useKanzleiConfig();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -29,10 +31,10 @@ const Navbar = () => {
           </div>
           <div>
             <span className="text-xl font-display font-bold text-primary-foreground tracking-wide">
-              KANZLEI BERGMANN
+              {isPreview ? firma.toUpperCase() : "KANZLEI BERGMANN"}
             </span>
             <span className="block text-[10px] text-gold-light tracking-[0.3em] uppercase">
-              Rechtsanwälte
+              {isPreview ? rechtsgebiet : "Rechtsanwälte"}
             </span>
           </div>
         </Link>

@@ -1,55 +1,10 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Star, Quote, CheckCircle, ShieldCheck } from "lucide-react";
-
-const testimonials = [
-  {
-    name: "Dr. Michael Schneider",
-    role: "Geschäftsführer, Schneider GmbH",
-    text: "Kanzlei Bergmann hat unsere Unternehmensrestrukturierung mit beeindruckender Expertise begleitet. Die strategische Beratung war erstklassig – wir konnten über 2,3 Mio. Euro sichern.",
-    rating: 5,
-    image: "https://randomuser.me/api/portraits/men/42.jpg",
-    caseType: "Unternehmensrecht",
-    verified: true,
-    date: "vor 2 Wochen",
-    platform: "Google",
-  },
-  {
-    name: "Sarah Keller",
-    role: "Marketing Direktorin",
-    text: "Nach meiner Kündigung fühlte ich mich hilflos. Herr Bergmann hat nicht nur eine faire Abfindung von 85.000€ verhandelt, sondern mir auch menschlich Halt gegeben. Absolute Empfehlung.",
-    rating: 5,
-    image: "https://randomuser.me/api/portraits/women/65.jpg",
-    caseType: "Arbeitsrecht",
-    verified: true,
-    date: "vor 1 Monat",
-    platform: "Google",
-  },
-  {
-    name: "Thomas Braun",
-    role: "Unternehmer",
-    text: "Die Erbschaftsangelegenheit unserer Familie war komplex und emotional. Frau Dr. Weber hat mit Fingerspitzengefühl eine Lösung gefunden, die alle Seiten zufriedenstellt.",
-    rating: 5,
-    image: "https://randomuser.me/api/portraits/men/55.jpg",
-    caseType: "Erbrecht",
-    verified: true,
-    date: "vor 3 Wochen",
-    platform: "Google",
-  },
-  {
-    name: "Anna-Lena Fischer",
-    role: "Ärztin, Praxisinhaberin",
-    text: "Bei meinem Mietrechtsstreit ging es um meine Praxisräume – meine Existenz. Kanzlei Bergmann hat vor Gericht alles gegeben und gewonnen. Professionell, schnell, souverän.",
-    rating: 5,
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
-    caseType: "Immobilienrecht",
-    verified: true,
-    date: "vor 5 Tagen",
-    platform: "Google",
-  },
-];
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const TestimonialsSection = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const { testimonials } = useKanzleiConfig();
 
   return (
     <section className="py-32 bg-navy-dark relative overflow-hidden">

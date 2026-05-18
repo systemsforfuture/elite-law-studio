@@ -38,7 +38,7 @@ const CtaBanner = () => {
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </a>
-            <a href="tel:+493012345678">
+            <a href="mailto:systems.future@pm.me">
               <Button variant="hero-outline" className="rounded-2xl group text-base px-8 py-6">
                 <Phone className="mr-2 h-5 w-5" />
                 Sofort anrufen

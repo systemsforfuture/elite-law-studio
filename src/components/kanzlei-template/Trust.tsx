@@ -1,6 +1,7 @@
 import { useScrollAnimation } from "@/hooks/use-scroll-animation";
 import { Shield, Clock, Award, TrendingUp, Lock, HeartHandshake, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useKanzleiConfig } from "@/pages/VorschauPage";
 
 const trustPoints = [
   { icon: Shield, title: "Anwaltsgeheimnis", desc: "Absolute Vertraulichkeit in jedem Fall" },
@@ -13,6 +14,7 @@ const trustPoints = [
 
 const TrustSection = () => {
   const { ref, isVisible } = useScrollAnimation();
+  const { brand_with } = useKanzleiConfig();
 
   return (
     <section className="py-32 bg-card relative overflow-hidden">
@@ -26,7 +28,7 @@ const TrustSection = () => {
               Warum wir
             </span>
             <h2 className="text-4xl md:text-5xl font-display font-black text-foreground mt-3 mb-6 tracking-[-0.03em]">
-              Ihr Vorteil mit <span className="text-gradient-gold">Kanzlei Bergmann</span>
+              Ihr Vorteil mit <span className="text-gradient-gold">{brand_with}</span>
             </h2>
             <p className="text-muted-foreground text-lg font-light leading-relaxed mb-8">
               Wir kombinieren juristische Exzellenz mit modernem Service – damit Sie sich auf das Wesentliche konzentrieren können.
