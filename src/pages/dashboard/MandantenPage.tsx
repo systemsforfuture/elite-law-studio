@@ -22,6 +22,8 @@ import {
 import type { Mandant, MandantStatus } from "@/data/types";
 import { Button } from "@/components/ui/button";
 import ActivityTimeline from "@/components/dashboard/ActivityTimeline";
+import MandantStandCard from "@/components/dashboard/MandantStandCard";
+import MandantUnifiedTimeline from "@/components/dashboard/MandantUnifiedTimeline";
 import { useMandantenQuery } from "@/lib/queries/use-mandanten";
 import NewMandantDialog from "@/components/dashboard/NewMandantDialog";
 import EmptyState from "@/components/dashboard/EmptyState";
@@ -30,6 +32,7 @@ import { Loader2, UserPlus } from "lucide-react";
 import { useAktenQuery } from "@/lib/queries/use-akten";
 import { useKonversationenQuery } from "@/lib/queries/use-konversationen";
 import { useRechnungenQuery } from "@/lib/queries/use-rechnungen";
+import { useTermineQuery } from "@/lib/queries/use-termine";
 import { useActivitiesForMandant } from "@/lib/queries/use-activities";
 
 const statusBadge: Record<MandantStatus, { label: string; cls: string }> = {
@@ -48,7 +51,7 @@ const herkunftLabel: Record<Mandant["herkunft"], string> = {
   import: "Migration",
 };
 
-type DetailTab = "ueberblick" | "aktivitaet" | "akten" | "kommunikation" | "rechnungen";
+type DetailTab = "stand" | "timeline" | "akten" | "rechnungen";
 
 const MandantDetail = ({
   mandant,
@@ -57,16 +60,18 @@ const MandantDetail = ({
   mandant: Mandant;
   onBack: () => void;
 }) => {
-  const [tab, setTab] = useState<DetailTab>("ueberblick");
+  const [tab, setTab] = useState<DetailTab>("stand");
   const { data: akten = [] } = useAktenQuery();
   const { data: konversationen = [] } = useKonversationenQuery();
   const { data: rechnungen = [] } = useRechnungenQuery();
+  const { data: termine = [] } = useTermineQuery();
   const { data: acts = [] } = useActivitiesForMandant(mandant.id);
   const aktenForMandant = akten.filter((a) => a.mandant_id === mandant.id);
   const konvForMandant = konversationen.filter(
     (k) => k.mandant_id === mandant.id,
   );
   const rechForMandant = rechnungen.filter((r) => r.mandant_id === mandant.id);
+  const termineForMandant = termine.filter((t) => t.mandant_id === mandant.id);
   const anwalt = findUser(mandant.zugewiesener_anwalt_id);
 
   return (
@@ -154,10 +159,14 @@ const MandantDetail = ({
       <div className="flex items-center gap-1 border-b border-border/50 overflow-x-auto">
         {(
           [
-            { v: "ueberblick" as const, label: "Überblick", icon: User },
-            { v: "aktivitaet" as const, label: "Aktivität", icon: ActivityIcon, count: acts.length },
+            { v: "stand" as const, label: "Stand", icon: User },
+            {
+              v: "timeline" as const,
+              label: "Verlauf",
+              icon: ActivityIcon,
+              count: konvForMandant.length + acts.length + termineForMandant.length + rechForMandant.length,
+            },
             { v: "akten" as const, label: "Akten", icon: Folder, count: aktenForMandant.length },
-            { v: "kommunikation" as const, label: "Kommunikation", icon: InboxIcon, count: konvForMandant.length },
             { v: "rechnungen" as const, label: "Rechnungen", icon: ReceiptIcon, count: rechForMandant.length },
           ]
         ).map((t) => {
@@ -189,24 +198,23 @@ const MandantDetail = ({
         })}
       </div>
 
-      {tab === "ueberblick" && (
-        <div className="grid sm:grid-cols-3 gap-4">
-          <Mini label="Aktive Akten" value={String(aktenForMandant.filter((a) => a.status === "in_bearbeitung").length)} />
-          <Mini
-            label="Konversationen"
-            value={String(konvForMandant.length)}
-            sub="Email · WhatsApp · Voice"
-          />
-          <Mini
-            label="Offene Rechnungen"
-            value={`${(mandant.open_invoices_eur ?? 0).toLocaleString("de-DE")}€`}
-            accent={(mandant.open_invoices_eur ?? 0) > 0 ? "amber" : undefined}
-          />
-        </div>
+      {tab === "stand" && (
+        <MandantStandCard
+          mandant={mandant}
+          akten={aktenForMandant}
+          konversationen={konvForMandant}
+          rechnungen={rechForMandant}
+          termine={termineForMandant}
+        />
       )}
 
-      {tab === "aktivitaet" && (
-        <ActivityTimeline activities={acts} emptyText="Keine Aktivitäten zu diesem Mandanten." />
+      {tab === "timeline" && (
+        <MandantUnifiedTimeline
+          activities={acts}
+          konversationen={konvForMandant}
+          termine={termineForMandant}
+          rechnungen={rechForMandant}
+        />
       )}
 
       {tab === "akten" && (
@@ -228,31 +236,6 @@ const MandantDetail = ({
                   </div>
                   <ArrowUpRight className="h-4 w-4 text-muted-foreground/60" />
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {tab === "kommunikation" && (
-        <div className="space-y-2">
-          {konvForMandant.length === 0 ? (
-            <p className="text-sm text-muted-foreground italic">Noch keine Konversation.</p>
-          ) : (
-            konvForMandant.map((k) => (
-              <div
-                key={k.id}
-                className="glass-card p-4 border-border/50 hover:border-accent/30 transition-all"
-              >
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <span className="text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/10 px-2 py-0.5 rounded">
-                    {k.kanal}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground font-mono">
-                    {new Date(k.zeitpunkt).toLocaleString("de-DE")}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground">{k.preview}</p>
               </div>
             ))
           )}

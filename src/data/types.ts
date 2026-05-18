@@ -127,6 +127,8 @@ export interface Konversation {
   zeitpunkt: string;
   betreff?: string;
   preview: string;
+  /** Voller Body / Transcript-Text wenn vorhanden. Fallback wenn keine messages-Liste da ist. */
+  inhalt?: string | null;
   ai_handled: boolean;
   eskaliert_an?: string;
   dauer_sek?: number;
