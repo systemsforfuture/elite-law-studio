@@ -35,6 +35,7 @@ import { CommandPalette, useCommandPalette } from "@/components/dashboard/Comman
 import KeyboardShortcutsModal, { useKeyboardShortcutsModal } from "@/components/dashboard/KeyboardShortcutsModal";
 import ThemeToggle from "@/components/dashboard/ThemeToggle";
 import NotificationsDropdown from "@/components/dashboard/NotificationsDropdown";
+import EncryptionIndicator from "@/components/dashboard/EncryptionIndicator";
 import WelcomeTour from "@/components/dashboard/WelcomeTour";
 import ProfileMenu from "@/components/dashboard/ProfileMenu";
 import AssistantWidget from "@/components/dashboard/AssistantWidget";
@@ -398,6 +399,7 @@ const DashboardLayout = () => {
                   : `${tokensLabel} · ${tierPct.toFixed(0)}%`}
               </span>
             </Link>
+            <EncryptionIndicator />
             <ThemeToggle />
             <NotificationsDropdown />
             <ProfileMenu />
