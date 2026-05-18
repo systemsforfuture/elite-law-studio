@@ -24,10 +24,7 @@ export interface Tenant {
   subscription_status: SubscriptionStatus;
   rechtsgebiete: string[];
   inhaber_name: string;
-  /** Anwalts-Notfall-Hotline (z.B. Mobil) — Transfer-Ziel bei „sofort_durchstellen" durch KI */
   notfall_nummer?: string;
-  /** KI-Telefonnummer (Vapi/Voice-Provider). Anrufer landen bei der KI-Empfangskraft. */
-  voice_phone_number?: string;
   onboarded_at: string;
   /** Mock-only: in DB nicht persistiert; in Production aus useMandantenQuery().length zu lesen */
   mandanten_count?: number;
@@ -141,13 +138,13 @@ export interface Konversation {
   cost_eur?: number | null;
   /** Voice-only: KI-extrahierte strukturierte Daten */
   structured_data?: VoiceStructuredData | null;
-  /** Voice-only: Eskalations-Grund vom KI-Tool */
+  /** Voice-only: Eskalations-Grund */
   escalation_reason?: string | null;
   /** Voice-only: Eskalations-Dringlichkeit */
   escalation_urgency?: EscalationUrgency | null;
   /** Voice-only: externe Vapi-Call-ID */
   vapi_call_id?: string | null;
-  /** Voice-only: Anruf-Start (zeitpunkt = end-of-call) */
+  /** Voice-only: Anruf-Start */
   started_at?: string | null;
   /** Voice-only: Anruf-Ende */
   ended_at?: string | null;
