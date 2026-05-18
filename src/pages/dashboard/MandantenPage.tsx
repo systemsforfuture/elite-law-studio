@@ -298,6 +298,8 @@ const MandantenPage = () => {
   const [selected, setSelected] = useState<Mandant | null>(null);
   const [newDialog, setNewDialog] = useState(false);
   const { data: mandanten = [], isLoading } = useMandantenQuery();
+  const { data: aktenAll = [] } = useAktenQuery();
+  const { data: konversationenAll = [] } = useKonversationenQuery();
 
   const filtered = useMemo(() => {
     return mandanten.filter((m) => {
@@ -330,25 +332,30 @@ const MandantenPage = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <MStat label="Gesamt" value={stats.total.toString()} />
         <MStat
-          label="Aktiv"
+          label="Gesamt"
+          value={stats.total.toString()}
+          sub={`${stats.abgeschlossen} abgeschlossen`}
+        />
+        <MStat
+          label="Aktive Mandate"
           value={stats.aktiv.toString()}
-          accent="emerald"
+          severity={stats.aktiv > 0 ? "success" : undefined}
         />
         <MStat
           label="Interessenten"
           value={stats.interessent.toString()}
-          accent="amber"
+          sub="warten auf Erstgespräch"
+          severity={stats.interessent > 0 ? "warning" : undefined}
         />
         <MStat
           label="Offene Forderungen"
           value={
             stats.offeneForderungen === 0
               ? "—"
-              : `${stats.offeneForderungen.toLocaleString("de-DE")}€`
+              : `${stats.offeneForderungen.toLocaleString("de-DE")} €`
           }
-          accent={stats.offeneForderungen > 0 ? "rose" : undefined}
+          severity={stats.offeneForderungen > 0 ? "critical" : undefined}
         />
       </div>
 
@@ -422,88 +429,148 @@ const MandantenPage = () => {
         </div>
       ) : (
 
-      <div className="glass-card border-border/50 overflow-hidden">
+      <div className="surface overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-xs uppercase tracking-wider text-muted-foreground/70 bg-muted/20">
+            <thead className="text-[11px] uppercase tracking-wider text-muted-foreground/80 bg-muted/15 border-b border-border/40">
               <tr>
-                <th className="text-left p-4 font-semibold">Name</th>
-                <th className="text-left p-4 font-semibold">Kontakt</th>
-                <th className="text-left p-4 font-semibold">Rechtsgebiet</th>
-                <th className="text-left p-4 font-semibold">Herkunft</th>
-                <th className="text-left p-4 font-semibold">Status</th>
-                <th className="text-right p-4 font-semibold">Offene Rechnung</th>
+                <th className="text-left px-4 py-3 font-semibold">Mandant</th>
+                <th className="text-left px-4 py-3 font-semibold">Rechtsgebiet</th>
+                <th className="text-center px-4 py-3 font-semibold">Akten</th>
+                <th className="text-left px-4 py-3 font-semibold">Letzter Kontakt</th>
+                <th className="text-left px-4 py-3 font-semibold">Status</th>
+                <th className="text-left px-4 py-3 font-semibold">Herkunft</th>
+                <th className="text-right px-4 py-3 font-semibold">Offen</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((m) => (
-                <tr
-                  key={m.id}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Mandant ${mandantName(m)} öffnen`}
-                  onClick={() => setSelected(m)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setSelected(m);
-                    }
-                  }}
-                  className="border-t border-border/30 hover:bg-muted/20 transition-colors cursor-pointer focus:outline-none focus:bg-accent/[0.04]"
-                >
-                  <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-navy/10 flex items-center justify-center">
-                        {m.typ === "unternehmen" ? (
-                          <Building2 className="h-4 w-4 text-navy" />
-                        ) : (
-                          <User className="h-4 w-4 text-navy" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground">
-                          {mandantName(m)}
+              {filtered.map((m) => {
+                const aktiveAkten = aktenAll.filter(
+                  (a) =>
+                    a.mandant_id === m.id &&
+                    a.status !== "abgeschlossen" &&
+                    a.status !== "archiviert",
+                ).length;
+                const lastKonv = konversationenAll
+                  .filter((k) => k.mandant_id === m.id)
+                  .sort((a, b) => b.zeitpunkt.localeCompare(a.zeitpunkt))[0];
+                const lastTs = lastKonv?.zeitpunkt ?? m.last_contact;
+                const lastDays = Math.floor(
+                  (Date.now() - new Date(lastTs).getTime()) / 86_400_000,
+                );
+                return (
+                  <tr
+                    key={m.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Mandant ${mandantName(m)} öffnen`}
+                    onClick={() => setSelected(m)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelected(m);
+                      }
+                    }}
+                    className="border-t border-border/30 hover:bg-muted/15 transition-colors cursor-pointer focus:outline-none focus:bg-muted/30"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-muted/40 border border-border/50 flex items-center justify-center shrink-0">
+                          {m.typ === "unternehmen" ? (
+                            <Building2 className="h-4 w-4 text-muted-foreground" />
+                          ) : (
+                            <User className="h-4 w-4 text-muted-foreground" />
+                          )}
                         </div>
-                        <div className="text-[10px] text-muted-foreground capitalize">
-                          {m.typ}
+                        <div className="min-w-0">
+                          <div className="font-medium text-foreground truncate">
+                            {mandantName(m)}
+                          </div>
+                          <div className="text-[11px] text-muted-foreground truncate">
+                            {m.email || m.telefon || "—"}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="p-4 text-muted-foreground text-xs">
-                    <div>{m.email}</div>
-                    <div>{m.telefon}</div>
-                  </td>
-                  <td className="p-4 text-foreground">{m.rechtsgebiet ?? "—"}</td>
-                  <td className="p-4 text-muted-foreground">
-                    {herkunftLabel[m.herkunft]}
-                  </td>
-                  <td className="p-4">
-                    <span className={`status-pill ${statusBadge[m.status].cls}`}>
-                      {statusBadge[m.status].label}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right tabular-nums">
-                    {m.open_invoices_eur ? (
-                      <span
-                        className="font-semibold"
-                        style={{ color: "hsl(var(--status-warning))" }}
+                    </td>
+                    <td className="px-4 py-3 text-foreground/85">
+                      {m.rechtsgebiet ?? <span className="text-muted-foreground">—</span>}
+                    </td>
+                    <td className="px-4 py-3 text-center tabular-nums">
+                      {aktiveAkten > 0 ? (
+                        <span className="font-medium text-foreground">{aktiveAkten}</span>
+                      ) : (
+                        <span className="text-muted-foreground/60">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-foreground/85">
+                      <div
+                        className={
+                          lastDays > 60
+                            ? "text-muted-foreground"
+                            : "text-foreground"
+                        }
                       >
-                        {m.open_invoices_eur.toLocaleString("de-DE")}€
+                        {lastDays <= 0
+                          ? "heute"
+                          : lastDays === 1
+                            ? "gestern"
+                            : lastDays < 30
+                              ? `vor ${lastDays} T`
+                              : lastDays < 365
+                                ? `vor ${Math.floor(lastDays / 30)} Mon`
+                                : "—"}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground/70 font-mono">
+                        {new Date(lastTs).toLocaleDateString("de-DE", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "2-digit",
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`status-pill ${statusBadge[m.status].cls}`}
+                      >
+                        {statusBadge[m.status].label}
                       </span>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground text-[12px]">
+                      {herkunftLabel[m.herkunft]}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {m.open_invoices_eur ? (
+                        <span
+                          className="font-medium"
+                          style={{ color: "hsl(var(--status-warning))" }}
+                        >
+                          {m.open_invoices_eur.toLocaleString("de-DE")} €
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground/60">—</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-        <div className="p-4 border-t border-border/40 flex justify-between items-center text-xs text-muted-foreground">
+        <div className="px-4 py-2.5 border-t border-border/40 flex justify-between items-center text-[11px] text-muted-foreground bg-muted/10">
           <span>
             {filtered.length} von {mandanten.length} Mandanten
           </span>
+          {statusFilter !== "all" || query ? (
+            <button
+              onClick={() => {
+                setQuery("");
+                setStatusFilter("all");
+              }}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Filter zurücksetzen
+            </button>
+          ) : null}
         </div>
       </div>
       )}
@@ -560,28 +627,36 @@ const Mini = ({
 const MStat = ({
   label,
   value,
-  accent,
+  sub,
+  severity,
 }: {
   label: string;
   value: string;
-  accent?: "emerald" | "amber" | "rose";
+  sub?: string;
+  severity?: "success" | "warning" | "critical";
 }) => {
-  const cls =
-    accent === "emerald"
-      ? "text-success"
-      : accent === "amber"
-      ? "text-warning"
-      : accent === "rose"
-      ? "text-critical"
-      : "text-foreground";
+  const colorVar =
+    severity === "success"
+      ? "hsl(var(--status-success))"
+      : severity === "warning"
+        ? "hsl(var(--status-warning))"
+        : severity === "critical"
+          ? "hsl(var(--status-critical))"
+          : undefined;
   return (
-    <div className="glass-card p-4 border-border/50">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
+    <div className="surface p-4">
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         {label}
       </div>
-      <div className={`text-2xl font-display font-black tabular-nums ${cls}`}>
+      <div
+        className="text-[22px] font-display font-bold tabular-nums leading-none tracking-tight"
+        style={colorVar ? { color: colorVar } : { color: "hsl(var(--foreground))" }}
+      >
         {value}
       </div>
+      {sub && (
+        <div className="text-[11px] text-muted-foreground/80 mt-1">{sub}</div>
+      )}
     </div>
   );
 };
