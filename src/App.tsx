@@ -35,11 +35,10 @@ const ErrorFallback = () => (
 );
 
 // Eager: critical landing routes (first paint matters).
-// `/` ist die per-Lead Kanzlei-Vorschau (Jarvis systems-lead-template-build
-// klont das Repo + macht Search-Replace auf VorschauPage's DEFAULT_CONFIG +
-// deployed nach systemsforfuture.github.io/<lead-slug>/). Der Lead sieht
-// damit auf der Root-URL DIREKT seine personalisierte Kanzlei-Seite.
-// Die alte SYSTEMS-SaaS-Sales-Page bleibt auf `/sales` erreichbar.
+// `/` bleibt die SYSTEMS-Sales-Page; Maillinks mit ?firma= oder ?lead=
+// rendern dort direkt die personalisierte Kanzlei-Vorschau, weil GitHub Pages
+// tiefe SPA-Routen sonst als HTTP 404 ausliefert.
+// `/sales` bleibt als expliziter Alias fuer externe Links erhalten.
 import VorschauPage from "./pages/VorschauPage.tsx";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
@@ -86,6 +85,16 @@ const RouteFallback = () => (
   </div>
 );
 
+const RootRoute = () => {
+  const params =
+    typeof window === "undefined"
+      ? new URLSearchParams()
+      : new URLSearchParams(window.location.search);
+  const isMailedPreview = Boolean(params.get("firma") || params.get("lead"));
+
+  return isMailedPreview ? <VorschauPage /> : <Index />;
+};
+
 const App = () => (
   <ErrorBoundary fallback={<ErrorFallback />}>
   <QueryClientProvider client={queryClient}>
@@ -107,14 +116,14 @@ const App = () => (
               <Routes>
                 {/*
                  * Routing-Klarheit:
-                 *   /            → SYSTEMS Sales (für Anwälte, die SYSTEMS kaufen sollen)
+                 *   /            → SYSTEMS Sales, oder mit ?firma= direkt Vorschau
                  *   /vorschau    → personalisierte Kanzlei-Demo aus Cold-Outreach
                  *                  (URL-Params füllen firma/ort/etc. → Anwalt sieht
                  *                  seine eigene zukünftige Webseite mit echten Daten)
                  *   /template/kanzlei → generische Kanzlei-Template-Demo zum Anschauen
                  *   /sales       → Alias auf Index für externe Links
                  */}
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<RootRoute />} />
                 <Route path="/sales" element={<Index />} />
                 <Route path="/vorschau" element={<VorschauPage />} />
                 <Route path="/login" element={<Login />} />

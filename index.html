@@ -47,10 +47,77 @@
     <!-- Preconnect für externe Ressourcen -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+      .preflight-fallback {
+        min-height: 100vh;
+        background: #0d1626;
+        color: #f7f3ec;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        padding: 48px 24px;
+      }
+
+      .preflight-fallback__inner {
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .preflight-fallback__eyebrow {
+        color: #c4b8a4;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .preflight-fallback h1 {
+        max-width: 680px;
+        margin: 18px 0 18px;
+        font-size: clamp(36px, 8vw, 72px);
+        line-height: 0.96;
+      }
+
+      .preflight-fallback p,
+      .preflight-fallback li {
+        color: rgba(247, 243, 236, 0.78);
+        font-size: 17px;
+        line-height: 1.65;
+      }
+
+      .preflight-fallback ul {
+        display: grid;
+        gap: 10px;
+        margin: 28px 0 0;
+        padding-left: 20px;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="preflight-fallback" aria-label="SYSTEMS Anwalt AI Vorschau">
+        <div class="preflight-fallback__inner">
+          <p class="preflight-fallback__eyebrow">SYSTEMS Anwalt AI</p>
+          <h1>Kanzlei-Automation für moderne Rechtsberatung.</h1>
+          <p>
+            Diese Vorschau zeigt eine kundenfähige SYSTEMS-Plattform für Kanzleien:
+            Voice-Agent, KI-Inbox, Termin-Koordination, Mahnwesen,
+            Dokumenten-Analyse und Mandantenportal in einer Oberfläche.
+          </p>
+          <ul>
+            <li>Mandantenanfragen werden erfasst, priorisiert und an das Kanzlei-Team übergeben.</li>
+            <li>Fristen, Rückfragen und Dokumente bleiben nachvollziehbar im Portal.</li>
+            <li>Die Seite rendert im Browser personalisiert aus den URL-Daten der Vorschau.</li>
+          </ul>
+        </div>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
