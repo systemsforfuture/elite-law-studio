@@ -3,6 +3,7 @@ import { Palette, Globe, Mic, Sparkles, ExternalLink, Loader2 } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { useTenant } from "@/contexts/TenantContext";
 import { useUpdateBranding } from "@/lib/queries/use-tenant";
+import { useUpdateVoiceAssistant } from "@/lib/queries/use-provider-config";
 import { toast } from "sonner";
 import type { Tonalitaet } from "@/data/types";
 
@@ -17,9 +18,13 @@ const BrandingPage = () => {
     tenant.branding_config.greeting ?? "",
   );
   const updateBranding = useUpdateBranding();
+  const resyncVoice = useUpdateVoiceAssistant();
 
   const handleSave = async () => {
     const t = toast.loading("Branding wird gespeichert…");
+    const voiceTouched =
+      tonalitaet !== tenant.branding_config.tonalitaet ||
+      greeting !== (tenant.branding_config.greeting ?? "");
     try {
       await updateBranding.mutateAsync({
         primary_color: primary,
@@ -27,10 +32,37 @@ const BrandingPage = () => {
         tonalitaet,
         greeting,
       });
-      toast.success("Branding gespeichert", {
-        id: t,
-        description: "Voice-Engine + Mandanten-Portal nutzen ab sofort die neuen Werte.",
-      });
+      // Wenn Voice-relevante Felder geändert wurden: Vapi-Assistant resyncen.
+      // Sonst sagt Anna beim nächsten Anruf weiterhin das Alte.
+      if (voiceTouched) {
+        try {
+          const res = await resyncVoice.mutateAsync({
+            tonalitaet,
+            greeting: greeting || undefined,
+          });
+          toast.success("Branding gespeichert", {
+            id: t,
+            description: res.ok
+              ? "Voice-KI ist neu konfiguriert. Beim nächsten Anruf gelten die neuen Werte."
+              : `Branding gespeichert, aber Voice-Resync fehlgeschlagen: ${
+                  res.message ?? "—"
+                }`,
+          });
+        } catch (e) {
+          toast.warning("Branding gespeichert, Voice-KI nicht aktualisiert", {
+            id: t,
+            description:
+              e instanceof Error
+                ? e.message
+                : "Bitte unter Integrationen → 'Voice-KI neu konfigurieren' erneut versuchen.",
+          });
+        }
+      } else {
+        toast.success("Branding gespeichert", {
+          id: t,
+          description: "Mandanten-Portal nutzt ab sofort die neuen Werte.",
+        });
+      }
     } catch (err) {
       toast.error("Speichern fehlgeschlagen", {
         id: t,
