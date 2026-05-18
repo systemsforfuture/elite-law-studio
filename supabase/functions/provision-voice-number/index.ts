@@ -144,10 +144,18 @@ Deno.serve(async (req) => {
       assistantId?: string;
     };
 
-    // Final speichern
+    // Final speichern — in einem einzigen UPDATE damit Top-Level-Felder für
+    // Webhook-Resolve (voice_phone_number + voice_phone_number_id) und
+    // provider_config.voice für die UI konsistent persistiert werden.
+    //
+    // WICHTIG: notfall_nummer NICHT überschreiben. Das ist die Anwalts-Hotline
+    // für Transfer bei "sofort_durchstellen" — eine Vapi-Nummer dort wäre ein
+    // KI-zu-KI-Loop. Owner setzt die Hotline separat im Onboarding.
     await admin
       .from("tenants")
       .update({
+        voice_phone_number: result.number,
+        voice_phone_number_id: result.id,
         provider_config: {
           ...baseCfg,
           voice: {
@@ -162,12 +170,6 @@ Deno.serve(async (req) => {
           },
         },
       })
-      .eq("id", ctx.tenant_id);
-
-    // Als notfall_nummer speichern, damit webhook-vapi den Tenant findet
-    await admin
-      .from("tenants")
-      .update({ notfall_nummer: result.number })
       .eq("id", ctx.tenant_id);
 
     // Audit-Log: Provisioning-Erfolg
